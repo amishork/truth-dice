@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ValueCard } from '@/components/ValueCard';
 import { ValuePair } from '@/components/ValuePair';
+import { ValuesChat } from '@/components/ValuesChat';
 
 const CORE_VALUES = [
   'Affection (love and caring)', 'Caring', 'Dependability', 'Forgiveness', 
@@ -458,91 +459,99 @@ const Index = () => {
 
   const DiceScreen = () => {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <Dices className="w-16 h-16 mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl font-bold mb-2">Explore Your Values</h2>
-            <p className="text-muted-foreground">
-              Roll the dice to explore your values in different contexts
-            </p>
-          </div>
+      <div className="min-h-screen flex flex-col lg:flex-row">
+        {/* Left column - Dice & Values */}
+        <div className="lg:w-1/2 w-full flex flex-col items-center justify-start p-6 lg:overflow-y-auto lg:max-h-screen">
+          <div className="max-w-md w-full space-y-8">
+            <div className="text-center">
+              <Dices className="w-16 h-16 mx-auto mb-4 text-primary" />
+              <h2 className="text-2xl font-bold mb-2">Explore Your Values</h2>
+              <p className="text-muted-foreground">
+                Roll the dice to explore your values in different contexts
+              </p>
+            </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-card rounded-xl p-6 text-center shadow-lg">
-              <p className="text-sm text-muted-foreground mb-2">Value</p>
-              <div className={`min-h-20 flex items-center justify-center ${isRolling ? 'animate-dice-roll' : ''}`}>
-                <p className="font-semibold text-lg">
-                  {dice1Result || '?'}
-                </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-card rounded-xl p-6 text-center shadow-lg">
+                <p className="text-sm text-muted-foreground mb-2">Value</p>
+                <div className={`min-h-20 flex items-center justify-center ${isRolling ? 'animate-dice-roll' : ''}`}>
+                  <p className="font-semibold text-lg">
+                    {dice1Result || '?'}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="bg-card rounded-xl p-6 text-center shadow-lg">
+                <p className="text-sm text-muted-foreground mb-2">Context</p>
+                <div className={`min-h-20 flex items-center justify-center ${isRolling ? 'animate-dice-roll' : ''}`}>
+                  <p className="font-semibold text-lg">
+                    {dice2Result || '?'}
+                  </p>
+                </div>
               </div>
             </div>
-            
-            <div className="bg-card rounded-xl p-6 text-center shadow-lg">
-              <p className="text-sm text-muted-foreground mb-2">Context</p>
-              <div className={`min-h-20 flex items-center justify-center ${isRolling ? 'animate-dice-roll' : ''}`}>
-                <p className="font-semibold text-lg">
-                  {dice2Result || '?'}
-                </p>
-              </div>
+
+            <Button
+              onClick={rollDice}
+              disabled={isRolling}
+              size="lg"
+              className="w-full bg-gradient-to-r from-primary to-accent"
+            >
+              <Dices className="mr-2 h-5 w-5" />
+              Roll Dice
+            </Button>
+
+            <div className="bg-muted rounded-xl p-4">
+              <h3 className="font-semibold mb-2 text-sm">Your Core Values:</h3>
+              <ul className="space-y-1 text-sm">
+                {finalSixValues.map((value, index) => (
+                  <li key={index} className="flex items-center">
+                    <Heart className="w-4 h-4 mr-2 text-primary" />
+                    {value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-card rounded-xl p-6 space-y-4">
+              <h3 className="font-semibold text-lg text-center mb-4">Transform Your Life</h3>
+              
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-primary/10"
+                asChild
+              >
+                <a href="#" className="no-underline">
+                  <span className="font-semibold text-base">Define Your Personal Values Workshop</span>
+                  <span className="text-xs text-muted-foreground">
+                    Deep dive into understanding and living your values
+                  </span>
+                  <ExternalLink className="w-4 h-4 absolute top-4 right-4" />
+                </a>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-primary/10"
+                asChild
+              >
+                <a href="#" className="no-underline">
+                  <span className="font-semibold text-base">Family Foundations Journey</span>
+                  <span className="text-xs text-muted-foreground">
+                    3 workshops to transform your family with your values
+                  </span>
+                  <ExternalLink className="w-4 h-4 absolute top-4 right-4" />
+                </a>
+              </Button>
             </div>
           </div>
+        </div>
 
-          <Button
-            onClick={rollDice}
-            disabled={isRolling}
-            size="lg"
-            className="w-full bg-gradient-to-r from-primary to-accent"
-          >
-            <Dices className="mr-2 h-5 w-5" />
-            Roll Dice
-          </Button>
-
-          <div className="bg-muted rounded-xl p-4">
-            <h3 className="font-semibold mb-2 text-sm">Your Core Values:</h3>
-            <ul className="space-y-1 text-sm">
-              {finalSixValues.map((value, index) => (
-                <li key={index} className="flex items-center">
-                  <Heart className="w-4 h-4 mr-2 text-primary" />
-                  {value}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="bg-card rounded-xl p-6 space-y-4">
-            <h3 className="font-semibold text-lg text-center mb-4">Transform Your Life</h3>
-            
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-primary/10"
-              asChild
-            >
-              <a href="#" className="no-underline">
-                <span className="font-semibold text-base">Define Your Personal Values Workshop</span>
-                <span className="text-xs text-muted-foreground">
-                  Deep dive into understanding and living your values
-                </span>
-                <ExternalLink className="w-4 h-4 absolute top-4 right-4" />
-              </a>
-            </Button>
-
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full h-auto py-4 flex flex-col items-start gap-2 hover:bg-primary/10"
-              asChild
-            >
-              <a href="#" className="no-underline">
-                <span className="font-semibold text-base">Family Foundations Journey</span>
-                <span className="text-xs text-muted-foreground">
-                  3 workshops to transform your family with your values
-                </span>
-                <ExternalLink className="w-4 h-4 absolute top-4 right-4" />
-              </a>
-            </Button>
-          </div>
+        {/* Right column - AI Chat */}
+        <div className="lg:w-1/2 w-full border-t lg:border-t-0 lg:border-l border-border bg-card/30 flex flex-col min-h-[400px] lg:min-h-0 lg:max-h-screen">
+          <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} />
         </div>
       </div>
     );
