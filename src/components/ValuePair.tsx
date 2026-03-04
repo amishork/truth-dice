@@ -15,27 +15,29 @@ export const ValuePair: React.FC<ValuePairProps> = ({
   title
 }) => {
   return (
-    <div className="flex flex-col items-center space-y-6 w-full max-w-md mx-auto">
-      <p className="text-center text-muted-foreground mb-4">{title}</p>
+    <div className="flex flex-col items-center space-y-8 w-full max-w-md mx-auto">
+      <p className="text-center text-muted-foreground font-serif italic text-lg leading-relaxed">{title}</p>
       
       <div className="flex flex-col gap-4 w-full">
-        <Button
+        <button
           onClick={() => onSelect(value1)}
-          variant="outline"
-          className="h-24 text-lg hover:bg-primary hover:text-primary-foreground transition-all"
+          className="relative group bg-card border border-border rounded-2xl p-8 text-lg font-serif text-foreground hover:border-primary/50 hover:glow-gold transition-all duration-300 text-center"
         >
+          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-primary/20 rounded-tl-sm opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-primary/20 rounded-br-sm opacity-0 group-hover:opacity-100 transition-opacity" />
           {value1}
-        </Button>
+        </button>
         
-        <div className="text-center text-sm text-muted-foreground">or</div>
+        <div className="text-center text-xs text-muted-foreground tracking-[0.3em] uppercase">or</div>
         
-        <Button
+        <button
           onClick={() => onSelect(value2)}
-          variant="outline"
-          className="h-24 text-lg hover:bg-primary hover:text-primary-foreground transition-all"
+          className="relative group bg-card border border-border rounded-2xl p-8 text-lg font-serif text-foreground hover:border-primary/50 hover:glow-gold transition-all duration-300 text-center"
         >
+          <div className="absolute top-2 left-2 w-4 h-4 border-t border-l border-primary/20 rounded-tl-sm opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-primary/20 rounded-br-sm opacity-0 group-hover:opacity-100 transition-opacity" />
           {value2}
-        </Button>
+        </button>
       </div>
     </div>
   );
