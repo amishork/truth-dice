@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Dices, Heart, ExternalLink, PenTool } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { ValueCard } from '@/components/ValueCard';
 import { ValuePair } from '@/components/ValuePair';
 import { ValuesChat } from '@/components/ValuesChat';
@@ -188,32 +187,20 @@ const Index = () => {
   // ─── Decorative divider ───
   const Divider = () => (
     <div className="flex items-center gap-4 my-8 w-full max-w-md mx-auto">
-      <div className="flex-1 h-px bg-foreground/15" />
-      <div className="w-2 h-2 border border-foreground/25 rotate-45" />
-      <div className="flex-1 h-px bg-foreground/15" />
+      <div className="flex-1 h-px bg-foreground/12" />
+      <div className="w-2 h-2 border border-foreground/20 rotate-45" />
+      <div className="flex-1 h-px bg-foreground/12" />
     </div>
-  );
-
-  // ─── Primary CTA button style ───
-  const PrimaryButton = ({ onClick, children, disabled, className = '' }: { onClick: () => void; children: React.ReactNode; disabled?: boolean; className?: string }) => (
-    <Button
-      onClick={onClick}
-      disabled={disabled}
-      size="lg"
-      className={`bg-primary text-primary-foreground hover:bg-primary/85 font-mono text-[0.65rem] tracking-[0.18em] uppercase h-14 rounded-sm shadow-[2px_2px_0_hsl(350_50%_22%)] ${className}`}
-    >
-      {children}
-    </Button>
   );
 
   const WelcomeScreen = () => (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 animate-fade-in relative">
       <div className="max-w-md w-full text-center space-y-10 relative z-10">
         {/* Logo mark */}
-        <div className="w-20 h-20 mx-auto sketch-border flex items-center justify-center relative">
-          <div className="absolute inset-0 border border-foreground/8 rotate-45 scale-[0.7]" />
+        <div className="w-20 h-20 mx-auto sketch-card flex items-center justify-center">
+          <div className="absolute inset-0 border border-foreground/6 rotate-45 scale-[0.7]" />
           <div className="absolute top-0 right-0 w-8 h-8 cross-hatch opacity-20 pointer-events-none" />
-          <PenTool className="w-7 h-7 text-foreground/60" />
+          <PenTool className="w-7 h-7 text-foreground/50" />
         </div>
         
         <div className="space-y-3">
@@ -225,13 +212,12 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="sketch-border p-6 space-y-4 text-left relative">
+        <div className="sketch-card p-6 space-y-4 text-left overflow-visible">
           <div className="absolute -top-3 left-4 bg-background px-2">
             <span className="label-technical">Process Overview</span>
           </div>
-          {/* Corner cross-hatch */}
-          <div className="absolute top-0 right-0 w-14 h-14 cross-hatch opacity-20 pointer-events-none rounded-tr-sm" />
-          <ol className="space-y-3 text-sm text-foreground/70 font-sans">
+          <div className="absolute top-0 right-0 w-14 h-14 cross-hatch opacity-20 pointer-events-none" />
+          <ol className="space-y-3 text-sm text-foreground/65 font-sans">
             {[
               'Swipe through values — does it resonate?',
               'Filter values — true about you, or aspire to?',
@@ -241,7 +227,7 @@ const Index = () => {
               'Explore with dice & discover workshops',
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-5 h-5 border border-foreground/25 flex items-center justify-center text-[0.55rem] font-mono text-foreground/50">
+                <span className="flex-shrink-0 w-5 h-5 border border-foreground/20 flex items-center justify-center text-[0.55rem] font-mono text-foreground/40">
                   {i + 1}
                 </span>
                 <span className="pt-0.5 leading-relaxed">{step}</span>
@@ -250,9 +236,9 @@ const Index = () => {
           </ol>
         </div>
 
-        <PrimaryButton onClick={() => setStage('section1')} className="w-full">
+        <button onClick={() => setStage('section1')} className="w-full h-14 btn-sketch-primary flex items-center justify-center gap-2">
           Begin Your Journey →
-        </PrimaryButton>
+        </button>
       </div>
     </div>
   );
@@ -266,11 +252,12 @@ const Index = () => {
         </span>
       </div>
       {subtitle && <p className="text-sm text-muted-foreground mb-3 font-serif italic">{subtitle}</p>}
-      <div className="h-px bg-foreground/12 relative">
+      <div className="h-px bg-foreground/10 relative">
         <div 
           className="h-[2px] bg-primary absolute top-0 left-0 transition-all duration-300"
           style={{ width: `${(current / total) * 100}%` }}
         />
+        {/* Tick mark at progress point */}
         <div 
           className="absolute -top-1.5 w-px h-3 bg-primary transition-all duration-300"
           style={{ left: `${(current / total) * 100}%` }}
@@ -368,18 +355,18 @@ const Index = () => {
           </p>
         </div>
         
-        <div className="space-y-0 max-w-md mx-auto w-full flex-1 sketch-border overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-16 h-16 cross-hatch opacity-15 pointer-events-none" />
+        <div className="space-y-0 max-w-md mx-auto w-full flex-1 sketch-card overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 cross-hatch opacity-12 pointer-events-none" />
           {sortedValues.map((value, index) => (
             <div
               key={index}
-              className="border-b border-foreground/8 py-3 px-4 flex items-center justify-between hover:bg-muted/30 transition-colors"
+              className="border-b border-foreground/6 py-3 px-4 flex items-center justify-between hover:bg-muted/20 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <span className="label-technical w-5">{String(index + 1).padStart(2, '0')}</span>
                 <span className="font-serif text-foreground">{value}</span>
               </div>
-              <span className="text-primary font-mono text-xs font-medium sketch-border px-2 py-0.5">
+              <span className="ink-red font-mono text-xs font-medium sketch-card px-2 py-0.5">
                 {selectionCounts[value] || 0}
               </span>
             </div>
@@ -388,9 +375,9 @@ const Index = () => {
         
         <Divider />
 
-        <PrimaryButton onClick={() => setStage('final')} className="w-full max-w-md mx-auto">
-          Continue to Final Selection <ChevronRight className="ml-2 h-4 w-4" />
-        </PrimaryButton>
+        <button onClick={() => setStage('final')} className="w-full max-w-md mx-auto h-14 btn-sketch-primary flex items-center justify-center gap-2">
+          Continue to Final Selection <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
     );
   };
@@ -410,7 +397,7 @@ const Index = () => {
               <span>{finalSixValues.length} of 6 selected</span>
               <span>{6 - finalSixValues.length} remaining</span>
             </div>
-            <div className="h-px bg-foreground/12 relative">
+            <div className="h-px bg-foreground/10 relative">
               <div 
                 className="h-[2px] bg-primary absolute top-0 left-0 transition-all duration-300"
                 style={{ width: `${(finalSixValues.length / 6) * 100}%` }}
@@ -419,24 +406,24 @@ const Index = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 gap-0 max-w-md mx-auto w-full flex-1 sketch-border overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-14 h-14 cross-hatch opacity-15 pointer-events-none" />
+        <div className="grid grid-cols-1 gap-0 max-w-md mx-auto w-full flex-1 sketch-card overflow-hidden">
+          <div className="absolute top-0 right-0 w-14 h-14 cross-hatch opacity-12 pointer-events-none" />
           {allWinners.map((value, index) => {
             const isSelected = finalSixValues.includes(value);
             return (
               <button
                 key={index}
                 onClick={() => handleFinalValueToggle(value)}
-                className={`p-4 text-left font-serif transition-all duration-150 border-b border-foreground/8 ${
+                className={`p-4 text-left font-serif transition-all duration-150 border-b border-foreground/6 ${
                   isSelected
                     ? 'bg-primary/5 text-foreground border-l-[3px] border-l-primary'
-                    : 'bg-transparent text-foreground hover:bg-muted/30'
+                    : 'bg-transparent text-foreground hover:bg-muted/20'
                 } ${!isSelected && finalSixValues.length >= 6 ? 'opacity-25 cursor-not-allowed' : ''}`}
                 disabled={!isSelected && finalSixValues.length >= 6}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-4 h-4 border flex items-center justify-center flex-shrink-0 transition-all rounded-sm ${
-                    isSelected ? 'border-primary bg-primary' : 'border-foreground/25'
+                    isSelected ? 'border-primary bg-primary' : 'border-foreground/20'
                   }`}>
                     {isSelected && <span className="text-primary-foreground text-[0.5rem]">✓</span>}
                   </div>
@@ -450,9 +437,9 @@ const Index = () => {
         {finalSixValues.length === 6 && (
           <>
             <Divider />
-            <PrimaryButton onClick={() => setStage('dice')} className="w-full max-w-md mx-auto">
-              Continue to Dice <ChevronRight className="ml-2 h-4 w-4" />
-            </PrimaryButton>
+            <button onClick={() => setStage('dice')} className="w-full max-w-md mx-auto h-14 btn-sketch-primary flex items-center justify-center gap-2">
+              Continue to Dice <ChevronRight className="h-4 w-4" />
+            </button>
           </>
         )}
       </div>
@@ -466,10 +453,10 @@ const Index = () => {
         <div className="lg:w-1/2 w-full flex flex-col items-center justify-start p-6 lg:p-10 lg:overflow-y-auto lg:max-h-screen">
           <div className="max-w-md w-full space-y-8">
             <div className="text-center space-y-3">
-              <div className="w-16 h-16 mx-auto sketch-border flex items-center justify-center animate-float relative">
-                <div className="absolute inset-0 border border-foreground/8 rotate-45 scale-75" />
+              <div className="w-16 h-16 mx-auto sketch-card flex items-center justify-center animate-float">
+                <div className="absolute inset-0 border border-foreground/6 rotate-45 scale-75" />
                 <div className="absolute top-0 right-0 w-6 h-6 cross-hatch opacity-20 pointer-events-none" />
-                <Dices className="w-6 h-6 text-foreground/60" />
+                <Dices className="w-6 h-6 text-foreground/50" />
               </div>
               <h2 className="text-2xl title-section text-foreground">Explore Your Values</h2>
               <p className="text-muted-foreground text-sm font-sans">
@@ -478,7 +465,7 @@ const Index = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="sketch-border p-6 text-center relative">
+              <div className="sketch-card p-6 text-center overflow-visible">
                 <div className="absolute -top-2.5 left-3 bg-background px-1.5">
                   <p className="label-technical">Value</p>
                 </div>
@@ -490,7 +477,7 @@ const Index = () => {
                 </div>
               </div>
               
-              <div className="sketch-border p-6 text-center relative">
+              <div className="sketch-card p-6 text-center overflow-visible">
                 <div className="absolute -top-2.5 left-3 bg-background px-1.5">
                   <p className="label-technical">Context</p>
                 </div>
@@ -503,16 +490,16 @@ const Index = () => {
               </div>
             </div>
 
-            <PrimaryButton onClick={rollDice} disabled={isRolling} className="w-full">
-              <Dices className="mr-2 h-4 w-4" />
+            <button onClick={rollDice} disabled={isRolling} className="w-full h-14 btn-sketch-primary flex items-center justify-center gap-2 disabled:opacity-50">
+              <Dices className="h-4 w-4" />
               Roll Dice
-            </PrimaryButton>
+            </button>
 
-            <div className="sketch-border p-5 relative">
+            <div className="sketch-card p-5 overflow-visible">
               <div className="absolute -top-2.5 left-3 bg-background px-1.5">
                 <span className="label-technical">Your Core Values</span>
               </div>
-              <div className="absolute top-0 right-0 w-10 h-10 cross-hatch opacity-15 pointer-events-none" />
+              <div className="absolute top-0 right-0 w-10 h-10 cross-hatch opacity-12 pointer-events-none" />
               <ul className="space-y-2.5 mt-1">
                 {finalSixValues.map((value, index) => (
                   <li key={index} className="flex items-center gap-3 text-sm text-foreground">
@@ -528,7 +515,7 @@ const Index = () => {
             <div className="space-y-4">
               <h3 className="title-section text-lg text-center text-foreground">Transform Your Life</h3>
               
-              <a href="#" className="block sketch-border p-5 hover:border-primary/60 transition-all group relative overflow-hidden">
+              <a href="#" className="block sketch-card p-5 hover:border-primary/50 transition-all group overflow-visible">
                 <div className="absolute top-0 right-0 w-10 h-10 cross-hatch opacity-10 pointer-events-none" />
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -541,7 +528,7 @@ const Index = () => {
                 </div>
               </a>
 
-              <a href="#" className="block sketch-border p-5 hover:border-primary/60 transition-all group relative overflow-hidden">
+              <a href="#" className="block sketch-card p-5 hover:border-primary/50 transition-all group overflow-visible">
                 <div className="absolute bottom-0 left-0 w-10 h-10 cross-hatch opacity-10 pointer-events-none" />
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -558,7 +545,7 @@ const Index = () => {
         </div>
 
         {/* Right column - AI Chat */}
-        <div className="lg:w-1/2 w-full border-t lg:border-t-0 lg:border-l border-foreground/15 flex flex-col min-h-[400px] lg:min-h-0 lg:max-h-screen">
+        <div className="lg:w-1/2 w-full border-t lg:border-t-0 lg:border-l border-foreground/12 flex flex-col min-h-[400px] lg:min-h-0 lg:max-h-screen">
           <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} />
         </div>
       </div>
