@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, PenTool } from 'lucide-react';
+import { Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 
@@ -138,11 +138,12 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   if (!rolledValue || !rolledContext) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
-        <div className="w-16 h-16 border border-foreground/20 flex items-center justify-center mb-6 animate-float">
-          <PenTool className="w-6 h-6 text-muted-foreground" />
+        <div className="w-16 h-16 sketch-border flex items-center justify-center mb-6 animate-float relative">
+          <div className="absolute top-0 right-0 w-6 h-6 cross-hatch opacity-20 pointer-events-none" />
+          <Sparkles className="w-5 h-5 text-muted-foreground" />
         </div>
-        <p className="text-base font-serif text-foreground/60 italic">Roll the dice to begin</p>
-        <p className="text-[0.65rem] font-mono mt-3 max-w-[240px] text-muted-foreground tracking-wide uppercase">
+        <p className="text-lg font-serif text-foreground/60 italic">Roll the dice to begin</p>
+        <p className="text-[0.6rem] font-mono mt-3 max-w-[240px] text-muted-foreground tracking-[0.15em] uppercase">
           Your coach will guide a Socratic exploration of your values
         </p>
       </div>
@@ -154,16 +155,26 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
       {/* Header */}
       <div className="px-5 py-4 border-b border-foreground/15">
         <div className="flex items-center gap-2">
-          <PenTool className="w-3.5 h-3.5 text-primary" />
-          <h3 className="font-mono text-[0.65rem] tracking-widest uppercase text-foreground/70">Values Coach</h3>
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <h3 className="font-serif text-lg text-foreground">Values Coach</h3>
         </div>
-        <p className="text-xs text-muted-foreground mt-1.5 font-serif italic">
-          Exploring <span className="text-primary font-medium not-italic">{rolledValue}</span> through <span className="text-primary font-medium not-italic">{rolledContext}</span>
+        <p className="text-[0.6rem] text-muted-foreground mt-1 font-mono tracking-[0.12em] uppercase">
+          Exploring <span className="text-primary font-medium">{rolledValue}</span> × <span className="text-primary font-medium">{rolledContext}</span>
         </p>
       </div>
 
+      {/* Rolled badge */}
+      <div className="px-5 py-3 border-b border-foreground/10">
+        <div className="inline-flex items-center gap-2 sketch-border px-3 py-1.5">
+          <span className="text-[0.55rem] font-mono tracking-[0.15em] uppercase text-muted-foreground">Rolled</span>
+          <span className="font-serif text-sm text-foreground font-medium">{rolledValue}</span>
+          <span className="text-muted-foreground text-xs">×</span>
+          <span className="font-serif text-sm text-primary italic">{rolledContext}</span>
+        </div>
+      </div>
+
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5">
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -172,8 +183,8 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             <div
               className={`max-w-[85%] px-4 py-3 text-sm ${
                 msg.role === 'user'
-                  ? 'border border-foreground/30 bg-muted text-foreground font-sans'
-                  : 'border-l-2 border-primary/40 bg-transparent text-foreground pl-4 pr-0 py-2'
+                  ? 'sketch-border bg-muted/50 text-foreground font-sans'
+                  : 'border-l-2 border-primary/50 bg-transparent text-foreground pl-4 pr-0 py-2'
               }`}
             >
               <div className="prose-sketch max-w-none text-sm leading-relaxed">
@@ -184,11 +195,11 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         ))}
         {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
           <div className="flex justify-start">
-            <div className="border-l-2 border-primary/40 pl-4 py-2">
+            <div className="border-l-2 border-primary/50 pl-4 py-2">
               <div className="flex gap-2">
-                <span className="w-1 h-1 bg-foreground/30 rounded-full animate-pulse" />
-                <span className="w-1 h-1 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.2s]" />
-                <span className="w-1 h-1 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.4s]" />
+                <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full animate-pulse" />
+                <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.2s]" />
+                <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.4s]" />
               </div>
             </div>
           </div>
@@ -210,13 +221,13 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             onChange={(e) => setInput(e.target.value)}
             placeholder="Share your thoughts..."
             disabled={isLoading}
-            className="flex-1 border border-foreground/30 bg-transparent px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary disabled:opacity-50 transition-colors font-sans"
+            className="flex-1 sketch-border bg-transparent px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary disabled:opacity-50 transition-colors font-mono text-[0.8rem] tracking-wide uppercase"
           />
           <Button
             type="submit"
             size="icon"
             disabled={isLoading || !input.trim()}
-            className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/80 rounded-none"
+            className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/85 rounded-sm shadow-[2px_2px_0_hsl(350_50%_22%)]"
           >
             <Send className="h-3.5 w-3.5" />
           </Button>
