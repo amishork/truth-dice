@@ -4,51 +4,44 @@
 
 @layer base {
   :root {
-    --background: 30 10% 7%;
-    --foreground: 38 30% 88%;
+    --background: 40 20% 96%;
+    --foreground: 0 0% 12%;
 
-    --card: 30 8% 12%;
-    --card-foreground: 38 30% 88%;
+    --card: 40 25% 97%;
+    --card-foreground: 0 0% 12%;
 
-    --popover: 30 8% 12%;
-    --popover-foreground: 38 30% 88%;
+    --popover: 40 25% 97%;
+    --popover-foreground: 0 0% 12%;
 
-    --primary: 40 72% 55%;
-    --primary-foreground: 30 10% 7%;
+    --primary: 350 55% 30%;
+    --primary-foreground: 40 20% 96%;
 
-    --secondary: 30 12% 18%;
-    --secondary-foreground: 38 30% 88%;
+    --secondary: 40 15% 90%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 30 8% 16%;
-    --muted-foreground: 38 15% 55%;
+    --muted: 40 10% 92%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 345 45% 45%;
-    --accent-foreground: 38 30% 92%;
+    --accent: 350 55% 30%;
+    --accent-foreground: 40 20% 96%;
 
     --destructive: 0 62% 50%;
-    --destructive-foreground: 38 30% 92%;
+    --destructive-foreground: 40 20% 96%;
 
-    --border: 30 10% 20%;
-    --input: 30 10% 20%;
-    --ring: 40 72% 55%;
+    --border: 0 0% 75%;
+    --input: 0 0% 75%;
+    --ring: 350 55% 30%;
 
-    --radius: 0.75rem;
+    --radius: 0.125rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(40 72% 55%), hsl(345 45% 45%));
-    --gradient-gold: linear-gradient(135deg, hsl(40 72% 55%), hsl(35 65% 45%));
-    --gradient-warm: linear-gradient(135deg, hsl(30 8% 12%), hsl(30 10% 18%));
-    --shadow-soft: 0 4px 24px hsla(40, 72%, 55%, 0.08);
-    --shadow-glow: 0 0 40px hsla(40, 72%, 55%, 0.12);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    --sidebar-background: 30 8% 10%;
-    --sidebar-foreground: 38 30% 88%;
-    --sidebar-primary: 40 72% 55%;
-    --sidebar-primary-foreground: 30 10% 7%;
-    --sidebar-accent: 30 8% 16%;
-    --sidebar-accent-foreground: 38 30% 88%;
-    --sidebar-border: 30 10% 20%;
-    --sidebar-ring: 40 72% 55%;
+    --sidebar-background: 40 20% 94%;
+    --sidebar-foreground: 0 0% 12%;
+    --sidebar-primary: 350 55% 30%;
+    --sidebar-primary-foreground: 40 20% 96%;
+    --sidebar-accent: 40 10% 90%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 0 0% 75%;
+    --sidebar-ring: 350 55% 30%;
   }
 }
 
@@ -59,39 +52,138 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'DM Sans', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 300;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 500;
   }
+}
+
+/* Paper texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 @layer utilities {
   .font-serif {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'EB Garamond', Georgia, serif;
   }
 
   .font-sans {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
-  .text-gold-gradient {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(40 72% 55%), hsl(35 80% 65%));
+  .font-mono {
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
   }
 
-  .bg-warm-gradient {
-    background-image: linear-gradient(180deg, hsl(30 10% 7%), hsl(30 8% 11%));
+  /* Sketch-style border that looks hand-drawn */
+  .sketch-border {
+    border: 1px solid hsl(0 0% 20%);
+    border-radius: 1px;
+    box-shadow: 
+      1px 1px 0 hsl(0 0% 80%),
+      -0.5px -0.5px 0 hsl(0 0% 85%);
   }
 
-  .border-gold {
-    border-color: hsl(40 72% 55% / 0.2);
+  /* Light construction lines */
+  .construction-lines {
+    background-image: 
+      linear-gradient(90deg, hsl(0 0% 85%) 1px, transparent 1px),
+      linear-gradient(hsl(0 0% 85%) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
-  .glow-gold {
-    box-shadow: 0 0 30px hsla(40, 72%, 55%, 0.1), 0 0 60px hsla(40, 72%, 55%, 0.05);
+  /* Cross-hatching shading effect */
+  .cross-hatch {
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 3px,
+        hsl(0 0% 85%) 3px,
+        hsl(0 0% 85%) 3.5px
+      );
+  }
+
+  .cross-hatch-dense {
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 2px,
+        hsl(0 0% 80%) 2px,
+        hsl(0 0% 80%) 2.5px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 2px,
+        hsl(0 0% 85%) 2px,
+        hsl(0 0% 85%) 2.5px
+      );
+  }
+
+  /* Pencil-shaded background */
+  .pencil-shade {
+    background-color: hsl(40 15% 93%);
+  }
+
+  /* Red ink accent */
+  .ink-red {
+    color: hsl(350 55% 30%);
+  }
+
+  /* Technical label styling */
+  .label-technical {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: hsl(0 0% 45%);
+  }
+
+  /* Blueprint dimension line */
+  .dimension-line {
+    position: relative;
+  }
+  .dimension-line::before,
+  .dimension-line::after {
+    content: '';
+    position: absolute;
+    background: hsl(0 0% 60%);
   }
 }
+
+/* Custom scrollbar - thin pencil style */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 70%);
+  border-radius: 0;
+}
+
+/* Markdown prose in sketch style */
+.prose-sketch {
+  color: hsl(0 0% 20%);
+  line-height: 1.7;
+}
+.prose-sketch p { margin: 0; }
+.prose-sketch p:not(:last-child) { margin-bottom: 0.5rem; }
+.prose-sketch strong { font-weight: 500; color: hsl(0 0% 10%); }
+.prose-sketch em { font-style: italic; color: hsl(350 55% 30%); }
