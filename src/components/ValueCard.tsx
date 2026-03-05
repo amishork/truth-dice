@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Heart } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ValueCardProps {
@@ -60,49 +60,56 @@ export const ValueCard: React.FC<ValueCardProps> = ({
   return (
     <div className="flex flex-col items-center space-y-8 w-full max-w-md mx-auto">
       <div
-        className={`relative bg-card border border-border rounded-2xl p-10 w-full min-h-[300px] flex flex-col items-center justify-center transition-all duration-300 glow-gold ${
-          swipeDirection === 'left' ? 'translate-x-[-100px] opacity-0 rotate-[-5deg]' : ''
-        } ${swipeDirection === 'right' ? 'translate-x-[100px] opacity-0 rotate-[5deg]' : ''}`}
+        className={`relative border border-foreground/80 bg-card p-10 w-full min-h-[300px] flex flex-col items-center justify-center transition-all duration-300 ${
+          swipeDirection === 'left' ? 'translate-x-[-100px] opacity-0 rotate-[-3deg]' : ''
+        } ${swipeDirection === 'right' ? 'translate-x-[100px] opacity-0 rotate-[3deg]' : ''}`}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Decorative corner accents */}
-        <div className="absolute top-3 left-3 w-6 h-6 border-t border-l border-primary/30 rounded-tl-md" />
-        <div className="absolute top-3 right-3 w-6 h-6 border-t border-r border-primary/30 rounded-tr-md" />
-        <div className="absolute bottom-3 left-3 w-6 h-6 border-b border-l border-primary/30 rounded-bl-md" />
-        <div className="absolute bottom-3 right-3 w-6 h-6 border-b border-r border-primary/30 rounded-br-md" />
+        {/* Corner tick marks — like architectural drawing registration */}
+        <div className="absolute top-0 left-3 w-px h-3 bg-foreground/30" />
+        <div className="absolute top-3 left-0 w-3 h-px bg-foreground/30" />
+        <div className="absolute top-0 right-3 w-px h-3 bg-foreground/30" />
+        <div className="absolute top-3 right-0 w-3 h-px bg-foreground/30" />
+        <div className="absolute bottom-0 left-3 w-px h-3 bg-foreground/30" />
+        <div className="absolute bottom-3 left-0 w-3 h-px bg-foreground/30" />
+        <div className="absolute bottom-0 right-3 w-px h-3 bg-foreground/30" />
+        <div className="absolute bottom-3 right-0 w-3 h-px bg-foreground/30" />
         
-        <h2 className="text-3xl font-serif font-semibold text-center mb-4 text-gold-gradient leading-tight">
+        {/* Light construction grid behind */}
+        <div className="absolute inset-4 opacity-[0.04] construction-lines pointer-events-none" />
+        
+        <h2 className="text-3xl font-serif font-medium text-center mb-4 text-foreground leading-tight relative z-10">
           {value}
         </h2>
         {description && (
-          <p className="text-muted-foreground text-center text-sm italic">{description}</p>
+          <p className="text-muted-foreground text-center text-sm italic font-serif relative z-10">{description}</p>
         )}
       </div>
 
-      <div className="flex gap-4 w-full">
+      <div className="flex gap-3 w-full">
         <Button
           onClick={onSwipeLeft}
           variant="outline"
           size="lg"
-          className="flex-1 h-14 gap-2 border-border hover:bg-accent/10 hover:border-accent/40 transition-all duration-300"
+          className="flex-1 h-14 gap-2 border-foreground/30 hover:bg-muted hover:border-foreground/60 transition-all font-mono text-xs tracking-wider uppercase"
         >
-          <X className="w-4 h-4" />
-          <span className="text-sm">{leftLabel}</span>
+          <X className="w-3.5 h-3.5" />
+          <span>{leftLabel}</span>
         </Button>
         <Button
           onClick={onSwipeRight}
           size="lg"
-          className="flex-1 h-14 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
+          className="flex-1 h-14 gap-2 bg-primary text-primary-foreground hover:bg-primary/80 transition-all font-mono text-xs tracking-wider uppercase"
         >
-          <Heart className="w-4 h-4" />
-          <span className="text-sm">{rightLabel}</span>
+          <Check className="w-3.5 h-3.5" />
+          <span>{rightLabel}</span>
         </Button>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center opacity-60">
-        Swipe left or right on the card, or use the buttons
+      <p className="text-[0.6rem] text-muted-foreground text-center font-mono tracking-widest uppercase opacity-50">
+        Swipe or tap to proceed
       </p>
     </div>
   );

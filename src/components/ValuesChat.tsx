@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, MessageCircle, Sparkles } from 'lucide-react';
+import { Send, PenTool } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 
@@ -108,7 +108,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     setIsLoading(true);
     try {
       const initMsgs: Msg[] = [{ role: 'user', content: `I just rolled the value "${rolledValue}" with the context "${rolledContext}". Help me explore this.` }];
-      setMessages([{ role: 'user', content: `🎲 Rolled: **${rolledValue}** × **${rolledContext}**` }]);
+      setMessages([{ role: 'user', content: `Rolled: ${rolledValue} × ${rolledContext}` }]);
       await streamChat(initMsgs);
     } catch (e) {
       console.error(e);
@@ -127,7 +127,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     scrollToBottom();
 
     try {
-      await streamChat(newMessages.filter(m => m.content && !m.content.startsWith('🎲')));
+      await streamChat(newMessages.filter(m => m.content && !m.content.startsWith('Rolled:')));
     } catch (e) {
       console.error(e);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
@@ -138,27 +138,31 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   if (!rolledValue || !rolledContext) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
-        <div className="w-16 h-16 rounded-full border border-border flex items-center justify-center mb-6 animate-float">
-          <Sparkles className="w-7 h-7 text-primary/60" />
+        <div className="w-16 h-16 border border-foreground/20 flex items-center justify-center mb-6 animate-float">
+          <PenTool className="w-6 h-6 text-muted-foreground" />
         </div>
-        <p className="text-lg font-serif text-foreground/70">Roll the dice to begin</p>
-        <p className="text-sm mt-2 max-w-[240px] opacity-60">Your AI coach will guide you through a Socratic exploration of your values</p>
+        <p className="text-base font-serif text-foreground/60 italic">Roll the dice to begin</p>
+        <p className="text-[0.65rem] font-mono mt-3 max-w-[240px] text-muted-foreground tracking-wide uppercase">
+          Your coach will guide a Socratic exploration of your values
+        </p>
       </div>
     );
   }
 
   return (
     <div className="h-full flex flex-col">
-      <div className="px-5 py-4 border-b border-border">
+      {/* Header */}
+      <div className="px-5 py-4 border-b border-foreground/15">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
-          <h3 className="font-serif text-sm text-foreground">Values Coach</h3>
+          <PenTool className="w-3.5 h-3.5 text-primary" />
+          <h3 className="font-mono text-[0.65rem] tracking-widest uppercase text-foreground/70">Values Coach</h3>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          Exploring <span className="text-primary font-medium">{rolledValue}</span> through <span className="text-primary font-medium">{rolledContext}</span>
+        <p className="text-xs text-muted-foreground mt-1.5 font-serif italic">
+          Exploring <span className="text-primary font-medium not-italic">{rolledValue}</span> through <span className="text-primary font-medium not-italic">{rolledContext}</span>
         </p>
       </div>
 
+      {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4">
         {messages.map((msg, i) => (
           <div
@@ -166,13 +170,13 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+              className={`max-w-[85%] px-4 py-3 text-sm ${
                 msg.role === 'user'
-                  ? 'bg-primary/15 text-foreground border border-primary/20 rounded-br-md'
-                  : 'bg-secondary text-foreground border border-border rounded-bl-md'
+                  ? 'border border-foreground/30 bg-muted text-foreground font-sans'
+                  : 'border-l-2 border-primary/40 bg-transparent text-foreground pl-4 pr-0 py-2'
               }`}
             >
-              <div className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>p:not(:last-child)]:mb-2">
+              <div className="prose-sketch max-w-none text-sm leading-relaxed">
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
             </div>
@@ -180,18 +184,19 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         ))}
         {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
           <div className="flex justify-start">
-            <div className="bg-secondary border border-border rounded-2xl rounded-bl-md px-4 py-3">
-              <div className="flex gap-1.5">
-                <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" />
-                <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse [animation-delay:0.2s]" />
-                <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse [animation-delay:0.4s]" />
+            <div className="border-l-2 border-primary/40 pl-4 py-2">
+              <div className="flex gap-2">
+                <span className="w-1 h-1 bg-foreground/30 rounded-full animate-pulse" />
+                <span className="w-1 h-1 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.2s]" />
+                <span className="w-1 h-1 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.4s]" />
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="p-4 border-t border-border">
+      {/* Input */}
+      <div className="p-4 border-t border-foreground/15">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -205,15 +210,15 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             onChange={(e) => setInput(e.target.value)}
             placeholder="Share your thoughts..."
             disabled={isLoading}
-            className="flex-1 rounded-xl border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 disabled:opacity-50 transition-all"
+            className="flex-1 border border-foreground/30 bg-transparent px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary disabled:opacity-50 transition-colors font-sans"
           />
           <Button
             type="submit"
             size="icon"
             disabled={isLoading || !input.trim()}
-            className="shrink-0 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+            className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/80 rounded-none"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-3.5 w-3.5" />
           </Button>
         </form>
       </div>
