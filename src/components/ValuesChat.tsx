@@ -4,6 +4,31 @@ import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
+interface ParsedMessage {
+  body: string;
+  question?: string;
+  options?: string[];
+}
+
+function parseAssistantMessage(content: string): ParsedMessage {
+  const optionsRegex = /```options\s*\n\s*QUESTION:\s*(.+?)\n([\s\S]*?)```/;
+  const match = content.match(optionsRegex);
+  
+  if (!match) {
+    return { body: content };
+  }
+
+  const body = content.slice(0, match.index).trim();
+  const question = match[1].trim();
+  const optionLines = match[2]
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.startsWith('- '))
+    .map(l => l.slice(2).trim());
+
+  return { body, question, options: optionLines.length > 0 ? optionLines : undefined };
+}
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/values-chat`;
 
 interface ValuesChatProps {
@@ -106,7 +131,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   const startConversation = async () => {
     setIsLoading(true);
     try {
-      const initMsgs: Msg[] = [{ role: 'user', content: `I just rolled the value "${rolledValue}" with the context "${rolledContext}". Help me explore this.` }];
+      const initMsgs: Msg[] = [{ role: 'user', content: `I just rolled the value "${rolledValue}" with the context "${rolledContext}". Begin the reflection.` }];
       setMessages([{ role: 'user', content: `Rolled: ${rolledValue} × ${rolledContext}` }]);
       await streamChat(initMsgs);
     } catch (e) {
@@ -116,9 +141,10 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     setIsLoading(false);
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
-    const userMsg: Msg = { role: 'user', content: input.trim() };
+  const sendMessage = async (text?: string) => {
+    const msgText = text || input.trim();
+    if (!msgText || isLoading) return;
+    const userMsg: Msg = { role: 'user', content: msgText };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
@@ -132,6 +158,10 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
       setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
     }
     setIsLoading(false);
+  };
+
+  const handleOptionClick = (option: string) => {
+    sendMessage(option);
   };
 
   if (!rolledValue || !rolledContext) {
@@ -174,24 +204,49 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[85%] px-4 py-3 text-sm ${
-                msg.role === 'user'
-                  ? 'sketch-card pencil-shade text-foreground font-sans'
-                  : 'border-l-2 border-primary/40 bg-transparent text-foreground pl-4 pr-0 py-2'
-              }`}
-            >
-              <div className="prose-sketch max-w-none text-sm leading-relaxed">
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
+        {messages.map((msg, i) => {
+          const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1;
+          const parsed = msg.role === 'assistant' ? parseAssistantMessage(msg.content) : null;
+          const showOptions = isLastAssistant && !isLoading && parsed?.options;
+
+          return (
+            <div key={i}>
+              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[85%] px-4 py-3 text-sm ${
+                    msg.role === 'user'
+                      ? 'sketch-card pencil-shade text-foreground font-sans'
+                      : 'border-l-2 border-primary/40 bg-transparent text-foreground pl-4 pr-0 py-2'
+                  }`}
+                >
+                  <div className="prose-sketch max-w-none text-sm leading-relaxed">
+                    <ReactMarkdown>
+                      {parsed ? parsed.body : msg.content}
+                    </ReactMarkdown>
+                  </div>
+                </div>
               </div>
+
+              {/* Question + Options */}
+              {showOptions && parsed?.question && (
+                <div className="mt-4 ml-4 pl-4 border-l-2 border-primary/40">
+                  <p className="text-sm font-serif text-foreground mb-3">{parsed.question}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {parsed.options!.map((opt, j) => (
+                      <button
+                        key={j}
+                        onClick={() => handleOptionClick(opt)}
+                        className="sketch-card px-4 py-2 text-sm font-sans text-foreground hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
         {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
           <div className="flex justify-start">
             <div className="border-l-2 border-primary/40 pl-4 py-2">
