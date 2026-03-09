@@ -22,6 +22,9 @@ import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
 import ScrollTextReveal from "@/components/ScrollTextReveal";
 import InfiniteMarquee from "@/components/InfiniteMarquee";
+import QuizMilestone from "@/components/QuizMilestone";
+import ValuesConstellation from "@/components/ValuesConstellation";
+import ValuesStatsDashboard from "@/components/ValuesStatsDashboard";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
