@@ -236,11 +236,13 @@ const DICE_CONTEXTS = ["hope", "fear", "person", "place", "physical object", "ex
 
 type Stage =
   | "home"
+  | "sorting"
   | "section1"
   | "section2"
   | "section3"
   | "section3-runoff"
   | "section4"
+  | "gratitude"
   | "final"
   | "dice";
 

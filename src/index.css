@@ -323,3 +323,14 @@
 .hero-bg-animated {
   animation: hero-drift 25s ease-in-out infinite;
 }
+
+/* Ambient mood glow overlay */
+.ambient-mood::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--ambient-glow, none);
+  transition: background 1.5s ease-in-out;
+}
