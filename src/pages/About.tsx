@@ -69,6 +69,8 @@ const About = () => {
         </div>
       </main>
 
+      <FounderBio />
+
       <Footer />
     </div>
   );

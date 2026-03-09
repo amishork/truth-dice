@@ -689,8 +689,14 @@ const Index = () => {
           </motion.div>
         </section>
 
+        {/* TRUSTED BY */}
+        <TrustedByLogos />
+
         {/* TESTIMONIALS */}
-        <Testimonials />
+        <TestimonialCarousel />
+
+        {/* CASE STUDIES */}
+        <CaseStudyCards />
 
         {/* STICKY CTA */}
         <motion.section
