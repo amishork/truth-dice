@@ -1014,6 +1014,13 @@ const Index = () => {
                   </div>
                 </a>
               </div>
+
+              {/* Stats Dashboard */}
+              <ValuesStatsDashboard
+                finalValues={finalSixValues}
+                selectionCounts={selectionCounts}
+                allWinners={allWinners}
+              />
             </div>
           </div>
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
