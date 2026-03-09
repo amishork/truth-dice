@@ -512,6 +512,8 @@ const Index = () => {
 
   const allWinners = useMemo(() => [...section3Winners, ...section3RunoffWinners], [section3Winners, section3RunoffWinners]);
 
+  const isQuizActive = ["section1", "section2", "section3", "section3-runoff", "section4", "final"].includes(stage);
+
   const Divider = () => (
     <div className="my-10 flex w-full max-w-md items-center gap-4 self-center">
       <div className="h-px flex-1 bg-border" />
