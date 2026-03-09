@@ -633,7 +633,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold text-foreground">How We Work</h2>
+            <ScrollTextReveal text="How We Work" className="text-3xl font-semibold text-foreground" />
             <p className="mt-4 text-muted-foreground">Words Incarnate approaches strategy as formation.</p>
             <p className="mt-8 text-foreground leading-relaxed">
               Drawing from classical wisdom, Catholic anthropology, and lived experience, we help leaders and
