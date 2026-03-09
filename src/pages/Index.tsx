@@ -827,7 +827,7 @@ const Index = () => {
     if (section2Index >= section1Selections.length) {
       return (
         <div className="min-h-screen bg-background">
-          <Navigation />
+          <Navigation dimmed={isQuizActive} />
           <div className="mx-auto max-w-3xl px-6 pt-24">
             <p className="text-muted-foreground">No values selected in the first pass—return and try again.</p>
             <div className="mt-6">
