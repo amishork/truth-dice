@@ -30,7 +30,7 @@ import WelcomeBack from "@/components/WelcomeBack";
 import ShareableValuesCard from "@/components/ShareableValuesCard";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
-import TextScramble from "@/components/TextScramble";
+
 import CommitmentEscalation from "@/components/CommitmentEscalation";
 import SpeedRound from "@/components/SpeedRound";
 import DiceProductPopup from "@/components/DiceProductPopup";
@@ -592,7 +592,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="wi-wordmark"><TextScramble text="WORDS INCARNATE" as="span" duration={1.8} /></h1>
+            <h1 className="wi-wordmark">WORDS INCARNATE</h1>
             <div className="mt-3 flex justify-center">
               <MorphingTagline />
             </div>
@@ -642,6 +642,9 @@ const Index = () => {
             )}
           </motion.div>
         </section>
+
+        {/* MARQUEE */}
+        <InfiniteMarquee />
 
         {/* CONTENT SECTIONS — with gradient blobs */}
         <section id="making-values" className="relative container mx-auto space-y-16 px-4 py-20">
@@ -751,9 +754,6 @@ const Index = () => {
             </div>
           </motion.div>
         </section>
-
-        {/* MARQUEE */}
-        <InfiniteMarquee />
 
         {/* TRUSTED BY */}
         <TrustedByLogos />
