@@ -48,6 +48,7 @@ const VALUE_MOODS: Record<string, { hue: number; sat: number; label: string }> =
 };
 
 function getMoodForValue(valueName: string): { hue: number; sat: number } | null {
+  if (!valueName) return null;
   const lower = valueName.toLowerCase();
   for (const [keyword, mood] of Object.entries(VALUE_MOODS)) {
     if (lower.includes(keyword)) return mood;
