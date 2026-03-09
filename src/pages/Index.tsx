@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import Testimonials from "@/components/Testimonials";
+import FloatingCTA from "@/components/FloatingCTA";
 import { Button } from "@/components/ui/button";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
@@ -413,6 +414,7 @@ const Index = () => {
       </a>
 
       <Navigation />
+      <FloatingCTA onClick={startValuesDiscovery} />
 
       <main id="main" className="pt-16">
         {/* HERO */}

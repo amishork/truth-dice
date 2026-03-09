@@ -4,6 +4,7 @@ import { Flame, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "./CartDrawer";
+import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -42,6 +43,7 @@ const Navigation = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <CartDrawer />
           <div className="md:hidden">
             <Sheet>
