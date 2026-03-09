@@ -34,14 +34,17 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/values-chat`
 interface ValuesChatProps {
   rolledValue: string;
   rolledContext: string;
+  onTriggerProductPopup?: () => void;
 }
 
-export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext }) => {
+export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, onTriggerProductPopup }) => {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const popupTriggeredRef = useRef(false);
 
   useEffect(() => {
     if (rolledValue && rolledContext && !hasStarted) {
