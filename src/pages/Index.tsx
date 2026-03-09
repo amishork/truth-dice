@@ -598,7 +598,7 @@ const Index = () => {
           <GradientBlobs />
 
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold text-foreground">Making Values Incarnate</h2>
+            <ScrollTextReveal text="Making Values Incarnate" className="text-3xl font-semibold text-foreground" />
             <p className="mt-4 text-muted-foreground">Formation for Families, Schools, and Organizations</p>
             <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
               <p>
