@@ -971,7 +971,7 @@ const Index = () => {
           {finalSixValues.length === 6 && (
             <>
               <Divider />
-              <Button onClick={() => { clearQuizState(); setStage("dice"); }} size="lg" className="w-full">
+              <Button onClick={() => { clearQuizState(); setStage("gratitude"); }} size="lg" className="w-full">
                 Continue to dice
                 <ChevronRight />
               </Button>
