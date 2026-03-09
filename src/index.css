@@ -4,44 +4,44 @@
 
 @layer base {
   :root {
-    --background: 40 25% 97%;
-    --foreground: 0 0% 12%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 8%;
 
-    --card: 40 20% 98.5%;
-    --card-foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
 
-    --popover: 40 20% 98%;
-    --popover-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
 
-    --primary: 350 48% 30%;
-    --primary-foreground: 40 20% 97%;
+    --primary: 350 78% 34%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 40 10% 92%;
-    --secondary-foreground: 0 0% 18%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 12%;
 
-    --muted: 40 12% 93%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
 
-    --accent: 350 48% 30%;
-    --accent-foreground: 40 20% 97%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 12%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 72%;
-    --input: 0 0% 72%;
-    --ring: 350 48% 30%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 350 78% 34%;
 
-    --radius: 0.2rem;
+    --radius: 0.4rem;
 
-    --sidebar-background: 40 15% 95%;
-    --sidebar-foreground: 0 0% 12%;
-    --sidebar-primary: 350 48% 30%;
-    --sidebar-primary-foreground: 40 20% 97%;
-    --sidebar-accent: 40 10% 91%;
-    --sidebar-accent-foreground: 0 0% 18%;
-    --sidebar-border: 0 0% 72%;
-    --sidebar-ring: 350 48% 30%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 8%;
+    --sidebar-primary: 350 78% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 12%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 350 78% 34%;
   }
 }
 
@@ -52,259 +52,212 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-weight: 300;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 400;
     -webkit-font-smoothing: auto;
     -moz-osx-font-smoothing: auto;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'EB Garamond', Georgia, serif;
-    font-weight: 500;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 650;
+    letter-spacing: -0.02em;
   }
-}
-
-/* ── Blueprint construction grid on the entire page ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.06;
-  background-image:
-    /* Major grid */
-    linear-gradient(90deg, hsl(210 20% 72%) 1px, transparent 1px),
-    linear-gradient(0deg, hsl(210 20% 72%) 1px, transparent 1px),
-    /* Minor grid */
-    linear-gradient(90deg, hsl(210 15% 80%) 0.5px, transparent 0.5px),
-    linear-gradient(0deg, hsl(210 15% 80%) 0.5px, transparent 0.5px);
-  background-size: 48px 48px, 48px 48px, 12px 12px, 12px 12px;
-}
-
-/* ── Paper grain overlay ── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 @layer utilities {
   .font-serif {
-    font-family: 'EB Garamond', Georgia, serif;
+    font-family: "EB Garamond", Georgia, serif;
   }
 
   .font-sans {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
   }
 
   .font-mono {
-    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-family: "IBM Plex Mono", "Courier New", monospace;
   }
 
-  /* ── Sketch border — hand-drawn pen line with offset shadow ── */
-  .sketch-border {
-    border: 1.5px solid hsl(0 0% 22%);
-    border-radius: 2px;
-    box-shadow:
-      2px 2px 0 hsl(0 0% 85%),
-      -0.5px -0.5px 0 hsl(0 0% 88%);
+  /* Wordmark styling used in hero + nav */
+  .wi-wordmark {
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-size: clamp(2.1rem, 6vw, 4.6rem);
+    line-height: 1.05;
+    color: hsl(var(--foreground));
+  }
+
+  .wi-tagline {
+    margin-top: 0.9rem;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: hsl(var(--primary));
+  }
+
+  .wi-navwordmark {
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    color: hsl(var(--foreground));
+  }
+
+  .wi-cta {
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* Keep existing quiz-specific styling (lightly modernized) */
+  .sketch-card {
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) + 0.1rem);
+    background-color: hsl(var(--card));
+    box-shadow: 0 20px 40px -30px hsl(var(--foreground) / 0.35);
     position: relative;
   }
 
-  /* ── Extension lines that overshoot corners like technical drafting ── */
-  .sketch-border::before {
-    content: '';
-    position: absolute;
-    inset: -8px;
-    pointer-events: none;
-    background-image:
-      /* Top-left corner extensions */
-      linear-gradient(0deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      linear-gradient(90deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      /* Top-right corner extensions */
-      linear-gradient(0deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      linear-gradient(90deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      /* Bottom-left corner extensions */
-      linear-gradient(0deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      linear-gradient(90deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      /* Bottom-right corner extensions */
-      linear-gradient(0deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%),
-      linear-gradient(90deg, hsl(0 0% 65%) 0, hsl(0 0% 65%) 100%);
-    background-size:
-      0.5px 8px, 8px 0.5px,
-      0.5px 8px, 8px 0.5px,
-      0.5px 8px, 8px 0.5px,
-      0.5px 8px, 8px 0.5px;
-    background-position:
-      8px 0, 0 8px,
-      calc(100% - 8px) 0, calc(100% - 8px) 8px,
-      8px calc(100% - 8px), 0 calc(100% - 8px),
-      calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) calc(100% - 8px);
-    background-repeat: no-repeat;
-  }
-
-  /* ── Light construction lines inside cards ── */
   .construction-lines {
     background-image:
-      linear-gradient(90deg, hsl(210 12% 82%) 0.5px, transparent 0.5px),
-      linear-gradient(hsl(210 12% 82%) 0.5px, transparent 0.5px);
+      linear-gradient(90deg, hsl(var(--border)) 0.5px, transparent 0.5px),
+      linear-gradient(hsl(var(--border)) 0.5px, transparent 0.5px);
     background-size: 24px 24px;
   }
 
-  /* ── Cross-hatching shading ── */
   .cross-hatch {
-    background-image:
-      repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 3px,
-        hsl(0 0% 75%) 3px,
-        hsl(0 0% 75%) 3.5px
-      );
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 3px,
+      hsl(var(--border)) 3px,
+      hsl(var(--border)) 3.5px
+    );
   }
 
   .cross-hatch-dense {
     background-image:
-      repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 2.5px,
-        hsl(0 0% 72%) 2.5px,
-        hsl(0 0% 72%) 3px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 2.5px,
-        hsl(0 0% 78%) 2.5px,
-        hsl(0 0% 78%) 3px
-      );
+      repeating-linear-gradient(45deg, transparent, transparent 2.5px, hsl(var(--border)) 2.5px, hsl(var(--border)) 3px),
+      repeating-linear-gradient(-45deg, transparent, transparent 2.5px, hsl(var(--border)) 2.5px, hsl(var(--border)) 3px);
   }
 
-  /* ── Pencil shading ── */
   .pencil-shade {
-    background-color: hsl(40 10% 93%);
+    background-color: hsl(var(--muted));
   }
 
-  /* ── Red ink accent ── */
   .ink-red {
-    color: hsl(350 48% 30%);
+    color: hsl(var(--primary));
   }
 
-  /* ── Technical label — small caps monospace ── */
   .label-technical {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: "IBM Plex Mono", monospace;
     font-size: 0.58rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: hsl(0 0% 45%);
+    color: hsl(var(--muted-foreground));
   }
 
-  /* ── Section title — architectural uppercase ── */
   .title-section {
-    font-family: 'EB Garamond', serif;
-    font-weight: 600;
-    letter-spacing: 0.06em;
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 750;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
-  /* ── Sketch button — hand-drawn CTA ── */
   .btn-sketch-primary {
-    background-color: hsl(350 48% 30%);
-    color: hsl(40 20% 97%);
-    border: 1.5px solid hsl(350 48% 24%);
-    border-radius: 2px;
-    box-shadow:
-      2px 2px 0 hsl(350 48% 20%),
-      inset 0 1px 0 hsl(350 48% 38%);
-    font-family: 'IBM Plex Mono', monospace;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: 1px solid hsl(var(--primary));
+    border-radius: calc(var(--radius) - 0.1rem);
+    box-shadow: 0 10px 22px -16px hsl(var(--foreground) / 0.35);
+    font-family: "IBM Plex Mono", monospace;
     font-size: 0.65rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    transition: all 150ms;
+    transition: transform 120ms, filter 120ms;
   }
 
   .btn-sketch-primary:hover {
-    background-color: hsl(350 48% 26%);
-    box-shadow:
-      3px 3px 0 hsl(350 48% 18%),
-      inset 0 1px 0 hsl(350 48% 34%);
+    filter: brightness(0.98);
+    transform: translateY(-1px);
   }
 
   .btn-sketch-secondary {
     background-color: transparent;
-    color: hsl(0 0% 20%);
-    border: 1.5px solid hsl(0 0% 30%);
-    border-radius: 2px;
-    box-shadow: 2px 2px 0 hsl(0 0% 85%);
-    font-family: 'IBM Plex Mono', monospace;
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 0.1rem);
+    box-shadow: 0 10px 22px -16px hsl(var(--foreground) / 0.25);
+    font-family: "IBM Plex Mono", monospace;
     font-size: 0.65rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    transition: all 150ms;
+    transition: transform 120ms, background-color 120ms;
   }
 
   .btn-sketch-secondary:hover {
-    background-color: hsl(40 10% 94%);
-    border-color: hsl(0 0% 22%);
+    background-color: hsl(var(--muted));
+    transform: translateY(-1px);
   }
 
-  /* ── Sketch card container ── */
-  .sketch-card {
-    border: 1.5px solid hsl(0 0% 22%);
-    border-radius: 2px;
-    background-color: hsl(40 20% 98.5%);
-    box-shadow:
-      2px 2px 0 hsl(0 0% 85%),
-      -0.5px -0.5px 0 hsl(0 0% 88%);
-    position: relative;
-  }
-
-  /* ── Dimension annotation line ── */
   .dimension-line {
     position: relative;
   }
 
   .dimension-line::after {
-    content: '';
+    content: "";
     position: absolute;
     left: -12px;
     right: -12px;
     top: 50%;
-    height: 0.5px;
-    background: hsl(0 0% 70%);
+    height: 1px;
+    background: hsl(var(--border));
     opacity: 0;
     transition: opacity 200ms;
   }
 
   .dimension-line:hover::after {
-    opacity: 0.5;
+    opacity: 0.7;
   }
 }
 
-/* ── Thin pencil scrollbar ── */
+/* Thin scrollbar */
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(0 0% 68%);
-  border-radius: 0;
+  background: hsl(var(--border));
+  border-radius: 10px;
 }
 
-/* ── Sketch-style markdown prose ── */
+/* Sketch-style markdown prose */
 .prose-sketch {
-  color: hsl(0 0% 18%);
+  color: hsl(var(--foreground));
   line-height: 1.8;
 }
-.prose-sketch p { margin: 0; }
-.prose-sketch p:not(:last-child) { margin-bottom: 0.6rem; }
-.prose-sketch strong { font-weight: 500; color: hsl(0 0% 8%); }
-.prose-sketch em { font-style: italic; color: hsl(350 48% 30%); }
+.prose-sketch p {
+  margin: 0;
+}
+.prose-sketch p:not(:last-child) {
+  margin-bottom: 0.6rem;
+}
+.prose-sketch strong {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+.prose-sketch em {
+  font-style: italic;
+  color: hsl(var(--primary));
+}

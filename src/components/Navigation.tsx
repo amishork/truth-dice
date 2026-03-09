@@ -1,71 +1,87 @@
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
-import { PenTool } from "lucide-react";
+import { Flame, Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+
+const navItems = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/our-story", label: "Our Story" },
+];
+
+const DesktopLink = ({ to, label }: { to: string; label: string }) => (
+  <NavLink
+    to={to}
+    className="relative text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+    activeClassName="text-foreground"
+  >
+    <span className="relative">
+      {label}
+      <span className="pointer-events-none absolute -bottom-2 left-0 h-px w-full scale-x-0 bg-foreground/60 transition-transform duration-200 [transform-origin:left] group-[.active]:scale-x-100" />
+    </span>
+  </NavLink>
+);
 
 const Navigation = () => {
   return (
-    <motion.nav 
-      className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-foreground/10"
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+    <motion.nav
+      className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm"
+      initial={{ y: -16, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <NavLink 
-            to="/" 
-            className="flex items-center space-x-3 group"
-          >
-            <div className="w-8 h-8 sketch-card flex items-center justify-center relative">
-              <div className="absolute top-0 right-0 w-3 h-3 cross-hatch opacity-20 pointer-events-none" />
-              <PenTool className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" />
-            </div>
-            <span className="brand-heading text-lg ink-red">
-              Words Incarnate
-            </span>
-          </NavLink>
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <NavLink to="/" className="flex items-center gap-3">
+          <Flame className="h-4 w-4 text-primary" />
+          <span className="wi-navwordmark">WORDS INCARNATE</span>
+        </NavLink>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            <NavLink 
-              to="/" 
-              className="text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
-              activeClassName="text-primary"
+        <div className="hidden items-center gap-8 md:flex">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className="group relative text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              activeClassName="active text-foreground"
             >
-              Home
+              {item.label}
+              <span className="pointer-events-none absolute -bottom-2 left-0 h-px w-full scale-x-0 bg-foreground/60 transition-transform duration-200 [transform-origin:left] group-[.active]:scale-x-100" />
             </NavLink>
-            <NavLink 
-              to="/about" 
-              className="text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
-              activeClassName="text-primary"
-            >
-              About
-            </NavLink>
-            <NavLink 
-              to="/services" 
-              className="text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
-              activeClassName="text-primary"
-            >
-              Services
-            </NavLink>
-            <NavLink 
-              to="/our-story" 
-              className="text-foreground/70 hover:text-foreground transition-colors duration-200 font-medium"
-              activeClassName="text-primary"
-            >
-              Our Story
-            </NavLink>
-          </div>
+          ))}
+        </div>
 
-          {/* Mobile Menu Button */}
-          <button className="md:hidden flex items-center justify-center w-8 h-8">
-            <div className="space-y-1.5">
-              <div className="w-5 h-0.5 bg-foreground/70"></div>
-              <div className="w-5 h-0.5 bg-foreground/70"></div>
-              <div className="w-5 h-0.5 bg-foreground/70"></div>
-            </div>
-          </button>
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[85vw] max-w-sm">
+              <div className="mt-8 space-y-6">
+                <div className="flex items-center gap-3">
+                  <Flame className="h-4 w-4 text-primary" />
+                  <span className="wi-navwordmark">WORDS INCARNATE</span>
+                </div>
+
+                <div className="h-px w-full bg-border" />
+
+                <nav className="flex flex-col gap-4">
+                  {navItems.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className="text-base font-medium text-muted-foreground"
+                      activeClassName="text-foreground"
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </motion.nav>
