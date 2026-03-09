@@ -342,6 +342,9 @@ const Index = () => {
   useDynamicTabTitle(stage === "sorting" || stage === "gratitude" ? "section1" : stage, quizProgress);
   useAnimatedFavicon(stage !== "home");
 
+  // Commitment tracker
+  const { markMilestone } = useCommitmentTracker();
+
   // Ambient mood shifting
   useAmbientMood(
     stage !== "home" && stage !== "sorting" && stage !== "gratitude",
