@@ -30,7 +30,7 @@ import WelcomeBack from "@/components/WelcomeBack";
 import ShareableValuesCard from "@/components/ShareableValuesCard";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
-import TextScramble from "@/components/TextScramble";
+
 import CommitmentEscalation from "@/components/CommitmentEscalation";
 import SpeedRound from "@/components/SpeedRound";
 import DiceProductPopup from "@/components/DiceProductPopup";
