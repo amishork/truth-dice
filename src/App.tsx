@@ -10,8 +10,13 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+import { useCartSync } from "@/hooks/useCartSync";
+
+// Wrapper component to use hooks inside QueryClientProvider
+const AppContent = () => {
+  useCartSync();
+  
+  return (
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -25,6 +30,12 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AppContent />
   </QueryClientProvider>
 );
 

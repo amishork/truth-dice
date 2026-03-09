@@ -3,6 +3,7 @@ import { NavLink } from "@/components/NavLink";
 import { Flame, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { CartDrawer } from "./CartDrawer";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -38,9 +39,11 @@ const Navigation = () => {
           ))}
         </div>
 
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
+        <div className="flex items-center gap-2">
+          <CartDrawer />
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Open menu">
                 <Menu />
               </Button>
@@ -69,6 +72,7 @@ const Navigation = () => {
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
       </div>
     </motion.nav>
