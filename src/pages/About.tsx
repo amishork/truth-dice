@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import FounderBio from "@/components/FounderBio";
 import { Button } from "@/components/ui/button";
 
 const fadeUp = {
@@ -67,6 +68,8 @@ const About = () => {
           </motion.div>
         </div>
       </main>
+
+      <FounderBio />
 
       <Footer />
     </div>

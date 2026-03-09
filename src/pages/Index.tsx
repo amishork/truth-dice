@@ -3,7 +3,9 @@ import { ChevronRight, Dices, ExternalLink, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import Testimonials from "@/components/Testimonials";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
+import TrustedByLogos from "@/components/TrustedByLogos";
+import CaseStudyCards from "@/components/CaseStudyCards";
 import FloatingCTA from "@/components/FloatingCTA";
 import BackToTop from "@/components/BackToTop";
 import EmberParticles from "@/components/EmberParticles";
@@ -687,8 +689,14 @@ const Index = () => {
           </motion.div>
         </section>
 
+        {/* TRUSTED BY */}
+        <TrustedByLogos />
+
         {/* TESTIMONIALS */}
-        <Testimonials />
+        <TestimonialCarousel />
+
+        {/* CASE STUDIES */}
+        <CaseStudyCards />
 
         {/* STICKY CTA */}
         <motion.section
