@@ -55,11 +55,9 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   }, [rolledValue, rolledContext]);
 
   const scrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
-    }, 50);
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    });
   };
 
   const exportConversation = () => {
