@@ -240,8 +240,6 @@ const Index = () => {
   const [dice2Result, setDice2Result] = useState<string>("");
   const [isRolling, setIsRolling] = useState(false);
 
-  const homeMainRef = useRef<HTMLElement | null>(null);
-
   useEffect(() => {
     // Keep stage transitions predictable (nav is fixed)
     window.scrollTo({ top: 0, behavior: "auto" });
