@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
+import { PenTool } from "lucide-react";
 
 const Navigation = () => {
   return (
@@ -16,12 +17,9 @@ const Navigation = () => {
             to="/" 
             className="flex items-center space-x-3 group"
           >
-            <div className="w-8 h-8">
-              <img 
-                src="/src/assets/flame-logo.png" 
-                alt="Words Incarnate" 
-                className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-              />
+            <div className="w-8 h-8 sketch-card flex items-center justify-center relative">
+              <div className="absolute top-0 right-0 w-3 h-3 cross-hatch opacity-20 pointer-events-none" />
+              <PenTool className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" />
             </div>
             <span className="brand-heading text-lg ink-red">
               Words Incarnate
