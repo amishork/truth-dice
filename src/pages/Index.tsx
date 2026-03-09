@@ -807,7 +807,7 @@ const Index = () => {
     const value = CORE_VALUES[currentValueIndex];
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizMilestone current={currentValueIndex + 1} total={CORE_VALUES.length} />
         <QuizTop title="Does it resonate?" current={currentValueIndex + 1} total={CORE_VALUES.length} />
         <div className="flex items-center justify-center px-6 pb-10">
