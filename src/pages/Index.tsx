@@ -418,13 +418,7 @@ const Index = () => {
 
       <Navigation />
 
-      <main
-        id="main"
-        ref={(el) => {
-          homeMainRef.current = el;
-        }}
-        className="pt-16"
-      >
+      <main id="main" className="pt-16">
         {/* HERO */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-muted/40" />
