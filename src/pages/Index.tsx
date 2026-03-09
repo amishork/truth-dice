@@ -300,6 +300,7 @@ const Index = () => {
   const [isRolling, setIsRolling] = useState(false);
 
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showLeadMagnet, setShowLeadMagnet] = useState(false);
   const [hasResumePrompt, setHasResumePrompt] = useState(() => {
     const s = saved.current;
     return s !== null && s.stage !== "home" && s.stage !== "dice";
