@@ -492,7 +492,7 @@ const Index = () => {
     </div>
   );
 
-  const HomeScreen = () => (
+  const homeScreen = (
     <div className="min-h-screen bg-background">
       <a
         href="#main"
@@ -724,7 +724,7 @@ const Index = () => {
     </div>
   );
 
-  const Section1Screen = () => {
+  const section1Screen = (() => {
     const value = CORE_VALUES[currentValueIndex];
     return (
       <div className="min-h-screen bg-background">
