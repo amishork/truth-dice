@@ -10,19 +10,6 @@ const navItems = [
   { to: "/our-story", label: "Our Story" },
 ];
 
-const DesktopLink = ({ to, label }: { to: string; label: string }) => (
-  <NavLink
-    to={to}
-    className="relative text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-    activeClassName="text-foreground"
-  >
-    <span className="relative">
-      {label}
-      <span className="pointer-events-none absolute -bottom-2 left-0 h-px w-full scale-x-0 bg-foreground/60 transition-transform duration-200 [transform-origin:left] group-[.active]:scale-x-100" />
-    </span>
-  </NavLink>
-);
-
 const Navigation = () => {
   return (
     <motion.nav
