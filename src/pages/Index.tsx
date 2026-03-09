@@ -702,6 +702,9 @@ const Index = () => {
           </motion.div>
         </section>
 
+        {/* MARQUEE */}
+        <InfiniteMarquee />
+
         {/* TRUSTED BY */}
         <TrustedByLogos />
 
