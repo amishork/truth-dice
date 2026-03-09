@@ -33,6 +33,7 @@ import GratitudeMoment from "@/components/GratitudeMoment";
 import TextScramble from "@/components/TextScramble";
 import CommitmentEscalation from "@/components/CommitmentEscalation";
 import SpeedRound from "@/components/SpeedRound";
+import DiceProductPopup from "@/components/DiceProductPopup";
 import ValuesPosterGenerator from "@/components/ValuesPosterGenerator";
 import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
 import { useAmbientMood } from "@/hooks/useAmbientMood";
