@@ -3,6 +3,7 @@ import { NavLink } from "@/components/NavLink";
 import { Flame, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { CartDrawer } from "./CartDrawer";
 
 const navItems = [
   { to: "/", label: "Home" },
