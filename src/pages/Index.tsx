@@ -22,6 +22,9 @@ import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
 import ScrollTextReveal from "@/components/ScrollTextReveal";
 import InfiniteMarquee from "@/components/InfiniteMarquee";
+import QuizMilestone from "@/components/QuizMilestone";
+import ValuesConstellation from "@/components/ValuesConstellation";
+import ValuesStatsDashboard from "@/components/ValuesStatsDashboard";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
@@ -761,6 +764,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <QuizMilestone current={currentValueIndex + 1} total={CORE_VALUES.length} />
         <QuizTop title="Does it resonate?" current={currentValueIndex + 1} total={CORE_VALUES.length} />
         <div className="flex items-center justify-center px-6 pb-10">
           <ValueCard
@@ -794,6 +798,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <QuizMilestone current={section2Index + 1} total={section1Selections.length} />
         <QuizTop title="True or aspire?" current={section2Index + 1} total={section1Selections.length} />
         <div className="flex items-center justify-center px-6 pb-10">
           <ValueCard
@@ -952,6 +957,9 @@ const Index = () => {
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
+              {/* Values Constellation */}
+              <ValuesConstellation values={finalSixValues} />
+
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
                 <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
@@ -1006,6 +1014,13 @@ const Index = () => {
                   </div>
                 </a>
               </div>
+
+              {/* Stats Dashboard */}
+              <ValuesStatsDashboard
+                finalValues={finalSixValues}
+                selectionCounts={selectionCounts}
+                allWinners={allWinners}
+              />
             </div>
           </div>
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
