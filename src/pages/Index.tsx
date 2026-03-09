@@ -31,8 +31,12 @@ import ShareableValuesCard from "@/components/ShareableValuesCard";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
 import TextScramble from "@/components/TextScramble";
+import CommitmentEscalation from "@/components/CommitmentEscalation";
+import SpeedRound from "@/components/SpeedRound";
+import ValuesPosterGenerator from "@/components/ValuesPosterGenerator";
 import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
 import { useAmbientMood } from "@/hooks/useAmbientMood";
+import { useCommitmentTracker } from "@/hooks/useCommitmentTracker";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
