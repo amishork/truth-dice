@@ -1020,6 +1020,9 @@ const Index = () => {
                 </a>
               </div>
 
+              {/* Shareable Values Card */}
+              <ShareableValuesCard values={finalSixValues} />
+
               {/* Stats Dashboard */}
               <ValuesStatsDashboard
                 finalValues={finalSixValues}

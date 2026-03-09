@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PricingCards from "@/components/PricingCards";
+import ComparisonTable from "@/components/ComparisonTable";
 import FAQ from "@/components/FAQ";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, GraduationCap, Building } from "lucide-react";
@@ -141,6 +142,9 @@ const Services = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Comparison Table */}
+        <ComparisonTable />
 
         {/* Pricing */}
         <PricingCards />
