@@ -1083,7 +1083,7 @@ const Index = () => {
           </div>
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
             <div className="min-h-[520px] lg:min-h-[calc(100vh-5rem)]">
-              <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} />
+              <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} onTriggerProductPopup={() => setShowDicePopup(true)} />
             </div>
           </div>
         </div>

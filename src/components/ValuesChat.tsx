@@ -321,6 +321,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             </div>
           </div>
         )}
+        <div ref={bottomRef} />
       </div>
 
       {/* Input */}
