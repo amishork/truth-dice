@@ -8,8 +8,7 @@ interface TheSortingProps {
 const TheSorting = ({ onComplete }: TheSortingProps) => {
   const [phase, setPhase] = useState<"dim" | "flame" | "text1" | "text2" | "fade">("dim");
 
-  // Auto-advance through phases
-  useState(() => {
+  useEffect(() => {
     const timers = [
       setTimeout(() => setPhase("flame"), 800),
       setTimeout(() => setPhase("text1"), 2200),
@@ -18,7 +17,7 @@ const TheSorting = ({ onComplete }: TheSortingProps) => {
       setTimeout(() => onComplete(), 9500),
     ];
     return () => timers.forEach(clearTimeout);
-  });
+  }, [onComplete]);
 
   return (
     <AnimatePresence>
