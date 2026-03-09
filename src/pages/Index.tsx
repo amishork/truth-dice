@@ -425,7 +425,7 @@ const Index = () => {
   const startValuesDiscovery = () => {
     resetQuiz();
     setHasResumePrompt(false);
-    setStage("section1");
+    setStage("sorting");
   };
 
   const resumeQuiz = () => {
