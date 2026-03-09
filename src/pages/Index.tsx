@@ -517,12 +517,14 @@ const Index = () => {
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
           {/* Parallax background layers */}
           <div
-            className="absolute inset-0 bg-cover bg-center will-change-transform"
-            style={{
-              backgroundImage: `url(${heroBg})`,
-              transform: `translateY(${scrollY * 0.3}px) scale(1.1)`,
-            }}
-          />
+            className="absolute inset-0 will-change-transform"
+            style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+          >
+            <div
+              className="hero-bg-animated h-full w-full bg-cover bg-center"
+              style={{ backgroundImage: `url(${heroBg})` }}
+            />
+          </div>
           <div
             className="absolute inset-0 bg-background/80 backdrop-blur-[2px]"
             style={{ transform: `translateY(${scrollY * 0.1}px)` }}
