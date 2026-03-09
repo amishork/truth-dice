@@ -643,6 +643,9 @@ const Index = () => {
           </motion.div>
         </section>
 
+        {/* MARQUEE */}
+        <InfiniteMarquee />
+
         {/* CONTENT SECTIONS — with gradient blobs */}
         <section id="making-values" className="relative container mx-auto space-y-16 px-4 py-20">
           <GradientBlobs />
