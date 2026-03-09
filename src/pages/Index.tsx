@@ -25,6 +25,9 @@ import InfiniteMarquee from "@/components/InfiniteMarquee";
 import QuizMilestone from "@/components/QuizMilestone";
 import ValuesConstellation from "@/components/ValuesConstellation";
 import ValuesStatsDashboard from "@/components/ValuesStatsDashboard";
+import SocialProofToasts from "@/components/SocialProofToasts";
+import WelcomeBack from "@/components/WelcomeBack";
+import ShareableValuesCard from "@/components/ShareableValuesCard";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
