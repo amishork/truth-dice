@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import AnimatedCounter from "./AnimatedCounter";
 
 const testimonials = [
   {
@@ -32,7 +33,7 @@ const Testimonials = () => {
   return (
     <section className="bg-card py-20">
       <div className="container mx-auto px-4">
-        {/* Stats */}
+        {/* Stats with animated counters */}
         <motion.div
           className="mb-16 grid gap-8 sm:grid-cols-3"
           initial={{ opacity: 0, y: 20 }}
@@ -42,7 +43,10 @@ const Testimonials = () => {
         >
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-4xl font-semibold text-primary">{stat.value}</p>
+              <AnimatedCounter
+                value={stat.value}
+                className="text-4xl font-semibold text-primary"
+              />
               <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
             </div>
           ))}
