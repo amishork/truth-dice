@@ -142,9 +142,6 @@ const Services = () => {
           </motion.div>
         </div>
 
-        {/* Comparison Table */}
-        <ComparisonTable />
-
         {/* Pricing */}
         <PricingCards />
 
