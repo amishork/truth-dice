@@ -503,6 +503,7 @@ const Index = () => {
   const rollDice = () => {
     if (finalSixValues.length === 0) return;
     setIsRolling(true);
+    if (!hasRolledOnce) setHasRolledOnce(true);
     const randomDice1 = finalSixValues[Math.floor(Math.random() * finalSixValues.length)];
     const randomDice2 = DICE_CONTEXTS[Math.floor(Math.random() * DICE_CONTEXTS.length)];
     window.setTimeout(() => {
