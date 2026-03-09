@@ -28,6 +28,11 @@ import ValuesStatsDashboard from "@/components/ValuesStatsDashboard";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import WelcomeBack from "@/components/WelcomeBack";
 import ShareableValuesCard from "@/components/ShareableValuesCard";
+import TheSorting from "@/components/TheSorting";
+import GratitudeMoment from "@/components/GratitudeMoment";
+import TextScramble from "@/components/TextScramble";
+import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
+import { useAmbientMood } from "@/hooks/useAmbientMood";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
