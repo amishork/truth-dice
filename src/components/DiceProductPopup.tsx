@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCartStore } from "@/stores/cartStore";
 import { storefrontApiRequest, STOREFRONT_QUERY, ShopifyProduct } from "@/lib/shopify";
+import { supabase } from "@/integrations/supabase/client";
 import diceProductImg from "@/assets/dice-product.jpg";
 
 interface DiceProductPopupProps {
@@ -18,6 +20,11 @@ export default function DiceProductPopup({ values, visible }: DiceProductPopupPr
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
   const [added, setAdded] = useState(false);
+
+  // AI image state
+  const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const imageGeneratedRef = useRef(false);
 
   // Delay appearance by 2s after becoming visible
   useEffect(() => {
@@ -37,6 +44,27 @@ export default function DiceProductPopup({ values, visible }: DiceProductPopupPr
       .catch(console.error);
   }, [show]);
 
+  // Generate AI dice image
+  useEffect(() => {
+    if (!show || imageGeneratedRef.current || values.length < 3) return;
+    imageGeneratedRef.current = true;
+    setImageLoading(true);
+
+    supabase.functions
+      .invoke("generate-dice-image", {
+        body: { values: values.slice(0, 3) },
+      })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Dice image generation error:", error);
+        } else if (data?.imageUrl) {
+          setAiImageUrl(data.imageUrl);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setImageLoading(false));
+  }, [show, values]);
+
   const handleAddToCart = async () => {
     if (!product) return;
     const variant = product.node.variants.edges[0]?.node;
@@ -54,6 +82,9 @@ export default function DiceProductPopup({ values, visible }: DiceProductPopupPr
 
   const displayValues = values.slice(0, 3);
   const price = product?.node.variants.edges[0]?.node.price;
+
+  // Determine which image to show
+  const imageSrc = aiImageUrl || product?.node.images?.edges?.[0]?.node.url || diceProductImg;
 
   return (
     <AnimatePresence>
@@ -76,11 +107,20 @@ export default function DiceProductPopup({ values, visible }: DiceProductPopupPr
 
           {/* Product image */}
           <div className="relative h-36 overflow-hidden">
-            <img
-              src={product?.node.images?.edges?.[0]?.node.url || diceProductImg}
-              alt="Values Dice Conversation Game"
-              className="h-full w-full object-cover"
-            />
+            {imageLoading ? (
+              <div className="h-full w-full flex items-center justify-center bg-muted">
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground">Generating your custom dice…</span>
+                </div>
+              </div>
+            ) : (
+              <img
+                src={imageSrc}
+                alt="Values Dice Conversation Game"
+                className="h-full w-full object-cover"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent" />
           </div>
 
