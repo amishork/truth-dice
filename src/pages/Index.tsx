@@ -687,13 +687,17 @@ const Index = () => {
               people—not just systems—we would be honored to walk with you.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
-                Let's make values incarnate again
-                <ChevronRight />
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
-                Free worksheet
-              </Button>
+              <MagneticButton>
+                <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
+                  Let's make values incarnate again
+                  <ChevronRight />
+                </Button>
+              </MagneticButton>
+              <MagneticButton>
+                <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
+                  Free worksheet
+                </Button>
+              </MagneticButton>
             </div>
           </motion.div>
         </section>
