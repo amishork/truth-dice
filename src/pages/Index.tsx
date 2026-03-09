@@ -1069,7 +1069,13 @@ const Index = () => {
   })();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background ambient-mood">
+      {stage === "sorting" && (
+        <TheSorting onComplete={() => setStage("section1")} />
+      )}
+      {stage === "gratitude" && (
+        <GratitudeMoment onComplete={() => setStage("dice")} />
+      )}
       {stage === "home" && homeScreen}
       {stage === "section1" && section1Screen}
       {stage === "section2" && section2Screen}
