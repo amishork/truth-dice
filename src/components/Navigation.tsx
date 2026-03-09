@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
+import { PenTool } from "lucide-react";
 
 const Navigation = () => {
   return (
