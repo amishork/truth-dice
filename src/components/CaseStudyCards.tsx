@@ -50,10 +50,10 @@ const CaseStudyCards = () => {
             <motion.div
               key={cs.title}
               className="group relative overflow-hidden rounded-xl border border-border bg-card"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
+              transition={{ duration: 0.6, delay: i * 0.15, ease: "easeOut" }}
             >
               {/* Tag */}
               <div className="border-b border-border px-6 py-3">
