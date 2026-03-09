@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { X, Check } from 'lucide-react';
+import { X, Check, Info } from 'lucide-react';
+import { VALUE_DESCRIPTIONS } from '@/lib/valueDescriptions';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ValueCardProps {
   value: string;
@@ -23,6 +25,7 @@ export const ValueCard: React.FC<ValueCardProps> = ({
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
 
   const minSwipeDistance = 50;
+  const tooltipText = VALUE_DESCRIPTIONS[value];
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -69,32 +72,43 @@ export const ValueCard: React.FC<ValueCardProps> = ({
         {/* Construction grid inside card */}
         <div className="absolute inset-4 opacity-[0.06] construction-lines pointer-events-none" />
 
-        {/* Corner extension lines — drafting overshoot marks */}
+        {/* Corner extension lines */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" style={{ left: 0, top: 0 }}>
-          {/* Top-left */}
           <line x1="0" y1="-6" x2="0" y2="6" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
           <line x1="-6" y1="0" x2="6" y2="0" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
-          {/* Top-right */}
           <line x1="100%" y1="-6" x2="100%" y2="6" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
           <line x1="calc(100% - 6px)" y1="0" x2="calc(100% + 6px)" y2="0" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
-          {/* Bottom-left */}
           <line x1="0" y1="calc(100% - 6px)" x2="0" y2="calc(100% + 6px)" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
           <line x1="-6" y1="100%" x2="6" y2="100%" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
-          {/* Bottom-right */}
           <line x1="100%" y1="calc(100% - 6px)" x2="100%" y2="calc(100% + 6px)" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
           <line x1="calc(100% - 6px)" y1="100%" x2="calc(100% + 6px)" y2="100%" stroke="hsl(0 0% 60%)" strokeWidth="0.5" />
         </svg>
 
-        {/* Cross-hatch shading in top-right corner */}
+        {/* Cross-hatch shading */}
         <div className="absolute top-0 right-0 w-14 h-14 cross-hatch opacity-25 pointer-events-none" />
-        {/* Pencil shading bottom-left */}
         <div className="absolute bottom-0 left-0 w-12 h-12 cross-hatch opacity-15 pointer-events-none" />
         
         <h2 className="text-3xl font-serif font-medium text-center mb-4 text-foreground leading-tight relative z-10">
           {value}
         </h2>
+
+        {/* Tooltip for value description */}
+        {tooltipText && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="relative z-10 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors mt-1">
+                <Info className="w-3.5 h-3.5" />
+                <span>What does this mean?</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-[250px] text-center">
+              <p className="text-sm">{tooltipText}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+
         {description && (
-          <p className="text-muted-foreground text-center text-sm italic font-serif relative z-10">{description}</p>
+          <p className="text-muted-foreground text-center text-sm italic font-serif relative z-10 mt-3">{description}</p>
         )}
       </div>
 

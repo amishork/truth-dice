@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles } from 'lucide-react';
+import { Send, Sparkles, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
@@ -57,6 +57,51 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     }, 50);
+  };
+
+  const exportConversation = () => {
+    if (messages.length === 0) return;
+    
+    const lines = [
+      "═══════════════════════════════════════",
+      "       WORDS INCARNATE — VALUES REFLECTION",
+      "═══════════════════════════════════════",
+      "",
+      `Value: ${rolledValue}`,
+      `Context: ${rolledContext}`,
+      `Date: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`,
+      "",
+      "───────────────────────────────────────",
+      "",
+    ];
+
+    messages.forEach((msg) => {
+      if (msg.content.startsWith("Rolled:")) return;
+      const parsed = msg.role === "assistant" ? parseAssistantMessage(msg.content) : null;
+      const label = msg.role === "user" ? "YOU" : "VALUES COACH";
+      lines.push(`[${label}]`);
+      lines.push(parsed ? parsed.body : msg.content);
+      if (parsed?.question) {
+        lines.push("");
+        lines.push(`Question: ${parsed.question}`);
+        if (parsed.options) {
+          parsed.options.forEach((opt) => lines.push(`  • ${opt}`));
+        }
+      }
+      lines.push("");
+    });
+
+    lines.push("───────────────────────────────────────");
+    lines.push("Exported from Words Incarnate");
+    lines.push("wordsincarnate.com");
+
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `values-reflection-${rolledValue.toLowerCase().replace(/\s+/g, "-")}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const streamChat = async (msgs: Msg[]) => {
@@ -183,9 +228,21 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="px-5 py-4 border-b border-foreground/12">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          <h3 className="font-serif text-lg text-foreground">Values Coach</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <h3 className="font-serif text-lg text-foreground">Values Coach</h3>
+          </div>
+          {messages.length > 1 && (
+            <button
+              onClick={exportConversation}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+              title="Export conversation"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Export</span>
+            </button>
+          )}
         </div>
         <p className="text-[0.6rem] text-muted-foreground mt-1 font-mono tracking-[0.12em] uppercase">
           Exploring <span className="ink-red font-medium">{rolledValue}</span> × <span className="ink-red font-medium">{rolledContext}</span>
