@@ -74,6 +74,7 @@ const Navigation = () => {
           </Sheet>
           </div>
         </div>
+      </div>
     </motion.nav>
   );
 };
