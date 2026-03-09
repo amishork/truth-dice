@@ -25,6 +25,9 @@ import InfiniteMarquee from "@/components/InfiniteMarquee";
 import QuizMilestone from "@/components/QuizMilestone";
 import ValuesConstellation from "@/components/ValuesConstellation";
 import ValuesStatsDashboard from "@/components/ValuesStatsDashboard";
+import SocialProofToasts from "@/components/SocialProofToasts";
+import WelcomeBack from "@/components/WelcomeBack";
+import ShareableValuesCard from "@/components/ShareableValuesCard";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
@@ -515,6 +518,8 @@ const Index = () => {
       <Navigation />
       <ExitIntentPopup onStartQuiz={startValuesDiscovery} />
       <LeadMagnetModal open={showLeadMagnet} onClose={() => setShowLeadMagnet(false)} />
+      <SocialProofToasts />
+      <WelcomeBack onStartQuiz={resumeQuiz} />
       <FloatingCTA onClick={startValuesDiscovery} />
       <BackToTop />
 
@@ -1014,6 +1019,9 @@ const Index = () => {
                   </div>
                 </a>
               </div>
+
+              {/* Shareable Values Card */}
+              <ShareableValuesCard values={finalSixValues} />
 
               {/* Stats Dashboard */}
               <ValuesStatsDashboard
