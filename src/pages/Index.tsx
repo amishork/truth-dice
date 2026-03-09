@@ -1007,14 +1007,6 @@ const Index = () => {
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
-              {/* Commitment Escalation — YOUR JOURNEY at top */}
-              <CommitmentEscalation onAction={(milestone) => {
-                if (milestone === "chat_used") {
-                  const chatEl = document.querySelector('[class*="lg:border-l"]');
-                  chatEl?.scrollIntoView({ behavior: "smooth" });
-                }
-              }} />
-
               {/* Explore your values */}
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
@@ -1039,7 +1031,15 @@ const Index = () => {
                 Roll dice
               </Button>
 
-              {/* Values Constellation — below Roll dice */}
+              {/* Commitment Escalation — YOUR JOURNEY below roll dice */}
+              <CommitmentEscalation onAction={(milestone) => {
+                if (milestone === "chat_used") {
+                  const chatEl = document.querySelector('[class*="lg:border-l"]');
+                  chatEl?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} />
+
+              {/* Values Constellation */}
               <ValuesConstellation values={finalSixValues} />
 
               {/* Speed Round & Poster buttons */}
