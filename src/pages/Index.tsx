@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronRight, Dices, ExternalLink, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import Testimonials from "@/components/Testimonials";
 import { Button } from "@/components/ui/button";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
   "Affection (love and caring)",
@@ -215,6 +219,13 @@ type Stage =
   | "final"
   | "dice";
 
+const fadeInUp = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" as const },
+  transition: { duration: 0.6 },
+};
+
 const Index = () => {
   const [stage, setStage] = useState<Stage>("home");
 
@@ -241,7 +252,6 @@ const Index = () => {
   const [isRolling, setIsRolling] = useState(false);
 
   useEffect(() => {
-    // Keep stage transitions predictable (nav is fixed)
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [stage]);
 
@@ -252,8 +262,6 @@ const Index = () => {
         if (i + 1 < section2Selections.length) pairs.push([section2Selections[i], section2Selections[i + 1]]);
       }
       setSection3Pairs(pairs);
-
-      // If we don't have enough pairs to compare, skip ahead.
       if (pairs.length === 0) setStage("section4");
     }
   }, [stage, section2Selections, section3Pairs.length]);
@@ -265,7 +273,6 @@ const Index = () => {
         if (i + 1 < section3Losers.length) pairs.push([section3Losers[i], section3Losers[i + 1]]);
       }
       setSection3RunoffPairs(pairs);
-
       if (pairs.length === 0) setStage("section4");
     }
   }, [stage, section3Losers, section3RunoffPairs.length]);
@@ -302,7 +309,6 @@ const Index = () => {
     const value = CORE_VALUES[currentValueIndex];
     setSection1Selections((prev) => [...prev, value]);
     incrementCount(value);
-
     if (currentValueIndex < CORE_VALUES.length - 1) setCurrentValueIndex((v) => v + 1);
     else setStage("section2");
   };
@@ -317,7 +323,6 @@ const Index = () => {
     if (!value) return;
     setSection2Selections((prev) => [...prev, value]);
     incrementCount(value);
-
     if (section2Index < section1Selections.length - 1) setSection2Index((v) => v + 1);
     else setStage("section3");
   };
@@ -330,12 +335,10 @@ const Index = () => {
   const handleSection3Selection = (value: string) => {
     const currentPair = section3Pairs[section3PairIndex];
     if (!currentPair) return;
-
     const loser = currentPair[0] === value ? currentPair[1] : currentPair[0];
     setSection3Winners((prev) => [...prev, value]);
     setSection3Losers((prev) => [...prev, loser]);
     incrementCount(value);
-
     if (section3PairIndex < section3Pairs.length - 1) setSection3PairIndex((v) => v + 1);
     else setStage("section3-runoff");
   };
@@ -343,7 +346,6 @@ const Index = () => {
   const handleRunoffSelection = (value: string) => {
     setSection3RunoffWinners((prev) => [...prev, value]);
     incrementCount(value);
-
     if (section3RunoffIndex < section3RunoffPairs.length - 1) setSection3RunoffIndex((v) => v + 1);
     else setStage("section4");
   };
@@ -358,11 +360,9 @@ const Index = () => {
 
   const rollDice = () => {
     if (finalSixValues.length === 0) return;
-
     setIsRolling(true);
     const randomDice1 = finalSixValues[Math.floor(Math.random() * finalSixValues.length)];
     const randomDice2 = DICE_CONTEXTS[Math.floor(Math.random() * DICE_CONTEXTS.length)];
-
     window.setTimeout(() => {
       setDice1Result(randomDice1);
       setDice2Result(randomDice2);
@@ -372,7 +372,6 @@ const Index = () => {
 
   const allWinners = useMemo(() => [...section3Winners, ...section3RunoffWinners], [section3Winners, section3RunoffWinners]);
 
-  // ─── Decorative divider ───
   const Divider = () => (
     <div className="my-10 flex w-full max-w-md items-center gap-4 self-center">
       <div className="h-px flex-1 bg-border" />
@@ -391,13 +390,10 @@ const Index = () => {
           {current} / {Math.max(total, 1)}
         </span>
       </div>
-
       <div className="mb-3 flex items-end justify-between">
         <h2 className="text-xl font-semibold text-foreground">{title}</h2>
       </div>
-
       {subtitle && <p className="mb-4 text-sm text-muted-foreground">{subtitle}</p>}
-
       <div className="relative h-px w-full bg-border">
         <div
           className="absolute left-0 top-0 h-[2px] bg-primary transition-all"
@@ -421,9 +417,19 @@ const Index = () => {
       <main id="main" className="pt-16">
         {/* HERO */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-muted/40" />
+          {/* Background image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${heroBg})` }}
+          />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px]" />
 
-          <div className="relative z-10 mx-auto w-full max-w-3xl text-center">
+          <motion.div
+            className="relative z-10 mx-auto w-full max-w-3xl text-center"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
             <h1 className="wi-wordmark">WORDS INCARNATE</h1>
             <p className="wi-tagline">CONNECTION. DELIGHT. BELONGING.</p>
             <p className="mt-8 text-lg text-muted-foreground">Formation, strategy, and experience design</p>
@@ -447,12 +453,12 @@ const Index = () => {
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">~5 minutes • guided values discovery • 6-value takeaway</p>
-          </div>
+          </motion.div>
         </section>
 
         {/* CONTENT SECTIONS */}
         <section id="making-values" className="container mx-auto space-y-16 px-4 py-20">
-          <div className="mx-auto max-w-3xl">
+          <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-semibold text-foreground">Making Values Incarnate</h2>
             <p className="mt-4 text-muted-foreground">Formation for Families, Schools, and Organizations</p>
             <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
@@ -465,9 +471,9 @@ const Index = () => {
               </p>
               <p>Words Incarnate helps close that gap—by turning values into experiences, and experiences into culture.</p>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="mx-auto max-w-3xl">
+          <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-semibold text-foreground">We Are Losing What Matters Most</h2>
             <p className="mt-4 text-muted-foreground">
               In a digitized and distracted world, something essential is being eroded:
@@ -485,9 +491,9 @@ const Index = () => {
               Words Incarnate meets this cultural and spiritual hunger by helping individuals and communities make
               their values concrete, livable, and shared.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mx-auto max-w-3xl">
+          <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-semibold text-foreground">How We Work</h2>
             <p className="mt-4 text-muted-foreground">Words Incarnate approaches strategy as formation.</p>
             <p className="mt-8 text-foreground leading-relaxed">
@@ -509,11 +515,18 @@ const Index = () => {
                   title: "Belonging",
                   desc: "creating the near occasion of communion and solidarity in purpose",
                 },
-              ].map((x) => (
-                <div key={x.title} className="rounded-lg border border-border bg-card p-5">
+              ].map((x, i) => (
+                <motion.div
+                  key={x.title}
+                  className="rounded-lg border border-border bg-card p-5"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                >
                   <p className="text-sm font-semibold text-foreground">{x.title}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{x.desc}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -521,9 +534,9 @@ const Index = () => {
               We put our professional passion for clarity, intelligence, and expertise at the service of these core
               values—in everything we do.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mx-auto max-w-3xl rounded-xl border border-border bg-card p-8">
+          <motion.div {...fadeInUp} className="mx-auto max-w-3xl rounded-xl border border-border bg-card p-8">
             <h2 className="text-3xl font-semibold text-foreground">An Invitation</h2>
             <p className="mt-4 text-muted-foreground">Words Incarnate is not a quick fix or a branding exercise.</p>
             <p className="mt-8 text-foreground leading-relaxed">
@@ -540,21 +553,56 @@ const Index = () => {
                 <ChevronRight />
               </Button>
             </div>
-          </div>
+          </motion.div>
         </section>
 
-        <footer className="border-t border-border py-10">
+        {/* TESTIMONIALS */}
+        <Testimonials />
+
+        {/* STICKY CTA */}
+        <motion.section
+          className="bg-primary py-16 text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="container mx-auto px-4">
-            <p className="text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Words Incarnate</p>
+            <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">
+              Ready to discover what drives you?
+            </h2>
+            <p className="mt-3 text-primary-foreground/80">
+              Start with our free values discovery — or book a consultation to go deeper.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={startValuesDiscovery}
+                className="wi-cta"
+              >
+                Start Values Discovery
+                <ChevronRight />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="wi-cta border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                onClick={() => window.location.href = "/contact"}
+              >
+                Book a Consultation
+              </Button>
+            </div>
           </div>
-        </footer>
+        </motion.section>
+
+        <Footer />
       </main>
     </div>
   );
 
   const Section1Screen = () => {
     const value = CORE_VALUES[currentValueIndex];
-
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -610,7 +658,6 @@ const Index = () => {
     const pair = section3Pairs[section3PairIndex];
     if (!pair) return null;
     const [value1, value2] = pair;
-
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -631,7 +678,6 @@ const Index = () => {
     const pair = section3RunoffPairs[section3RunoffIndex];
     if (!pair) return null;
     const [value1, value2] = pair;
-
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -655,7 +701,6 @@ const Index = () => {
 
   const Section4Screen = () => {
     const sortedValues = [...allWinners].sort((a, b) => (selectionCounts[b] || 0) - (selectionCounts[a] || 0));
-
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -666,7 +711,6 @@ const Index = () => {
               These values won the most battles. The number shows how many times each was selected.
             </p>
           </div>
-
           <div className="sketch-card overflow-hidden">
             {sortedValues.map((value, index) => (
               <div
@@ -683,9 +727,7 @@ const Index = () => {
               </div>
             ))}
           </div>
-
           <Divider />
-
           <Button onClick={() => setStage("final")} size="lg" className="w-full">
             Continue to final selection
             <ChevronRight />
@@ -707,12 +749,10 @@ const Index = () => {
             </p>
             <p className="mt-4 text-xs text-muted-foreground">{finalSixValues.length} of 6 selected</p>
           </div>
-
           <div className="sketch-card overflow-hidden">
             {allWinners.map((value, index) => {
               const isSelected = finalSixValues.includes(value);
               const isDisabled = !isSelected && finalSixValues.length >= 6;
-
               return (
                 <button
                   key={`${value}-${index}`}
@@ -735,7 +775,6 @@ const Index = () => {
               );
             })}
           </div>
-
           {finalSixValues.length === 6 && (
             <>
               <Divider />
@@ -754,16 +793,13 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
-          {/* Left column */}
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
                 <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div className="sketch-card p-6 text-center">
                   <p className="label-technical">Value</p>
@@ -771,7 +807,6 @@ const Index = () => {
                     <p className="text-base font-medium text-foreground">{dice1Result || "?"}</p>
                   </div>
                 </div>
-
                 <div className="sketch-card p-6 text-center">
                   <p className="label-technical">Context</p>
                   <div className={`mt-4 min-h-16 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
@@ -779,12 +814,10 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-
               <Button onClick={rollDice} disabled={isRolling} size="lg" className="w-full">
                 <Dices />
                 Roll dice
               </Button>
-
               <div className="sketch-card p-5">
                 <p className="label-technical">Your core values</p>
                 <ul className="mt-4 space-y-2.5">
@@ -796,7 +829,6 @@ const Index = () => {
                   ))}
                 </ul>
               </div>
-
               <div className="space-y-3">
                 <p className="text-xs font-medium text-muted-foreground">Optional next steps</p>
                 <a href="#" className="block rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/40">
@@ -820,8 +852,6 @@ const Index = () => {
               </div>
             </div>
           </div>
-
-          {/* Right column */}
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
             <div className="min-h-[520px] lg:min-h-[calc(100vh-5rem)]">
               <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} />

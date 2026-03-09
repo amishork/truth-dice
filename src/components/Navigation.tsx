@@ -9,6 +9,8 @@ const navItems = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/our-story", label: "Our Story" },
+  { to: "/services", label: "Services" },
+  { to: "/contact", label: "Contact" },
 ];
 
 const Navigation = () => {
