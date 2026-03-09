@@ -320,6 +320,7 @@ const Index = () => {
   const [dice1Result, setDice1Result] = useState<string>("");
   const [dice2Result, setDice2Result] = useState<string>("");
   const [isRolling, setIsRolling] = useState(false);
+  const [hasRolledOnce, setHasRolledOnce] = useState(false);
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [showLeadMagnet, setShowLeadMagnet] = useState(false);
