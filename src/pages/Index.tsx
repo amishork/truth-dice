@@ -957,6 +957,9 @@ const Index = () => {
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
+              {/* Values Constellation */}
+              <ValuesConstellation values={finalSixValues} />
+
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
                 <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
