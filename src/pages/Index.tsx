@@ -994,10 +994,16 @@ const Index = () => {
     );
   })();
 
+  // Mark results_viewed milestone when entering dice screen
+  useEffect(() => {
+    if (stage === "dice") markMilestone("results_viewed");
+  }, [stage, markMilestone]);
+
   const diceScreen = (() => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <ValuesPosterGenerator values={finalSixValues} open={showPosterGen} onClose={() => setShowPosterGen(false)} />
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
@@ -1037,6 +1043,38 @@ const Index = () => {
                   ))}
                 </ul>
               </div>
+
+              {/* Speed Round & Poster buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSpeedRound((s) => !s)}
+                  className="text-xs"
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  Speed Round
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPosterGen(true)}
+                  className="text-xs"
+                >
+                  <Image className="h-3.5 w-3.5" />
+                  Create Poster
+                </Button>
+              </div>
+
+              {/* Speed Round */}
+              {showSpeedRound && (
+                <SpeedRound
+                  values={allWinners}
+                  deliberateValues={finalSixValues}
+                  onClose={() => setShowSpeedRound(false)}
+                />
+              )}
+
               <div className="space-y-3">
                 <p className="text-xs font-medium text-muted-foreground">Optional next steps</p>
                 <a href="#" className="block rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/40">
@@ -1061,6 +1099,15 @@ const Index = () => {
 
               {/* Shareable Values Card */}
               <ShareableValuesCard values={finalSixValues} />
+
+              {/* Commitment Escalation */}
+              <CommitmentEscalation onAction={(milestone) => {
+                if (milestone === "chat_used") {
+                  // Scroll to chat panel
+                  const chatEl = document.querySelector('[class*="lg:border-l"]');
+                  chatEl?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} />
 
               {/* Stats Dashboard */}
               <ValuesStatsDashboard
