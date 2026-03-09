@@ -518,6 +518,8 @@ const Index = () => {
       <Navigation />
       <ExitIntentPopup onStartQuiz={startValuesDiscovery} />
       <LeadMagnetModal open={showLeadMagnet} onClose={() => setShowLeadMagnet(false)} />
+      <SocialProofToasts />
+      <WelcomeBack onStartQuiz={resumeQuiz} />
       <FloatingCTA onClick={startValuesDiscovery} />
       <BackToTop />
 
