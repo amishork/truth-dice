@@ -944,7 +944,7 @@ const Index = () => {
   const finalScreen = (() => {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
         <div className="mx-auto w-full max-w-3xl px-6 pt-24">
           <div className="mb-8">
