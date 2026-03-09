@@ -19,6 +19,9 @@ import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LeadMagnetModal from "@/components/LeadMagnetModal";
+import MagneticButton from "@/components/MagneticButton";
+import ScrollTextReveal from "@/components/ScrollTextReveal";
+import InfiniteMarquee from "@/components/InfiniteMarquee";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
