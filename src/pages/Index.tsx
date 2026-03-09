@@ -1,10 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronRight, Dices, ExternalLink, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import Testimonials from "@/components/Testimonials";
 import FloatingCTA from "@/components/FloatingCTA";
+import BackToTop from "@/components/BackToTop";
+import EmberParticles from "@/components/EmberParticles";
+import MorphingTagline from "@/components/MorphingTagline";
+import CursorGlow from "@/components/CursorGlow";
+import GradientBlobs from "@/components/GradientBlobs";
+import Confetti from "@/components/Confetti";
 import { Button } from "@/components/ui/button";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
@@ -220,6 +226,45 @@ type Stage =
   | "final"
   | "dice";
 
+const STORAGE_KEY = "wi-quiz-progress";
+
+interface QuizState {
+  stage: Stage;
+  currentValueIndex: number;
+  section1Selections: string[];
+  section2Index: number;
+  section2Selections: string[];
+  section3PairIndex: number;
+  section3Winners: string[];
+  section3Losers: string[];
+  section3RunoffIndex: number;
+  section3RunoffWinners: string[];
+  selectionCounts: Record<string, number>;
+  finalSixValues: string[];
+}
+
+function loadQuizState(): QuizState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveQuizState(state: QuizState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+}
+
+function clearQuizState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -228,29 +273,63 @@ const fadeInUp = {
 };
 
 const Index = () => {
-  const [stage, setStage] = useState<Stage>("home");
+  const saved = useRef(loadQuizState());
 
-  const [currentValueIndex, setCurrentValueIndex] = useState(0);
-  const [section1Selections, setSection1Selections] = useState<string[]>([]);
-
-  const [section2Index, setSection2Index] = useState(0);
-  const [section2Selections, setSection2Selections] = useState<string[]>([]);
+  const [stage, setStage] = useState<Stage>(saved.current?.stage === "home" || !saved.current ? "home" : saved.current.stage);
+  const [currentValueIndex, setCurrentValueIndex] = useState(saved.current?.currentValueIndex ?? 0);
+  const [section1Selections, setSection1Selections] = useState<string[]>(saved.current?.section1Selections ?? []);
+  const [section2Index, setSection2Index] = useState(saved.current?.section2Index ?? 0);
+  const [section2Selections, setSection2Selections] = useState<string[]>(saved.current?.section2Selections ?? []);
 
   const [section3Pairs, setSection3Pairs] = useState<[string, string][]>([]);
-  const [section3PairIndex, setSection3PairIndex] = useState(0);
-  const [section3Winners, setSection3Winners] = useState<string[]>([]);
-  const [section3Losers, setSection3Losers] = useState<string[]>([]);
+  const [section3PairIndex, setSection3PairIndex] = useState(saved.current?.section3PairIndex ?? 0);
+  const [section3Winners, setSection3Winners] = useState<string[]>(saved.current?.section3Winners ?? []);
+  const [section3Losers, setSection3Losers] = useState<string[]>(saved.current?.section3Losers ?? []);
 
   const [section3RunoffPairs, setSection3RunoffPairs] = useState<[string, string][]>([]);
-  const [section3RunoffIndex, setSection3RunoffIndex] = useState(0);
-  const [section3RunoffWinners, setSection3RunoffWinners] = useState<string[]>([]);
+  const [section3RunoffIndex, setSection3RunoffIndex] = useState(saved.current?.section3RunoffIndex ?? 0);
+  const [section3RunoffWinners, setSection3RunoffWinners] = useState<string[]>(saved.current?.section3RunoffWinners ?? []);
 
-  const [selectionCounts, setSelectionCounts] = useState<Record<string, number>>({});
-  const [finalSixValues, setFinalSixValues] = useState<string[]>([]);
+  const [selectionCounts, setSelectionCounts] = useState<Record<string, number>>(saved.current?.selectionCounts ?? {});
+  const [finalSixValues, setFinalSixValues] = useState<string[]>(saved.current?.finalSixValues ?? []);
 
   const [dice1Result, setDice1Result] = useState<string>("");
   const [dice2Result, setDice2Result] = useState<string>("");
   const [isRolling, setIsRolling] = useState(false);
+
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [hasResumePrompt, setHasResumePrompt] = useState(() => {
+    const s = saved.current;
+    return s !== null && s.stage !== "home" && s.stage !== "dice";
+  });
+
+  // Persist quiz state
+  useEffect(() => {
+    if (stage === "home" || stage === "dice") return;
+    saveQuizState({
+      stage,
+      currentValueIndex,
+      section1Selections,
+      section2Index,
+      section2Selections,
+      section3PairIndex,
+      section3Winners,
+      section3Losers,
+      section3RunoffIndex,
+      section3RunoffWinners,
+      selectionCounts,
+      finalSixValues,
+    });
+  }, [stage, currentValueIndex, section1Selections, section2Index, section2Selections, section3PairIndex, section3Winners, section3Losers, section3RunoffIndex, section3RunoffWinners, selectionCounts, finalSixValues]);
+
+  // Parallax scroll
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    if (stage !== "home") return;
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [stage]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -299,11 +378,17 @@ const Index = () => {
     setDice1Result("");
     setDice2Result("");
     setIsRolling(false);
+    clearQuizState();
   };
 
   const startValuesDiscovery = () => {
     resetQuiz();
+    setHasResumePrompt(false);
     setStage("section1");
+  };
+
+  const resumeQuiz = () => {
+    setHasResumePrompt(false);
   };
 
   const handleSection1Right = () => {
@@ -353,9 +438,12 @@ const Index = () => {
 
   const handleFinalValueToggle = (value: string) => {
     setFinalSixValues((prev) => {
-      if (prev.includes(value)) return prev.filter((v) => v !== value);
-      if (prev.length >= 6) return prev;
-      return [...prev, value];
+      const next = prev.includes(value) ? prev.filter((v) => v !== value) : prev.length >= 6 ? prev : [...prev, value];
+      // Trigger confetti on 6th selection
+      if (!prev.includes(value) && next.length === 6) {
+        setShowConfetti(true);
+      }
+      return next;
     });
   };
 
@@ -415,16 +503,26 @@ const Index = () => {
 
       <Navigation />
       <FloatingCTA onClick={startValuesDiscovery} />
+      <BackToTop />
 
       <main id="main" className="pt-16">
-        {/* HERO */}
+        {/* HERO — parallax + particles + cursor glow */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
-          {/* Background image */}
+          {/* Parallax background layers */}
           <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroBg})` }}
+            className="absolute inset-0 bg-cover bg-center will-change-transform"
+            style={{
+              backgroundImage: `url(${heroBg})`,
+              transform: `translateY(${scrollY * 0.3}px) scale(1.1)`,
+            }}
           />
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px]" />
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-[2px]"
+            style={{ transform: `translateY(${scrollY * 0.1}px)` }}
+          />
+
+          <EmberParticles />
+          <CursorGlow />
 
           <motion.div
             className="relative z-10 mx-auto w-full max-w-3xl text-center"
@@ -433,7 +531,9 @@ const Index = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="wi-wordmark">WORDS INCARNATE</h1>
-            <p className="wi-tagline">CONNECTION. DELIGHT. BELONGING.</p>
+            <div className="mt-3 flex justify-center">
+              <MorphingTagline />
+            </div>
             <p className="mt-8 text-lg text-muted-foreground">Formation, strategy, and experience design</p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -455,11 +555,32 @@ const Index = () => {
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">~5 minutes • guided values discovery • 6-value takeaway</p>
+
+            {/* Resume prompt */}
+            {hasResumePrompt && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mx-auto mt-6 max-w-sm rounded-lg border border-primary/30 bg-card p-4 shadow-lg"
+              >
+                <p className="text-sm text-foreground">You have a quiz in progress!</p>
+                <div className="mt-3 flex justify-center gap-2">
+                  <Button size="sm" onClick={resumeQuiz}>
+                    Resume
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => { setHasResumePrompt(false); resetQuiz(); setStage("home"); }}>
+                    Start Over
+                  </Button>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </section>
 
-        {/* CONTENT SECTIONS */}
-        <section id="making-values" className="container mx-auto space-y-16 px-4 py-20">
+        {/* CONTENT SECTIONS — with gradient blobs */}
+        <section id="making-values" className="relative container mx-auto space-y-16 px-4 py-20">
+          <GradientBlobs />
+
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-semibold text-foreground">Making Values Incarnate</h2>
             <p className="mt-4 text-muted-foreground">Formation for Families, Schools, and Organizations</p>
@@ -743,6 +864,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
         <div className="mx-auto w-full max-w-3xl px-6 pt-24">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground">Your final 6 values</h2>
@@ -780,7 +902,7 @@ const Index = () => {
           {finalSixValues.length === 6 && (
             <>
               <Divider />
-              <Button onClick={() => setStage("dice")} size="lg" className="w-full">
+              <Button onClick={() => { clearQuizState(); setStage("dice"); }} size="lg" className="w-full">
                 Continue to dice
                 <ChevronRight />
               </Button>
