@@ -65,7 +65,7 @@ export const ValueCard: React.FC<ValueCardProps> = ({
       x: -120,
       rotate: -25,
       opacity: 0,
-      transition: { duration: 0.35, ease: [0.4, 0, 1, 1] },
+      transition: { duration: 0.35, ease: [0.4, 0, 1, 1] as [number, number, number, number] },
     },
     right: {
       y: -30,
@@ -73,7 +73,7 @@ export const ValueCard: React.FC<ValueCardProps> = ({
       rotate: 8,
       opacity: 0,
       scale: 0.95,
-      transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
     },
   };
 
