@@ -34,14 +34,17 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/values-chat`
 interface ValuesChatProps {
   rolledValue: string;
   rolledContext: string;
+  onTriggerProductPopup?: () => void;
 }
 
-export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext }) => {
+export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, onTriggerProductPopup }) => {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const popupTriggeredRef = useRef(false);
 
   useEffect(() => {
     if (rolledValue && rolledContext && !hasStarted) {
@@ -52,11 +55,9 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   }, [rolledValue, rolledContext]);
 
   const scrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
-    }, 50);
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    });
   };
 
   const exportConversation = () => {
@@ -164,6 +165,11 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
               return [...prev, { role: 'assistant', content: assistantSoFar }];
             });
             scrollToBottom();
+            // Trigger product popup when specific phrase appears
+            if (!popupTriggeredRef.current && assistantSoFar.includes('At Words Incarnate, everything we create')) {
+              popupTriggeredRef.current = true;
+              onTriggerProductPopup?.();
+            }
           }
         } catch {
           textBuffer = line + '\n' + textBuffer;
@@ -315,6 +321,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             </div>
           </div>
         )}
+        <div ref={bottomRef} />
       </div>
 
       {/* Input */}

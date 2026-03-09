@@ -321,7 +321,7 @@ const Index = () => {
   const [dice1Result, setDice1Result] = useState<string>("");
   const [dice2Result, setDice2Result] = useState<string>("");
   const [isRolling, setIsRolling] = useState(false);
-  const [hasRolledOnce, setHasRolledOnce] = useState(false);
+  const [showDicePopup, setShowDicePopup] = useState(false);
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [showLeadMagnet, setShowLeadMagnet] = useState(false);
@@ -503,7 +503,7 @@ const Index = () => {
   const rollDice = () => {
     if (finalSixValues.length === 0) return;
     setIsRolling(true);
-    if (!hasRolledOnce) setHasRolledOnce(true);
+    // popup now triggered by chat phrase instead
     const randomDice1 = finalSixValues[Math.floor(Math.random() * finalSixValues.length)];
     const randomDice2 = DICE_CONTEXTS[Math.floor(Math.random() * DICE_CONTEXTS.length)];
     window.setTimeout(() => {
@@ -1007,7 +1007,7 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         <ValuesPosterGenerator values={finalSixValues} open={showPosterGen} onClose={() => setShowPosterGen(false)} />
-        <DiceProductPopup values={finalSixValues} visible={hasRolledOnce} />
+        <DiceProductPopup values={finalSixValues} visible={showDicePopup} />
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
@@ -1083,7 +1083,7 @@ const Index = () => {
           </div>
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
             <div className="min-h-[520px] lg:min-h-[calc(100vh-5rem)]">
-              <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} />
+              <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} onTriggerProductPopup={() => setShowDicePopup(true)} />
             </div>
           </div>
         </div>
