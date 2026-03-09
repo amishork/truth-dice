@@ -798,6 +798,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <QuizMilestone current={section2Index + 1} total={section1Selections.length} />
         <QuizTop title="True or aspire?" current={section2Index + 1} total={section1Selections.length} />
         <div className="flex items-center justify-center px-6 pb-10">
           <ValueCard
