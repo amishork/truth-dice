@@ -19,6 +19,9 @@ import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LeadMagnetModal from "@/components/LeadMagnetModal";
+import MagneticButton from "@/components/MagneticButton";
+import ScrollTextReveal from "@/components/ScrollTextReveal";
+import InfiniteMarquee from "@/components/InfiniteMarquee";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
@@ -546,21 +549,25 @@ const Index = () => {
             <p className="mt-8 text-lg text-muted-foreground">Formation, strategy, and experience design</p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
-                Start Values Discovery
-                <ChevronRight />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="wi-cta"
-                onClick={() => {
-                  const el = document.getElementById("making-values");
-                  el?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              >
-                Learn more
-              </Button>
+              <MagneticButton>
+                <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
+                  Start Values Discovery
+                  <ChevronRight />
+                </Button>
+              </MagneticButton>
+              <MagneticButton>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="wi-cta"
+                  onClick={() => {
+                    const el = document.getElementById("making-values");
+                    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  Learn more
+                </Button>
+              </MagneticButton>
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">~5 minutes • guided values discovery • 6-value takeaway</p>
@@ -591,7 +598,7 @@ const Index = () => {
           <GradientBlobs />
 
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold text-foreground">Making Values Incarnate</h2>
+            <ScrollTextReveal text="Making Values Incarnate" className="text-3xl font-semibold text-foreground" />
             <p className="mt-4 text-muted-foreground">Formation for Families, Schools, and Organizations</p>
             <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
               <p>
@@ -606,7 +613,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold text-foreground">We Are Losing What Matters Most</h2>
+            <ScrollTextReveal text="We Are Losing What Matters Most" className="text-3xl font-semibold text-foreground" />
             <p className="mt-4 text-muted-foreground">
               In a digitized and distracted world, something essential is being eroded:
             </p>
@@ -626,7 +633,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold text-foreground">How We Work</h2>
+            <ScrollTextReveal text="How We Work" className="text-3xl font-semibold text-foreground" />
             <p className="mt-4 text-muted-foreground">Words Incarnate approaches strategy as formation.</p>
             <p className="mt-8 text-foreground leading-relaxed">
               Drawing from classical wisdom, Catholic anthropology, and lived experience, we help leaders and
@@ -680,16 +687,23 @@ const Index = () => {
               people—not just systems—we would be honored to walk with you.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
-                Let's make values incarnate again
-                <ChevronRight />
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
-                Free worksheet
-              </Button>
+              <MagneticButton>
+                <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
+                  Let's make values incarnate again
+                  <ChevronRight />
+                </Button>
+              </MagneticButton>
+              <MagneticButton>
+                <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
+                  Free worksheet
+                </Button>
+              </MagneticButton>
             </div>
           </motion.div>
         </section>
+
+        {/* MARQUEE */}
+        <InfiniteMarquee />
 
         {/* TRUSTED BY */}
         <TrustedByLogos />

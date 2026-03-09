@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
+import ScrollProgressBar from "./components/ScrollProgressBar";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import OurStory from "./pages/OurStory";
@@ -41,6 +42,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <ScrollProgressBar />
         <BrowserRouter>
           <AnimatedRoutes />
         </BrowserRouter>

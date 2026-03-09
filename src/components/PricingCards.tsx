@@ -101,10 +101,10 @@ const PricingCards = () => {
                 className={`sketch-card p-6 flex flex-col ${
                   tier.popular ? "ring-2 ring-primary" : ""
                 }`}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                transition={{ duration: 0.6, delay: i * 0.12, ease: "easeOut" }}
               >
                 {tier.popular && (
                   <span className="mb-3 self-start rounded-full bg-primary px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
