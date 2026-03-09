@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Dices, ExternalLink, Heart } from "lucide-react";
+import { ChevronRight, Dices, ExternalLink, Heart, Zap, Image } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -31,8 +31,12 @@ import ShareableValuesCard from "@/components/ShareableValuesCard";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
 import TextScramble from "@/components/TextScramble";
+import CommitmentEscalation from "@/components/CommitmentEscalation";
+import SpeedRound from "@/components/SpeedRound";
+import ValuesPosterGenerator from "@/components/ValuesPosterGenerator";
 import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
 import { useAmbientMood } from "@/hooks/useAmbientMood";
+import { useCommitmentTracker } from "@/hooks/useCommitmentTracker";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
@@ -319,6 +323,8 @@ const Index = () => {
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [showLeadMagnet, setShowLeadMagnet] = useState(false);
+  const [showSpeedRound, setShowSpeedRound] = useState(false);
+  const [showPosterGen, setShowPosterGen] = useState(false);
   const [hasResumePrompt, setHasResumePrompt] = useState(() => {
     const s = saved.current;
     return s !== null && s.stage !== "home" && s.stage !== "dice";
@@ -335,6 +341,9 @@ const Index = () => {
 
   useDynamicTabTitle(stage === "sorting" || stage === "gratitude" ? "section1" : stage, quizProgress);
   useAnimatedFavicon(stage !== "home");
+
+  // Commitment tracker
+  const { markMilestone } = useCommitmentTracker();
 
   // Ambient mood shifting
   useAmbientMood(
@@ -425,6 +434,7 @@ const Index = () => {
   const startValuesDiscovery = () => {
     resetQuiz();
     setHasResumePrompt(false);
+    markMilestone("quiz_started");
     setStage("sorting");
   };
 
@@ -501,6 +511,8 @@ const Index = () => {
   };
 
   const allWinners = useMemo(() => [...section3Winners, ...section3RunoffWinners], [section3Winners, section3RunoffWinners]);
+
+  const isQuizActive = ["section1", "section2", "section3", "section3-runoff", "section4", "final"].includes(stage);
 
   const Divider = () => (
     <div className="my-10 flex w-full max-w-md items-center gap-4 self-center">
@@ -795,7 +807,7 @@ const Index = () => {
     const value = CORE_VALUES[currentValueIndex];
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizMilestone current={currentValueIndex + 1} total={CORE_VALUES.length} />
         <QuizTop title="Does it resonate?" current={currentValueIndex + 1} total={CORE_VALUES.length} />
         <div className="flex items-center justify-center px-6 pb-10">
@@ -815,7 +827,7 @@ const Index = () => {
     if (section2Index >= section1Selections.length) {
       return (
         <div className="min-h-screen bg-background">
-          <Navigation />
+          <Navigation dimmed={isQuizActive} />
           <div className="mx-auto max-w-3xl px-6 pt-24">
             <p className="text-muted-foreground">No values selected in the first pass—return and try again.</p>
             <div className="mt-6">
@@ -829,7 +841,7 @@ const Index = () => {
     const value = section1Selections[section2Index];
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizMilestone current={section2Index + 1} total={section1Selections.length} />
         <QuizTop title="True or aspire?" current={section2Index + 1} total={section1Selections.length} />
         <div className="flex items-center justify-center px-6 pb-10">
@@ -852,7 +864,7 @@ const Index = () => {
     const [value1, value2] = pair;
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizTop title="Legacy choice" current={section3PairIndex + 1} total={section3Pairs.length} />
         <div className="flex items-center justify-center px-6 pb-10">
           <ValuePair
@@ -872,7 +884,7 @@ const Index = () => {
     const [value1, value2] = pair;
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizTop
           title="Runoff round"
           subtitle="Second chance for values that didn't win the first round"
@@ -895,7 +907,7 @@ const Index = () => {
     const sortedValues = [...allWinners].sort((a, b) => (selectionCounts[b] || 0) - (selectionCounts[a] || 0));
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <div className="mx-auto w-full max-w-3xl px-6 pt-24">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground">Your top values</h2>
@@ -932,7 +944,7 @@ const Index = () => {
   const finalScreen = (() => {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
         <div className="mx-auto w-full max-w-3xl px-6 pt-24">
           <div className="mb-8">
@@ -982,10 +994,16 @@ const Index = () => {
     );
   })();
 
+  // Mark results_viewed milestone when entering dice screen
+  useEffect(() => {
+    if (stage === "dice") markMilestone("results_viewed");
+  }, [stage, markMilestone]);
+
   const diceScreen = (() => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+        <ValuesPosterGenerator values={finalSixValues} open={showPosterGen} onClose={() => setShowPosterGen(false)} />
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
@@ -1025,6 +1043,38 @@ const Index = () => {
                   ))}
                 </ul>
               </div>
+
+              {/* Speed Round & Poster buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSpeedRound((s) => !s)}
+                  className="text-xs"
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  Speed Round
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPosterGen(true)}
+                  className="text-xs"
+                >
+                  <Image className="h-3.5 w-3.5" />
+                  Create Poster
+                </Button>
+              </div>
+
+              {/* Speed Round */}
+              {showSpeedRound && (
+                <SpeedRound
+                  values={allWinners}
+                  deliberateValues={finalSixValues}
+                  onClose={() => setShowSpeedRound(false)}
+                />
+              )}
+
               <div className="space-y-3">
                 <p className="text-xs font-medium text-muted-foreground">Optional next steps</p>
                 <a href="#" className="block rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/40">
@@ -1049,6 +1099,15 @@ const Index = () => {
 
               {/* Shareable Values Card */}
               <ShareableValuesCard values={finalSixValues} />
+
+              {/* Commitment Escalation */}
+              <CommitmentEscalation onAction={(milestone) => {
+                if (milestone === "chat_used") {
+                  // Scroll to chat panel
+                  const chatEl = document.querySelector('[class*="lg:border-l"]');
+                  chatEl?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} />
 
               {/* Stats Dashboard */}
               <ValuesStatsDashboard

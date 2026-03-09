@@ -14,12 +14,18 @@ const navItems = [
   { to: "/contact", label: "Contact" },
 ];
 
-const Navigation = () => {
+interface NavigationProps {
+  dimmed?: boolean;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ dimmed = false }) => {
   return (
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm"
+      className={`fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm transition-all duration-700 ${
+        dimmed ? "opacity-20 blur-[1px] pointer-events-none" : ""
+      }`}
       initial={{ y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      animate={{ y: 0, opacity: dimmed ? 0.2 : 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
