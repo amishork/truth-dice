@@ -346,7 +346,7 @@ const Index = () => {
 
   // Persist quiz state
   useEffect(() => {
-    if (stage === "home" || stage === "dice") return;
+    if (stage === "home" || stage === "dice" || stage === "sorting" || stage === "gratitude") return;
     saveQuizState({
       stage,
       currentValueIndex,
