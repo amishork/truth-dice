@@ -577,7 +577,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="wi-wordmark">WORDS INCARNATE</h1>
+            <h1 className="wi-wordmark"><TextScramble text="WORDS INCARNATE" as="span" duration={1.8} /></h1>
             <div className="mt-3 flex justify-center">
               <MorphingTagline />
             </div>
