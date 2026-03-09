@@ -864,7 +864,7 @@ const Index = () => {
     const [value1, value2] = pair;
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizTop title="Legacy choice" current={section3PairIndex + 1} total={section3Pairs.length} />
         <div className="flex items-center justify-center px-6 pb-10">
           <ValuePair
