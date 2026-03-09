@@ -244,7 +244,7 @@ const Index = () => {
 
   useEffect(() => {
     // Keep stage transitions predictable (nav is fixed)
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    window.scrollTo({ top: 0, behavior: "auto" });
   }, [stage]);
 
   useEffect(() => {
