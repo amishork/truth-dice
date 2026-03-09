@@ -1,7 +1,7 @@
 export const SHOPIFY_API_VERSION = '2025-07';
-export const SHOPIFY_STORE_PERMANENT_DOMAIN = 'truth-dice-pdacu.myshopify.com';
+export const SHOPIFY_STORE_PERMANENT_DOMAIN = 'rhanc5-u2.myshopify.com';
 export const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-export const SHOPIFY_STOREFRONT_TOKEN = 'bbff51594ada5c865c26a92d32940b7a';
+export const SHOPIFY_STOREFRONT_TOKEN = '34c438630f503de5b7b32e80feb6fa38';
 
 export interface ShopifyProduct {
   node: {
