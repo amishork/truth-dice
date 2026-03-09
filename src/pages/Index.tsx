@@ -1007,6 +1007,7 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         <ValuesPosterGenerator values={finalSixValues} open={showPosterGen} onClose={() => setShowPosterGen(false)} />
+        <DiceProductPopup values={finalSixValues} visible={hasRolledOnce} />
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
