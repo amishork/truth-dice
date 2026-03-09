@@ -1007,9 +1007,15 @@ const Index = () => {
         <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
           <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
             <div className="mx-auto w-full max-w-md space-y-8">
-              {/* Values Constellation */}
-              <ValuesConstellation values={finalSixValues} />
+              {/* Commitment Escalation — YOUR JOURNEY at top */}
+              <CommitmentEscalation onAction={(milestone) => {
+                if (milestone === "chat_used") {
+                  const chatEl = document.querySelector('[class*="lg:border-l"]');
+                  chatEl?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} />
 
+              {/* Explore your values */}
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
                 <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
@@ -1032,17 +1038,9 @@ const Index = () => {
                 <Dices />
                 Roll dice
               </Button>
-              <div className="sketch-card p-5">
-                <p className="label-technical">Your core values</p>
-                <ul className="mt-4 space-y-2.5">
-                  {finalSixValues.map((value, index) => (
-                    <li key={`${value}-${index}`} className="flex items-center gap-3 text-sm text-foreground">
-                      <Heart className="h-4 w-4 text-primary" />
-                      <span>{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
+              {/* Values Constellation — below Roll dice */}
+              <ValuesConstellation values={finalSixValues} />
 
               {/* Speed Round & Poster buttons */}
               <div className="grid grid-cols-2 gap-3">
@@ -1075,46 +1073,8 @@ const Index = () => {
                 />
               )}
 
-              <div className="space-y-3">
-                <p className="text-xs font-medium text-muted-foreground">Optional next steps</p>
-                <a href="#" className="block rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/40">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Define Your Personal Values Workshop</p>
-                      <p className="mt-1 text-xs text-muted-foreground">Deep dive into understanding and living your values</p>
-                    </div>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </a>
-                <a href="#" className="block rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/40">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Family Foundations Journey</p>
-                      <p className="mt-1 text-xs text-muted-foreground">3 workshops to transform your family with your values</p>
-                    </div>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </a>
-              </div>
-
               {/* Shareable Values Card */}
               <ShareableValuesCard values={finalSixValues} />
-
-              {/* Commitment Escalation */}
-              <CommitmentEscalation onAction={(milestone) => {
-                if (milestone === "chat_used") {
-                  // Scroll to chat panel
-                  const chatEl = document.querySelector('[class*="lg:border-l"]');
-                  chatEl?.scrollIntoView({ behavior: "smooth" });
-                }
-              }} />
-
-              {/* Stats Dashboard */}
-              <ValuesStatsDashboard
-                finalValues={finalSixValues}
-                selectionCounts={selectionCounts}
-                allWinners={allWinners}
-              />
             </div>
           </div>
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
