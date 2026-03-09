@@ -1,5 +1,13 @@
+import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 },
+};
 
 const About = () => {
   return (
@@ -8,24 +16,43 @@ const About = () => {
 
       <main className="container mx-auto px-4 pt-24 pb-20">
         <div className="mx-auto max-w-3xl">
-          <h1 className="text-4xl sm:text-5xl font-semibold text-foreground">About</h1>
-          <p className="mt-4 text-muted-foreground">Connection. Delight. Belonging.</p>
+          <motion.h1 {...fadeUp} className="text-4xl sm:text-5xl font-semibold text-foreground">
+            About
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="mt-4 text-muted-foreground"
+          >
+            Connection. Delight. Belonging.
+          </motion.p>
 
-          <div className="mt-10 space-y-5 text-foreground leading-relaxed">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mt-10 space-y-5 text-foreground leading-relaxed"
+          >
             <p>
               Words Incarnate exists to help people name what they love—and build lives and cultures that embody it.
             </p>
             <p>
-              We work with families, schools, and organizations to translate values from “ideas we agree with” into
+              We work with families, schools, and organizations to translate values from "ideas we agree with" into
               practices that shape daily life.
             </p>
             <p>
               Our approach treats strategy as formation: aligning belief, behavior, and the lived experiences that
               become culture.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mt-12 rounded-xl border border-border bg-card p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, duration: 0.6 }}
+            className="mt-12 rounded-xl border border-border bg-card p-8"
+          >
             <h2 className="text-2xl font-semibold text-foreground">How we serve</h2>
             <ul className="mt-6 space-y-3 text-muted-foreground">
               <li>Formation experiences designed for real life (not just retreats or slogans).</li>
@@ -37,9 +64,11 @@ const About = () => {
                 <a href="/">Start values discovery</a>
               </Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, GraduationCap, Building } from "lucide-react";
 
@@ -57,10 +58,9 @@ const Services = () => {
           transition={{ duration: 0.8 }}
           className="max-w-6xl mx-auto"
         >
-          {/* Hero Section */}
-          <div className="text-center mb-20">
+          <div className="text-center mb-20 pt-8">
             <motion.h1 
-              className="brand-heading text-5xl md:text-6xl mb-6 ink-red"
+              className="text-4xl sm:text-5xl font-semibold text-foreground mb-6"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -78,7 +78,6 @@ const Services = () => {
             </motion.p>
           </div>
 
-          {/* Services Grid */}
           <div className="space-y-16">
             {services.map((service, index) => {
               const Icon = service.icon;
@@ -97,7 +96,7 @@ const Services = () => {
                           <Icon className="w-6 h-6 text-primary" />
                         </div>
                         <div>
-                          <h2 className="brand-heading text-3xl ink-red">{service.title}</h2>
+                          <h2 className="text-3xl font-semibold text-primary">{service.title}</h2>
                           <p className="text-primary font-medium">{service.subtitle}</p>
                         </div>
                       </div>
@@ -121,7 +120,7 @@ const Services = () => {
                         ))}
                       </ul>
                       
-                      <Button className="group interactive-glow">
+                      <Button onClick={() => window.location.href = "/contact"} className="group">
                         {service.cta}
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
@@ -138,31 +137,32 @@ const Services = () => {
             })}
           </div>
 
-          {/* Call to Action Section */}
           <motion.div 
             className="sketch-card p-8 md:p-12 text-center mt-20"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4, duration: 0.8 }}
           >
-            <h2 className="brand-heading text-3xl md:text-4xl mb-6 ink-red">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-6 text-primary">
               Ready to Discover Your Values?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Start your journey toward authentic living with our interactive values discovery process.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="interactive-glow">
+              <Button size="lg" onClick={() => window.location.href = "/"}>
                 Start Values Discovery
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" onClick={() => window.location.href = "/contact"}>
                 Schedule Consultation
               </Button>
             </div>
           </motion.div>
         </motion.div>
       </main>
+
+      <Footer />
     </div>
   );
 };
