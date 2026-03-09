@@ -415,6 +415,8 @@ const Index = () => {
 
       <Navigation />
       <FloatingCTA onClick={startValuesDiscovery} />
+
+      <main id="main" className="pt-16">
         {/* HERO */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
           {/* Background image */}
