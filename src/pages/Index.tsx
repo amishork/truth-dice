@@ -675,10 +675,13 @@ const Index = () => {
               If you are ready to make your values visible again, to restore meaning to daily life, and to form
               people—not just systems—we would be honored to walk with you.
             </p>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
                 Let's make values incarnate again
                 <ChevronRight />
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
+                Free worksheet
               </Button>
             </div>
           </motion.div>
