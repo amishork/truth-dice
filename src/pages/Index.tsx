@@ -884,7 +884,7 @@ const Index = () => {
     const [value1, value2] = pair;
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <QuizTop
           title="Runoff round"
           subtitle="Second chance for values that didn't win the first round"
