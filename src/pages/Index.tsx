@@ -434,6 +434,7 @@ const Index = () => {
   const startValuesDiscovery = () => {
     resetQuiz();
     setHasResumePrompt(false);
+    markMilestone("quiz_started");
     setStage("sorting");
   };
 
