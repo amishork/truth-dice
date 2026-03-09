@@ -613,7 +613,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-semibold text-foreground">We Are Losing What Matters Most</h2>
+            <ScrollTextReveal text="We Are Losing What Matters Most" className="text-3xl font-semibold text-foreground" />
             <p className="mt-4 text-muted-foreground">
               In a digitized and distracted world, something essential is being eroded:
             </p>
