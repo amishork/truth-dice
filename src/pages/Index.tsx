@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Dices, ExternalLink, Heart } from "lucide-react";
+import { ChevronRight, Dices, ExternalLink, Heart, Zap, Image } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
