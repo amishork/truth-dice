@@ -324,6 +324,26 @@ const Index = () => {
     return s !== null && s.stage !== "home" && s.stage !== "dice";
   });
 
+  // Dynamic tab title & animated favicon
+  const quizProgress = useMemo(() => {
+    if (stage === "section1") return { current: currentValueIndex + 1, total: CORE_VALUES.length };
+    if (stage === "section2") return { current: section2Index + 1, total: section1Selections.length };
+    if (stage === "section3") return { current: section3PairIndex + 1, total: section3Pairs.length };
+    if (stage === "section3-runoff") return { current: section3RunoffIndex + 1, total: section3RunoffPairs.length };
+    return undefined;
+  }, [stage, currentValueIndex, section2Index, section1Selections.length, section3PairIndex, section3Pairs.length, section3RunoffIndex, section3RunoffPairs.length]);
+
+  useDynamicTabTitle(stage === "sorting" || stage === "gratitude" ? "section1" : stage, quizProgress);
+  useAnimatedFavicon(stage !== "home");
+
+  // Ambient mood shifting
+  useAmbientMood(
+    stage !== "home" && stage !== "sorting" && stage !== "gratitude",
+    stage === "section1" ? section1Selections :
+    stage === "section2" ? section2Selections :
+    [...section3Winners, ...section3RunoffWinners]
+  );
+
   // Persist quiz state
   useEffect(() => {
     if (stage === "home" || stage === "dice") return;
