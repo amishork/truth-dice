@@ -492,7 +492,7 @@ const Index = () => {
     </div>
   );
 
-  const HomeScreen = () => (
+  const homeScreen = (
     <div className="min-h-screen bg-background">
       <a
         href="#main"
@@ -724,7 +724,7 @@ const Index = () => {
     </div>
   );
 
-  const Section1Screen = () => {
+  const section1Screen = (() => {
     const value = CORE_VALUES[currentValueIndex];
     return (
       <div className="min-h-screen bg-background">
@@ -741,9 +741,9 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
-  const Section2Screen = () => {
+  const section2Screen = (() => {
     if (section2Index >= section1Selections.length) {
       return (
         <div className="min-h-screen bg-background">
@@ -775,9 +775,9 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
-  const Section3Screen = () => {
+  const section3Screen = (() => {
     const pair = section3Pairs[section3PairIndex];
     if (!pair) return null;
     const [value1, value2] = pair;
@@ -795,9 +795,9 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
-  const Section3RunoffScreen = () => {
+  const section3RunoffScreen = (() => {
     const pair = section3RunoffPairs[section3RunoffIndex];
     if (!pair) return null;
     const [value1, value2] = pair;
@@ -820,9 +820,9 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
-  const Section4Screen = () => {
+  const section4Screen = (() => {
     const sortedValues = [...allWinners].sort((a, b) => (selectionCounts[b] || 0) - (selectionCounts[a] || 0));
     return (
       <div className="min-h-screen bg-background">
@@ -858,9 +858,9 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
-  const FinalScreen = () => {
+  const finalScreen = (() => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -911,9 +911,9 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
-  const DiceScreen = () => {
+  const diceScreen = (() => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -984,18 +984,18 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  })();
 
   return (
     <div className="min-h-screen bg-background">
-      {stage === "home" && <HomeScreen />}
-      {stage === "section1" && <Section1Screen />}
-      {stage === "section2" && <Section2Screen />}
-      {stage === "section3" && <Section3Screen />}
-      {stage === "section3-runoff" && <Section3RunoffScreen />}
-      {stage === "section4" && <Section4Screen />}
-      {stage === "final" && <FinalScreen />}
-      {stage === "dice" && <DiceScreen />}
+      {stage === "home" && homeScreen}
+      {stage === "section1" && section1Screen}
+      {stage === "section2" && section2Screen}
+      {stage === "section3" && section3Screen}
+      {stage === "section3-runoff" && section3RunoffScreen}
+      {stage === "section4" && section4Screen}
+      {stage === "final" && finalScreen}
+      {stage === "dice" && diceScreen}
     </div>
   );
 };
