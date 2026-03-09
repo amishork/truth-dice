@@ -165,6 +165,11 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
               return [...prev, { role: 'assistant', content: assistantSoFar }];
             });
             scrollToBottom();
+            // Trigger product popup when specific phrase appears
+            if (!popupTriggeredRef.current && assistantSoFar.includes('At Words Incarnate, everything we create')) {
+              popupTriggeredRef.current = true;
+              onTriggerProductPopup?.();
+            }
           }
         } catch {
           textBuffer = line + '\n' + textBuffer;
