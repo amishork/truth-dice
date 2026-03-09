@@ -28,6 +28,11 @@ import ValuesStatsDashboard from "@/components/ValuesStatsDashboard";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import WelcomeBack from "@/components/WelcomeBack";
 import ShareableValuesCard from "@/components/ShareableValuesCard";
+import TheSorting from "@/components/TheSorting";
+import GratitudeMoment from "@/components/GratitudeMoment";
+import TextScramble from "@/components/TextScramble";
+import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
+import { useAmbientMood } from "@/hooks/useAmbientMood";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
@@ -231,11 +236,13 @@ const DICE_CONTEXTS = ["hope", "fear", "person", "place", "physical object", "ex
 
 type Stage =
   | "home"
+  | "sorting"
   | "section1"
   | "section2"
   | "section3"
   | "section3-runoff"
   | "section4"
+  | "gratitude"
   | "final"
   | "dice";
 
@@ -317,9 +324,29 @@ const Index = () => {
     return s !== null && s.stage !== "home" && s.stage !== "dice";
   });
 
+  // Dynamic tab title & animated favicon
+  const quizProgress = useMemo(() => {
+    if (stage === "section1") return { current: currentValueIndex + 1, total: CORE_VALUES.length };
+    if (stage === "section2") return { current: section2Index + 1, total: section1Selections.length };
+    if (stage === "section3") return { current: section3PairIndex + 1, total: section3Pairs.length };
+    if (stage === "section3-runoff") return { current: section3RunoffIndex + 1, total: section3RunoffPairs.length };
+    return undefined;
+  }, [stage, currentValueIndex, section2Index, section1Selections.length, section3PairIndex, section3Pairs.length, section3RunoffIndex, section3RunoffPairs.length]);
+
+  useDynamicTabTitle(stage === "sorting" || stage === "gratitude" ? "section1" : stage, quizProgress);
+  useAnimatedFavicon(stage !== "home");
+
+  // Ambient mood shifting
+  useAmbientMood(
+    stage !== "home" && stage !== "sorting" && stage !== "gratitude",
+    stage === "section1" ? section1Selections :
+    stage === "section2" ? section2Selections :
+    [...section3Winners, ...section3RunoffWinners]
+  );
+
   // Persist quiz state
   useEffect(() => {
-    if (stage === "home" || stage === "dice") return;
+    if (stage === "home" || stage === "dice" || stage === "sorting" || stage === "gratitude") return;
     saveQuizState({
       stage,
       currentValueIndex,
@@ -398,7 +425,7 @@ const Index = () => {
   const startValuesDiscovery = () => {
     resetQuiz();
     setHasResumePrompt(false);
-    setStage("section1");
+    setStage("sorting");
   };
 
   const resumeQuiz = () => {
@@ -550,7 +577,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="wi-wordmark">WORDS INCARNATE</h1>
+            <h1 className="wi-wordmark"><TextScramble text="WORDS INCARNATE" as="span" duration={1.8} /></h1>
             <div className="mt-3 flex justify-center">
               <MorphingTagline />
             </div>
@@ -944,7 +971,7 @@ const Index = () => {
           {finalSixValues.length === 6 && (
             <>
               <Divider />
-              <Button onClick={() => { clearQuizState(); setStage("dice"); }} size="lg" className="w-full">
+              <Button onClick={() => { clearQuizState(); setStage("gratitude"); }} size="lg" className="w-full">
                 Continue to dice
                 <ChevronRight />
               </Button>
@@ -1042,7 +1069,13 @@ const Index = () => {
   })();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background ambient-mood">
+      {stage === "sorting" && (
+        <TheSorting onComplete={() => setStage("section1")} />
+      )}
+      {stage === "gratitude" && (
+        <GratitudeMoment onComplete={() => setStage("dice")} />
+      )}
       {stage === "home" && homeScreen}
       {stage === "section1" && section1Screen}
       {stage === "section2" && section2Screen}
