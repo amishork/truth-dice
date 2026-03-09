@@ -242,34 +242,52 @@ const Index = () => {
               </p>
             </div>
           </div>
-
-        <div className="sketch-card p-6 space-y-4 text-left overflow-visible">
-          <div className="absolute -top-3 left-4 bg-background px-2">
-            <span className="label-technical">Process Overview</span>
+          
+          {/* Process Overview - Reimagined */}
+          <div className="sketch-card p-8 text-left overflow-visible relative">
+            <div className="absolute -top-3 left-6 bg-background px-3">
+              <span className="label-technical">Values Discovery Journey</span>
+            </div>
+            <div className="absolute top-0 right-0 w-16 h-16 cross-hatch opacity-12 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-12 h-12 cross-hatch opacity-8 pointer-events-none" />
+            
+            <div className="grid md:grid-cols-2 gap-6 mt-2">
+              {[
+                { step: '01', title: 'Resonance Filter', desc: 'Does this value speak to your heart?' },
+                { step: '02', title: 'Truth Assessment', desc: 'Is this true about you or aspirational?' },
+                { step: '03', title: 'Legacy Choice', desc: 'What would you want said at your funeral?' },
+                { step: '04', title: 'Statistical Review', desc: 'See which values won the most battles' },
+                { step: '05', title: 'Final Selection', desc: 'Choose your definitive 6 core values' },
+                { step: '06', title: 'Living Exploration', desc: 'Roll dice & discover with AI coaching' }
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-4 group">
+                  <div className="w-8 h-8 border-2 border-foreground/20 flex items-center justify-center flex-shrink-0 transition-all group-hover:border-primary/40 group-hover:bg-primary/5">
+                    <span className="text-xs font-mono text-foreground/60 group-hover:text-primary/80">{item.step}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-serif text-sm font-medium text-foreground group-hover:text-primary transition-colors">{item.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="absolute top-0 right-0 w-14 h-14 cross-hatch opacity-20 pointer-events-none" />
-          <ol className="space-y-3 text-sm text-foreground/65 font-sans">
-            {[
-              'Swipe through values — does it resonate?',
-              'Filter values — true about you, or aspire to?',
-              'Choose values for your funeral tribute',
-              'Review your top values with statistics',
-              'Select your final 6 core values',
-              'Explore with dice & discover workshops',
-            ].map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-5 h-5 border border-foreground/20 flex items-center justify-center text-[0.55rem] font-mono text-foreground/40">
-                  {i + 1}
-                </span>
-                <span className="pt-0.5 leading-relaxed">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
 
-        <button onClick={() => setStage('section1')} className="w-full h-14 btn-sketch-primary flex items-center justify-center gap-2">
-          Begin Your Journey →
-        </button>
+          {/* Call to Action */}
+          <div className="space-y-6">
+            <button 
+              onClick={() => setStage('section1')} 
+              className="w-full max-w-sm mx-auto h-16 btn-sketch-primary text-lg flex items-center justify-center gap-3 group"
+            >
+              <span>Begin Your Journey</span>
+              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </button>
+            
+            <p className="text-xs text-muted-foreground font-mono tracking-wider uppercase">
+              ~5 minutes • 194 values • 6 final selections
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
