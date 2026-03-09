@@ -323,6 +323,8 @@ const Index = () => {
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [showLeadMagnet, setShowLeadMagnet] = useState(false);
+  const [showSpeedRound, setShowSpeedRound] = useState(false);
+  const [showPosterGen, setShowPosterGen] = useState(false);
   const [hasResumePrompt, setHasResumePrompt] = useState(() => {
     const s = saved.current;
     return s !== null && s.stage !== "home" && s.stage !== "dice";
