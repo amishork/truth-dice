@@ -194,23 +194,54 @@ const Index = () => {
   );
 
   const WelcomeScreen = () => (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 animate-fade-in relative">
-      <div className="max-w-md w-full text-center space-y-10 relative z-10">
-        {/* Logo mark */}
-        <div className="w-20 h-20 mx-auto sketch-card flex items-center justify-center">
-          <div className="absolute inset-0 border border-foreground/6 rotate-45 scale-[0.7]" />
-          <div className="absolute top-0 right-0 w-8 h-8 cross-hatch opacity-20 pointer-events-none" />
-          <PenTool className="w-7 h-7 text-foreground/50" />
-        </div>
-        
-        <div className="space-y-3">
-          <h1 className="text-4xl title-section text-foreground leading-tight">
-            Discover Your<br />Core Values
-          </h1>
-          <p className="text-muted-foreground text-sm font-sans leading-relaxed max-w-xs mx-auto">
-            A guided journey to identify the 6 values that define who you are
-          </p>
-        </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Hero Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-32 h-32 cross-hatch opacity-8 rotate-12 pointer-events-none" />
+        <div className="absolute bottom-40 right-16 w-20 h-20 cross-hatch opacity-6 -rotate-12 pointer-events-none" />
+        <div className="absolute top-1/3 right-1/4 w-24 h-24 cross-hatch opacity-4 rotate-45 pointer-events-none" />
+      </div>
+
+      <div className="flex flex-col items-center justify-center min-h-screen p-6 relative z-10">
+        <div className="max-w-2xl w-full text-center space-y-12 animate-fade-in">
+          
+          {/* Brand Identity */}
+          <div className="space-y-8">
+            <div className="w-24 h-24 mx-auto sketch-card flex items-center justify-center animate-float">
+              <div className="absolute inset-0 border-2 border-foreground/8 rotate-45 scale-75" />
+              <div className="absolute top-0 right-0 w-10 h-10 cross-hatch opacity-15 pointer-events-none" />
+              <PenTool className="w-8 h-8 text-primary/60" />
+            </div>
+            
+            <div className="space-y-6">
+              <h1 className="text-6xl md:text-7xl title-section text-foreground leading-none tracking-tight">
+                Words<br />
+                <span className="ink-red">Incarnate</span>
+              </h1>
+              
+              {/* Core Brand Values */}
+              <div className="flex items-center justify-center space-x-4 text-sm font-mono tracking-widest uppercase text-muted-foreground">
+                <span className="relative">
+                  Connection
+                  <div className="absolute -bottom-1 left-0 w-full h-px bg-primary/30" />
+                </span>
+                <span className="text-foreground/20">•</span>
+                <span className="relative">
+                  Delight
+                  <div className="absolute -bottom-1 left-0 w-full h-px bg-primary/30" />
+                </span>
+                <span className="text-foreground/20">•</span>
+                <span className="relative">
+                  Belonging
+                  <div className="absolute -bottom-1 left-0 w-full h-px bg-primary/30" />
+                </span>
+              </div>
+              
+              <p className="text-lg text-muted-foreground font-serif italic leading-relaxed max-w-lg mx-auto">
+                Transform your deepest values from abstract concepts into living principles that guide your most important decisions
+              </p>
+            </div>
+          </div>
 
         <div className="sketch-card p-6 space-y-4 text-left overflow-visible">
           <div className="absolute -top-3 left-4 bg-background px-2">
