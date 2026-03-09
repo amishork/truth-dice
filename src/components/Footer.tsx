@@ -1,5 +1,6 @@
 import { Flame } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 const Footer = () => {
   return (
@@ -50,10 +51,14 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Newsletter + Contact */}
           <div>
-            <p className="label-technical mb-4">Get in Touch</p>
-            <div className="flex flex-col gap-2.5 text-sm text-muted-foreground">
+            <p className="label-technical mb-4">Stay Connected</p>
+            <p className="text-sm text-muted-foreground mb-3">
+              Get insights on values-driven living.
+            </p>
+            <NewsletterSignup />
+            <div className="mt-6 flex flex-col gap-2.5 text-sm text-muted-foreground">
               <a href="mailto:hello@wordsincarnate.com" className="transition-colors hover:text-foreground">
                 hello@wordsincarnate.com
               </a>

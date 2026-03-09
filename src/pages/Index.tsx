@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
+import LeadMagnetModal from "@/components/LeadMagnetModal";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const CORE_VALUES = [
@@ -298,6 +300,7 @@ const Index = () => {
   const [isRolling, setIsRolling] = useState(false);
 
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showLeadMagnet, setShowLeadMagnet] = useState(false);
   const [hasResumePrompt, setHasResumePrompt] = useState(() => {
     const s = saved.current;
     return s !== null && s.stage !== "home" && s.stage !== "dice";
@@ -502,6 +505,8 @@ const Index = () => {
       </a>
 
       <Navigation />
+      <ExitIntentPopup onStartQuiz={startValuesDiscovery} />
+      <LeadMagnetModal open={showLeadMagnet} onClose={() => setShowLeadMagnet(false)} />
       <FloatingCTA onClick={startValuesDiscovery} />
       <BackToTop />
 
@@ -670,10 +675,13 @@ const Index = () => {
               If you are ready to make your values visible again, to restore meaning to daily life, and to form
               people—not just systems—we would be honored to walk with you.
             </p>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
                 Let's make values incarnate again
                 <ChevronRight />
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
+                Free worksheet
               </Button>
             </div>
           </motion.div>
