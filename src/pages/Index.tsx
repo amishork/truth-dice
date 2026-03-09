@@ -1075,8 +1075,6 @@ const Index = () => {
 
               {/* Shareable Values Card */}
               <ShareableValuesCard values={finalSixValues} />
-                allWinners={allWinners}
-              />
             </div>
           </div>
           <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
