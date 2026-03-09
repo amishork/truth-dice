@@ -907,7 +907,7 @@ const Index = () => {
     const sortedValues = [...allWinners].sort((a, b) => (selectionCounts[b] || 0) - (selectionCounts[a] || 0));
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <Navigation dimmed={isQuizActive} />
         <div className="mx-auto w-full max-w-3xl px-6 pt-24">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-foreground">Your top values</h2>
