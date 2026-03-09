@@ -549,21 +549,25 @@ const Index = () => {
             <p className="mt-8 text-lg text-muted-foreground">Formation, strategy, and experience design</p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
-                Start Values Discovery
-                <ChevronRight />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="wi-cta"
-                onClick={() => {
-                  const el = document.getElementById("making-values");
-                  el?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              >
-                Learn more
-              </Button>
+              <MagneticButton>
+                <Button size="lg" onClick={startValuesDiscovery} className="wi-cta">
+                  Start Values Discovery
+                  <ChevronRight />
+                </Button>
+              </MagneticButton>
+              <MagneticButton>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="wi-cta"
+                  onClick={() => {
+                    const el = document.getElementById("making-values");
+                    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  Learn more
+                </Button>
+              </MagneticButton>
             </div>
 
             <p className="mt-6 text-xs text-muted-foreground">~5 minutes • guided values discovery • 6-value takeaway</p>
