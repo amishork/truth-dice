@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import PageMeta from "@/components/PageMeta";
 import EmberParticles from "@/components/EmberParticles";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
@@ -56,6 +57,11 @@ const OurStory = () => {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background">
+      <PageMeta
+        title="Our Story"
+        description="How Words Incarnate began — from a simple question about what we truly value to a conviction that values become real through practices."
+        path="/our-story"
+      />
       <Navigation />
 
       {/* Scroll progress bar */}

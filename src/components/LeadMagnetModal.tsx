@@ -4,6 +4,7 @@ import { X, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import { toast } from "@/hooks/use-toast";
 
 interface LeadMagnetModalProps {
@@ -16,10 +17,12 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+    if (honeypot) return; // Bot detected
 
     setLoading(true);
     const { error } = await supabase.from("email_captures").insert({
@@ -35,6 +38,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
     }
 
     setSubmitted(true);
+    sendNotification("lead_magnet", { email: email.trim(), name: name.trim() || null });
   };
 
   const handleClose = () => {
@@ -85,6 +89,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                   A printable guide to help you and your family identify, discuss, and live your core values together.
                 </p>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
+                  <input type="text" name="organization" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }} aria-hidden="true" />
                   <div>
                     <Input
                       placeholder="Your first name"

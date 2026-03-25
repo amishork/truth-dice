@@ -3,16 +3,19 @@ import { Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import { toast } from "@/hooks/use-toast";
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+    if (honeypot) return; // Bot detected
 
     setLoading(true);
     const { error } = await supabase.from("email_captures").insert({
@@ -28,6 +31,7 @@ const NewsletterSignup = () => {
 
     setSubmitted(true);
     setEmail("");
+    sendNotification("newsletter", { email: email.trim() });
   };
 
   if (submitted) {
@@ -41,6 +45,7 @@ const NewsletterSignup = () => {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
+      <input type="text" name="company" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }} aria-hidden="true" />
       <Input
         type="email"
         required

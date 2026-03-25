@@ -57,7 +57,7 @@ const FounderBio = () => {
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              {["M.A. Philosophy of Education", "15+ Years Formation Work", "200+ Families Served"].map((cred) => (
+              {["B.A. Philosophy, University of Dallas", "Seminary Formation", "15+ Years Formation Work"].map((cred) => (
                 <span
                   key={cred}
                   className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"

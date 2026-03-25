@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FounderBio from "@/components/FounderBio";
+import PageMeta from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 
 const fadeUp = {
@@ -13,6 +14,7 @@ const fadeUp = {
 const About = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="About" description="Learn about Words Incarnate — values formation, strategy, and experience design for families, schools, and organizations." path="/about" />
       <Navigation />
 
       <main className="container mx-auto px-4 pt-24 pb-20">

@@ -1,10 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const ALLOWED_ORIGINS = [
+  "https://wordsincarnate.com",
+  "https://www.wordsincarnate.com",
+  "http://localhost:5173",
+  "http://localhost:4173",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 const buildSystemPrompt = (rolledValue: string, rolledContext: string) => `
 # Words Incarnate — Guided Reflection Conversation Partner
@@ -491,63 +502,147 @@ The customer's stated intention is captured during the chatbot intake flow. The 
 **Usage:** The intention does not change the product. It changes the delivery. Treat it as a lens, not a script.
 `;
 
+// Cap conversation context to avoid runaway token costs
+const MAX_HISTORY_MESSAGES = 16;
+
+function capMessages(messages: Array<{ role: string; content: string }>) {
+  if (messages.length <= MAX_HISTORY_MESSAGES) return messages;
+  // Always keep the first user message (the roll context) + last N messages
+  return [messages[0], ...messages.slice(-MAX_HISTORY_MESSAGES + 1)];
+}
+
 serve(async (req) => {
+  const cors = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: cors });
   }
 
   try {
     const { messages, rolledValue, rolledContext } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Try Anthropic first, fall back to OpenAI-compatible endpoint
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
     const systemPrompt = buildSystemPrompt(rolledValue || "[value]", rolledContext || "[context]");
+    const cappedMessages = capMessages(messages);
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
+    let response: Response;
+
+    if (ANTHROPIC_API_KEY) {
+      // Anthropic Messages API (streaming)
+      response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: cappedMessages,
           stream: true,
         }),
-      }
-    );
+      });
 
-    if (!response.ok) {
-      if (response.status === 429) {
+      if (!response.ok) {
+        const t = await response.text();
+        console.error("Anthropic API error:", response.status, t);
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again shortly." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "AI service error" }),
+          { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+
+      // Anthropic SSE uses a different format than OpenAI. Transform to OpenAI-compatible SSE
+      // so the frontend doesn't need to change.
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      const encoder = new TextEncoder();
+
+      const stream = new ReadableStream({
+        async start(controller) {
+          let buffer = "";
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                controller.close();
+                break;
+              }
+              buffer += decoder.decode(value, { stream: true });
+              let newlineIndex: number;
+              while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+                const line = buffer.slice(0, newlineIndex).trim();
+                buffer = buffer.slice(newlineIndex + 1);
+                if (!line.startsWith("data: ") || line === "data: [DONE]") continue;
+                try {
+                  const event = JSON.parse(line.slice(6));
+                  if (event.type === "content_block_delta" && event.delta?.text) {
+                    const openaiChunk = {
+                      choices: [{ delta: { content: event.delta.text } }],
+                    };
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify(openaiChunk)}\n\n`));
+                  }
+                  if (event.type === "message_stop") {
+                    controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+                    controller.close();
+                    return;
+                  }
+                } catch { /* skip malformed chunks */ }
+              }
+            }
+          } catch (err) {
+            console.error("Stream transform error:", err);
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: { ...cors, "Content-Type": "text/event-stream" },
+      });
+
+    } else if (OPENAI_API_KEY) {
+      // OpenAI-compatible fallback (GPT-4o-mini, etc.)
+      response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "system", content: systemPrompt }, ...cappedMessages],
+          stream: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const t = await response.text();
+        console.error("OpenAI API error:", response.status, t);
         return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "AI service error" }),
+          { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
         );
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      return new Response(
-        JSON.stringify({ error: "AI gateway error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+
+      return new Response(response.body, {
+        headers: { ...cors, "Content-Type": "text/event-stream" },
+      });
+    } else {
+      throw new Error("No AI API key configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY in Supabase secrets.");
     }
-
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
   } catch (e) {
+    const cors = getCorsHeaders(req);
     console.error("values-chat error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
     );
   }
 });

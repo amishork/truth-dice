@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import PageMeta from "@/components/PageMeta";
 import MultiStepContactForm from "@/components/MultiStepContactForm";
 
 const fadeUp = {
@@ -12,6 +13,7 @@ const fadeUp = {
 const Contact = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Contact" description="Ready to make your values incarnate? Get in touch with Words Incarnate to explore formation experiences for your family, school, or organization." path="/contact" />
       <Navigation />
 
       <main className="container mx-auto px-4 pt-24 pb-20">

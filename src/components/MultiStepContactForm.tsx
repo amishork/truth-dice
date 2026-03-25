@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import { toast } from "sonner";
 import { Send, ChevronRight, ChevronLeft, CheckCircle, User, Briefcase, MessageSquare } from "lucide-react";
 import Confetti from "@/components/Confetti";
@@ -43,6 +44,7 @@ const MultiStepContactForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleChange = (field: keyof ContactForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -83,6 +85,7 @@ const MultiStepContactForm = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(step)) return;
+    if (honeypot) return; // Bot detected
     const result = contactSchema.safeParse(form);
     if (!result.success) {
       toast.error("Please check your inputs.");
@@ -108,6 +111,7 @@ const MultiStepContactForm = () => {
     setShowConfetti(true);
     setSubmitted(true);
     toast.success("Your message has been sent!");
+    sendNotification("contact", result.data);
   };
 
   if (submitted) {
@@ -142,6 +146,17 @@ const MultiStepContactForm = () => {
     <div className="sketch-card overflow-hidden">
       {/* Progress dots */}
       <div className="flex items-center justify-center gap-3 px-8 pt-6">
+        {/* Honeypot - hidden from users, catches bots */}
+        <input
+          type="text"
+          name="website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+          aria-hidden="true"
+        />
         {STEPS.map((s, i) => {
           const Icon = s.icon;
           const isActive = i === step;

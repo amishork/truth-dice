@@ -1,12 +1,15 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PricingCards from "@/components/PricingCards";
 import FAQ from "@/components/FAQ";
+import PageMeta from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, GraduationCap, Building } from "lucide-react";
 
 const Services = () => {
+  const navigate = useNavigate();
   const services = [
     {
       icon: Users,
@@ -51,6 +54,7 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Services" description="Values discovery workshops, family formation, school culture advisory, and organizational strategy. Tailored formation experiences for every context." path="/services" />
       <Navigation />
       
       <main className="pt-16">
@@ -123,7 +127,7 @@ const Services = () => {
                           ))}
                         </ul>
                         
-                        <Button onClick={() => window.location.href = "/contact"} className="group">
+                        <Button onClick={() => navigate("/contact")} className="group">
                           {service.cta}
                           <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                         </Button>
@@ -164,7 +168,7 @@ const Services = () => {
               Start your journey toward authentic living with our interactive values discovery process.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" onClick={() => window.location.href = "/"}>
+              <Button size="lg" variant="secondary" onClick={() => navigate("/")}>
                 Start Values Discovery
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -172,7 +176,7 @@ const Services = () => {
                 size="lg"
                 variant="outline"
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-                onClick={() => window.location.href = "/contact"}
+                onClick={() => navigate("/contact")}
               >
                 Schedule Consultation
               </Button>
