@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const ALLOWED_ORIGINS = [
   "https://wordsincarnate.com",
   "https://www.wordsincarnate.com",
+  "https://truth-dice.vercel.app",
   "http://localhost:5173",
   "http://localhost:4173",
 ];
