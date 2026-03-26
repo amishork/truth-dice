@@ -17,10 +17,13 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-const OWNER_EMAIL = "hello@wordsincarnate.com";
+const OWNER_EMAIL = "alexandermishork@gmail.com";
 const FROM_EMAIL = "Words Incarnate <hello@wordsincarnate.com>";
 // Until domain is verified in Resend, use their onboarding address:
 const FROM_EMAIL_FALLBACK = "Words Incarnate <onboarding@resend.dev>";
+
+// Set to true once you verify a domain in Resend
+const DOMAIN_VERIFIED = false;
 
 async function sendEmail(apiKey: string, to: string, subject: string, html: string) {
   const res = await fetch("https://api.resend.com/emails", {
@@ -78,35 +81,39 @@ serve(async (req) => {
         `
       );
 
-      // Send confirmation to the person who submitted
-      await sendEmail(
-        RESEND_API_KEY,
-        data.email,
-        "We received your message — Words Incarnate",
-        `
-        <p>Hi ${data.name},</p>
-        <p>Thank you for reaching out to Words Incarnate. We received your message and will be in touch within 1–2 business days.</p>
-        <p>In the meantime, if you haven't already, you can <a href="https://wordsincarnate.com/quiz">discover your core values</a> with our free guided quiz.</p>
-        <br />
-        <p>Connection · Delight · Belonging</p>
-        <p><em>Words Incarnate</em></p>
-        `
-      );
+      // Send confirmation to the person (only works with verified domain)
+      if (DOMAIN_VERIFIED) {
+        await sendEmail(
+          RESEND_API_KEY,
+          data.email,
+          "We received your message — Words Incarnate",
+          `
+          <p>Hi ${data.name},</p>
+          <p>Thank you for reaching out to Words Incarnate. We received your message and will be in touch within 1–2 business days.</p>
+          <p>In the meantime, if you haven't already, you can <a href="https://wordsincarnate.com/quiz">discover your core values</a> with our free guided quiz.</p>
+          <br />
+          <p>Connection · Delight · Belonging</p>
+          <p><em>Words Incarnate</em></p>
+          `
+        );
+      }
     } else if (type === "newsletter") {
-      // Welcome email to new subscriber
-      await sendEmail(
-        RESEND_API_KEY,
-        data.email,
-        "Welcome to Words Incarnate",
-        `
-        <p>Welcome to Words Incarnate.</p>
-        <p>You'll receive occasional insights on values-driven living — formation for families, schools, and organizations.</p>
-        <p>While you're here: <a href="https://wordsincarnate.com/quiz">discover your core values</a> with our free 5-minute guided quiz.</p>
-        <br />
-        <p>Connection · Delight · Belonging</p>
-        <p><em>Words Incarnate</em></p>
-        `
-      );
+      // Welcome email to new subscriber (only works with verified domain)
+      if (DOMAIN_VERIFIED) {
+        await sendEmail(
+          RESEND_API_KEY,
+          data.email,
+          "Welcome to Words Incarnate",
+          `
+          <p>Welcome to Words Incarnate.</p>
+          <p>You'll receive occasional insights on values-driven living — formation for families, schools, and organizations.</p>
+          <p>While you're here: <a href="https://wordsincarnate.com/quiz">discover your core values</a> with our free 5-minute guided quiz.</p>
+          <br />
+          <p>Connection · Delight · Belonging</p>
+          <p><em>Words Incarnate</em></p>
+          `
+        );
+      }
 
       // Notify you
       await sendEmail(
@@ -116,22 +123,24 @@ serve(async (req) => {
         `<p>New newsletter signup: <strong>${data.email}</strong></p>`
       );
     } else if (type === "lead_magnet") {
-      // Send worksheet to subscriber
-      await sendEmail(
-        RESEND_API_KEY,
-        data.email,
-        "Your Values Discovery Worksheet — Words Incarnate",
-        `
-        <p>Hi${data.name ? ` ${data.name}` : ""},</p>
-        <p>Thank you for your interest in values discovery. Here is your free worksheet:</p>
-        <p><strong><a href="https://wordsincarnate.com/values-worksheet.pdf">Download Your Values Discovery Worksheet</a></strong></p>
-        <p>This printable guide will help you and your family identify, discuss, and live your core values together.</p>
-        <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Try our interactive values discovery quiz</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
-        <br />
-        <p>Connection · Delight · Belonging</p>
-        <p><em>Words Incarnate</em></p>
-        `
-      );
+      // Send worksheet to subscriber (only works with verified domain)
+      if (DOMAIN_VERIFIED) {
+        await sendEmail(
+          RESEND_API_KEY,
+          data.email,
+          "Your Values Discovery Worksheet — Words Incarnate",
+          `
+          <p>Hi${data.name ? ` ${data.name}` : ""},</p>
+          <p>Thank you for your interest in values discovery. Here is your free worksheet:</p>
+          <p><strong><a href="https://wordsincarnate.com/values-worksheet.pdf">Download Your Values Discovery Worksheet</a></strong></p>
+          <p>This printable guide will help you and your family identify, discuss, and live your core values together.</p>
+          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Try our interactive values discovery quiz</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
+          <br />
+          <p>Connection · Delight · Belonging</p>
+          <p><em>Words Incarnate</em></p>
+          `
+        );
+      }
 
       // Notify you
       await sendEmail(
