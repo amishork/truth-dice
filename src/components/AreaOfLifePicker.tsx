@@ -73,7 +73,7 @@ export default function AreaOfLifePicker({ completedAreas, onSelect, onBack }: A
                   isLocked
                     ? 'border-border/50 bg-muted/20 cursor-not-allowed'
                     : isCompleted
-                    ? 'border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/8'
+                    ? 'border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10'
                     : 'border-border bg-background hover:border-foreground/30 hover:shadow-sm'
                 }`}
                 initial={{ opacity: 0, y: 8 }}

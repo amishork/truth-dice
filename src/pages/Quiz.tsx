@@ -650,7 +650,7 @@ const Quiz = () => {
                         const isActive = session.id === selectedSessionId;
                         return (
                           <button key={session.id} onClick={() => handleSessionSelect(session)}
-                            className={`w-full rounded-lg border px-4 py-3 text-left transition-all ${isActive ? "border-primary/40 bg-primary/8 shadow-sm" : "border-border bg-background hover:border-foreground/20 hover:shadow-sm"}`}
+                            className={`w-full rounded-lg border px-4 py-3 text-left transition-all ${isActive ? "border-primary/40 bg-primary/10 shadow-sm" : "border-border bg-background hover:border-foreground/20 hover:shadow-sm"}`}
                           >
                             <div className="mb-2 flex items-center gap-2.5">
                               <span className="text-base">{area?.icon ?? "🪞"}</span>
