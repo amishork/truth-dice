@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
-import Confetti from "@/components/Confetti";
 import CommitmentEscalation from "@/components/CommitmentEscalation";
 import SpeedRound from "@/components/SpeedRound";
 import DiceProductPopup from "@/components/DiceProductPopup";
@@ -100,7 +99,6 @@ const Quiz = () => {
   const [isRolling, setIsRolling] = useState(false);
   const [showDicePopup, setShowDicePopup] = useState(false);
 
-  const [showConfetti, setShowConfetti] = useState(false);
   const [showSpeedRound, setShowSpeedRound] = useState(false);
   const [showPosterGen, setShowPosterGen] = useState(false);
 
@@ -249,9 +247,6 @@ const Quiz = () => {
   const handleFinalValueToggle = (value: string) => {
     setFinalSixValues((prev) => {
       const next = prev.includes(value) ? prev.filter((v) => v !== value) : prev.length >= 6 ? prev : [...prev, value];
-      if (!prev.includes(value) && next.length === 6) {
-        setShowConfetti(true);
-      }
       return next;
     });
   };
@@ -442,7 +437,6 @@ const Quiz = () => {
       {stage === "final" && (
         <div className="min-h-screen bg-background">
           <Navigation quizMode />
-          <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
           <div className="mx-auto w-full max-w-3xl px-6 pt-24">
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-foreground">Your final 6 values</h2>

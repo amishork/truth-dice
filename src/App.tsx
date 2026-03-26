@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageTransition from "./components/PageTransition";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
           <BrowserRouter>
             <AnimatedRoutes />
           </BrowserRouter>
+          <Analytics />
         </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>

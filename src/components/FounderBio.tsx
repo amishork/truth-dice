@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import founderPhoto from "@/assets/founder-photo.jpg";
+import founderPhoto from "@/assets/founder-photo.webp";
 
 const FounderBio = () => {
   return (

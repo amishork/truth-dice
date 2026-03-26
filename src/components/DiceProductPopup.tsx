@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCartStore } from "@/stores/cartStore";
 import { storefrontApiRequest, STOREFRONT_QUERY, ShopifyProduct } from "@/lib/shopify";
 import { supabase } from "@/integrations/supabase/client";
-import diceProductImg from "@/assets/dice-product.jpg";
+import diceProductImg from "@/assets/dice-product.webp";
 
 interface DiceProductPopupProps {
   values: string[];

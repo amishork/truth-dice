@@ -308,124 +308,40 @@ Present Tier I by default after segmentation. Mention Tier II as the natural nex
 
 ### INDIVIDUAL
 
-**Practical Tools**
 | Tier | Name | Price | Description |
 |------|------|-------|-------------|
-| I | The Personal Formation Workbook | $65 | Self-guided workbook. Values discovery, self-assessment, gap analysis, personal commitment. ~90 min, solo. |
-| II | A Rule of Life: A Six-Part Formation Series | $295 | Six-module self-guided formation curriculum. Builds toward a Personal Mission Statement and working Rule of Life. |
-| III | The Living Rule: A Custom Formation System | $15,000+ | Fully custom personal identity and formation system. Nothing templated. |
-
-**Workshops & Experiences**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Presence & Clarity Workshop | $195 | Single half-day guided experience. Small group or private. Personal values statement and one commitment. In-person or virtual. |
-| II | The Wonder & Wisdom Journey | $850 | Three-session private guided journey. Name It / Live It / Commit. Co-created Personal Mission Document. In-person or virtual. |
-| III | The Incarnate Life Retreat | $18,000+ | Fully custom multi-day private retreat. Bespoke facilitation, venue support, Personal Identity Document, 90-day follow-up. |
-
-**One-on-One Coaching**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Clarity Session | $250 | Single 75-min coaching session. Any pressing topic. Written summary and 30-day commitment. |
-
-**Ongoing Consulting**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Vocation Strategy Session | $350 | Single 90-min consulting session. Pre-session intake. Written Strategic Brief with three recommended next moves. |
-| II | The Vocation Advisory | $6,000/year | 12-month advisory. Monthly sessions, annual values review, year-end summary. |
-| III | The Life Formation Partnership | $40,000/year | Unlimited sessions, on-call access, annual retreat, dedicated advisor. |
+| I | Values Discovery Session | $150 | Single guided session. Personal values discovery, values profile, and one concrete commitment. In-person or virtual. |
+| II | Deep Dive Journey | $450 | Three-session guided journey. Name It / Live It / Commit. Co-created Personal Mission Document. In-person or virtual. |
+| III | Ongoing Coaching | $900/month | Monthly coaching partnership. Ongoing sessions, values review, accountability, and personal formation support. |
 
 ### PARENT / FAMILY
 
-**Practical Tools**
 | Tier | Name | Price | Description |
 |------|------|-------|-------------|
-| I | The Dinner Table Booklet | $85 | Self-guided family tool built around one shared meal or evening. Values prompt cards, family values page, weekly ritual guide. |
-| II | Universities of the Home: A Family Formation Series | $495 | Six-module self-guided family curriculum. Builds toward a Family Mission Statement and embedded family practices. |
-| III | The Living Heritage: A Custom Family Formation System | $22,000+ | Fully custom family identity system designed as a family heirloom. Revision rights for 3 years. |
-
-**Workshops & Experiences**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Hearth & Heritage Workshop | $350 | Single 2-hour facilitated family session. Values discovery, shared storytelling, closing commitment. Private, in-person. |
-| II | The Family Formation Journey | $1,800 | Three-session private facilitated journey. Our Story / Our Values / Our Home. Family Mission Document. In-person. |
-| III | The Incarnate Home Intensive | $28,000+ | Fully custom multi-day private family retreat. Heirloom Family Identity Document, 90-day follow-up. |
-
-**One-on-One Coaching**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Hearth Session | $250 | Single 75-min coaching session for a parent or couple. Written summary and 30-day family commitment. |
-| II | The Family Formation Arc | $2,800 | Six-session coaching journey over 3 months for parent or couple. Examine / Clarify / Design. Family Leadership Document. |
-| III | The Incarnate Home Partnership | $45,000/year | Unlimited coaching, on-call access, annual family retreat, custom formation resources. |
-
-**Ongoing Consulting**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Family Mission Session | $350 | Single 90-min consulting session. Pre-session intake. Written Family Strategy Brief with three recommended next moves. |
-| II | The Hearth Advisory | $7,200/year | 12-month advisory. Monthly sessions, annual values review, year-end summary. |
-| III | The Living Home Partnership | $55,000/year | Unlimited sessions, on-call access, annual retreat, dedicated advisor. |
+| I | Family Values Workshop | $300 | Single facilitated family session. Values discovery, shared storytelling, closing commitment. Private, in-person or virtual. |
+| II | Family Formation Journey | $800 | Three-session private facilitated journey. Our Story / Our Values / Our Home. Family Mission Document. In-person. |
+| III | Quarterly Family Coaching | $1,500/quarter | Ongoing family coaching partnership. Quarterly sessions, family values review, custom formation resources. |
 
 ### SCHOOL LEADER / EDUCATOR
 
-**Practical Tools**
 | Tier | Name | Price | Description |
 |------|------|-------|-------------|
-| I | The Formation Compass | $295 | Self-guided leadership tool. Culture health assessment, gap analysis, Culture Commitment Document. Single sitting or 90-min team session. |
-| II | The Mission Architecture Series | $4,500 | Four-module guided curriculum for a leadership team. Diagnose / Clarify / Language / Anchor. 6-8 weeks. Institutional Culture Document. |
-| III | Soul of the School: A Complete Identity Architecture | $90,000+ | Fully custom institutional identity system. Mission manual, faculty curriculum, onboarding system. Nothing templated. |
-
-**Workshops & Experiences**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Soul of the School Workshop | $3,500 | Single half-day on-site facilitated experience for full faculty. Personal mission statements, shared purpose, collective commitment. Up to 60 participants. |
-| II | The Mission Formation Journey | $14,500 | Three-session facilitated faculty series. Reconnect / Resurface / Recommit. Closing Shared Mission Ceremony. Faculty Culture Document. Up to 60 participants. |
-| III | The Incarnate Culture Retreat | $100,000+ | Fully custom multi-day off-site faculty and leadership retreat. Bespoke design, private facilitator, Culture Document, 90-day follow-up. |
-
-**One-on-One Coaching**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Formation Session | $350 | Single 90-min coaching session for a school leader. Written summary and 30-day commitment. |
-
-**Ongoing Consulting**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Mission Strategy Session | $1,750 | Single 2-hour consulting session with leadership team. Pre-session intake. Written Strategic Brief within 5 business days. |
-| II | The Soul of the School Advisory | $30,000/year | 12-month consulting partnership. Monthly strategy sessions, annual culture audit, culture calendar, mid-year review, year-end report. |
-| III | The Living Institution Partnership | $200,000/year | Unlimited sessions, embedded advisory, board facilitation, crisis support, dedicated institutional partner. |
+| I | Staff Workshop | $1,200 | Single half-day on-site facilitated experience for faculty. Personal mission statements, shared purpose, collective commitment. |
+| II | Semester-Long Program | $3,500 | Multi-session facilitated faculty series over one semester. Culture assessment, values alignment, Faculty Culture Document. |
+| III | Full-Year Transformation | $8,000 | Year-long consulting partnership. Monthly strategy sessions, culture audit, curriculum integration, year-end report. |
 
 ### BUSINESS LEADER / ORGANIZATION
 
-**Practical Tools**
 | Tier | Name | Price | Description |
 |------|------|-------|-------------|
-| I | The Culture Compass | $395 | Self-guided leadership tool. Values discovery, culture health assessment, gap analysis, Culture Commitment Document. Half-day team session. |
-| II | The Culture Architecture Series | $6,500 | Five-module guided curriculum for a leadership team. Diagnose / Clarify / Language / Embed / Sustain. 8-10 weeks. Organizational Culture Document. |
-| III | The Living Mission: A Custom Culture Architecture | $120,000+ | Fully custom organizational identity system. Culture manual, hiring system, leadership playbook, brand values narrative. Nothing templated. |
-
-**Workshops & Experiences**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Mission & Culture Workshop | $4,500 | Single half-day on-site facilitated experience. Values discovery, shared story, collective commitment. Up to 50 participants. |
-| II | The Culture Formation Journey | $22,000 | Five-session facilitated series. Diagnose / Clarify / Embody / Integrate / Commit. Organizational Culture Document. Up to 50 participants. |
-| III | The Soul of the Organization Retreat | $175,000+ | Fully custom multi-day off-site retreat. Bespoke design, private facilitator, Organizational Identity Document, 90-day implementation support. |
-
-**One-on-One Coaching**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Clarity Session | $350 | Single 90-min coaching session for a founder or executive. Written summary and 30-day leadership commitment. |
-| II | Formed to Lead: A Coaching Arc | $6,000 | Nine-session coaching journey over 5 months. Diagnose / Clarify / Design / Deploy. Personal Leadership Document. |
-| III | The Executive Formation Partnership | $120,000/year | Unlimited coaching, on-call access, annual executive retreat, board-level advisory. |
-
-**Ongoing Consulting**
-| Tier | Name | Price | Description |
-|------|------|-------|-------------|
-| I | The Culture Strategy Session | $2,000 | Single 2-hour consulting session. Pre-session intake. Written Strategic Brief within 5 business days. |
-| II | The Mission Formation Retainer | $36,000/year | 12-month consulting partnership. Monthly strategy sessions, annual culture audit, hiring/onboarding guidance, mid-year review, year-end report. |
-| III | The Living Mission Partnership | $250,000/year | Unlimited sessions, embedded advisory, board facilitation, crisis support, dedicated organizational partner. |
+| I | Leadership Workshop | $2,000 | Single half-day on-site facilitated experience. Values discovery, shared story, collective commitment. Up to 50 participants. |
+| II | Team Alignment Program | $6,000 | Multi-session facilitated series. Diagnose / Clarify / Embody / Integrate / Commit. Organizational Culture Document. |
+| III | Enterprise Transformation | Custom | Fully custom engagement scoped with an advisor. Culture architecture, hiring integration, leadership playbook, ongoing advisory. |
 
 **Presentation Rules:**
 1. Name the Tier I offering, give the one-sentence purpose, and state the price.
 2. Name the Tier II offering as the natural next step if they want a sustained journey.
-3. Name Tier III only if the user signals they want something fully custom, unlimited, or exclusive.
+3. Name Tier III only if the user signals that scale, exclusivity, or full customization matters to them.
 
 Never: Describe a product in more detail than listed. Invent features, materials, durations, or inclusions. Present all three tiers simultaneously unless asked. State that a Tier III price is final — always say it is a starting point scoped with the advisor.
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Info } from 'lucide-react';
 import { VALUE_DESCRIPTIONS } from '@/lib/valueDescriptions';
@@ -25,6 +25,7 @@ export const ValueCard: React.FC<ValueCardProps> = ({
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
   const [cardKey, setCardKey] = useState(value);
+  const isAnimating = useRef(false);
 
   const minSwipeDistance = 50;
   const tooltipText = VALUE_DESCRIPTIONS[value];
@@ -51,9 +52,12 @@ export const ValueCard: React.FC<ValueCardProps> = ({
   };
 
   const triggerExit = (dir: 'left' | 'right') => {
+    if (isAnimating.current) return;
+    isAnimating.current = true;
     setExitDirection(dir);
     setTimeout(() => {
       setExitDirection(null);
+      isAnimating.current = false;
       if (dir === 'left') onSwipeLeft();
       else onSwipeRight();
     }, 350);
@@ -137,6 +141,7 @@ export const ValueCard: React.FC<ValueCardProps> = ({
       <div className="flex gap-3 w-full">
         <button
           onClick={() => triggerExit('left')}
+          disabled={isAnimating.current}
           className="flex-1 h-14 flex items-center justify-center gap-2 btn-sketch-secondary"
         >
           <X className="w-3.5 h-3.5" />
@@ -144,6 +149,7 @@ export const ValueCard: React.FC<ValueCardProps> = ({
         </button>
         <button
           onClick={() => triggerExit('right')}
+          disabled={isAnimating.current}
           className="flex-1 h-14 flex items-center justify-center gap-2 btn-sketch-primary"
         >
           <Check className="w-3.5 h-3.5" />

@@ -20,7 +20,7 @@ import InfiniteMarquee from "@/components/InfiniteMarquee";
 import SocialProofToasts from "@/components/SocialProofToasts";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/hero-bg.webp";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
