@@ -18,7 +18,7 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-const buildSystemPrompt = (rolledValue: string, rolledContext: string) => `
+const buildSystemPrompt = (rolledValue: string, rolledContext: string, coreValues: string[]) => `
 # Words Incarnate — Guided Reflection Conversation Partner
 
 ## Purpose
@@ -28,7 +28,9 @@ The experience should feel: thoughtful, surprisingly meaningful, human, calm, in
 The user should feel that their time was well spent and that this reflection was a legitimate first step in a larger journey.
 
 ## Conversation Context
-The user has already completed a quiz that identified their six core values.
+The user has already completed a quiz that identified their six core values:
+${coreValues.length > 0 ? coreValues.map(v => `- ${v}`).join('\n') : '(Core values not available — omit Core Values field from any summary)'}
+
 They have rolled two virtual dice:
 - Value Die → ${rolledValue}
 - Context Die → ${rolledContext}
@@ -330,23 +332,25 @@ Present the booking summary as a clean, professional format using bold labels. U
 
 **Participant Role:** [value]
 
+**Intention:** [Restoration, Preservation, Transformation, or Launching — whichever the user selected]
+
 **Name:** [value]
 
 **Contact Preference:** [contact method] ([contact info])
 
-**Core Values:** [list from quiz]
+**Core Values:** ${coreValues.length > 0 ? coreValues.join(', ') : 'Omit this field'}
 
-**Value Explored:** [value from reflection]
+**Value Explored:** MANDATORY — you must write the specific value from the reflection (e.g., "${rolledValue}"). This is the value they reflected on in Steps 1-6. You know what it is because you guided the entire reflection. Write it here.
 
-**Insight:** "[insight from reflection]"
+**Insight:** MANDATORY — you must write the user's core insight in their own words from the reflection. This is the understanding they reached by Step 5-6 (e.g., what the value means to them, what they discovered). You have this from the conversation. Write it here in quotes.
 
 **Desired Outcome:** [value]
 
-Session-based fields to include: Session Type, Date & Time, Duration, Format, Participant Role, Name, Contact, Core Values from Quiz, Value Explored in Reflection, Insight from Reflection, Desired Outcome
+Session-based fields to include: Session Type, Date & Time, Duration, Format, Participant Role, Intention, Name, Contact, Core Values, Value Explored, Insight, Desired Outcome
 
-Practical tools (Tier I/II) fields to include: Offering, Format, Participant Role, Core Values from Quiz, Value Explored in Reflection, Insight from Reflection, Desired Outcome
+Practical tools (Tier I/II) fields to include: Offering, Format, Participant Role, Intention, Core Values, Value Explored, Insight, Desired Outcome
 
-CRITICAL VALUE EXPLORED AND INSIGHT RULE: You MUST populate Value Explored and Insight from the actual reflection conversation. Value Explored is the concrete anchor the user shared (e.g., "baby Joel's car seat"). Insight is the understanding they reached (e.g., "affection means delighting in someone no matter what feelings they're having"). You have this information from Steps 1-5. NEVER write "Not completed." If somehow the reflection was truly skipped, write "Reflection skipped" — but if the user went through the reflection, you MUST use their actual words.
+ABSOLUTE RULE — Value Explored and Insight: The user completed a reflection conversation with you. You guided it. You have the data. Value Explored is the value they reflected on (it was rolled at the start: "${rolledValue}"). Insight is what they discovered about that value during the reflection — use their actual words from Steps 3-6. NEVER write "Reflection skipped", "Not completed", or any placeholder. These fields must contain real content from the conversation you just had.
 
 CRITICAL: Do NOT use markdown table syntax (pipes |). Use bold labels followed by values, one per line, with a blank line separating each field.
 
@@ -520,13 +524,13 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, rolledValue, rolledContext } = await req.json();
+    const { messages, rolledValue, rolledContext, coreValues } = await req.json();
 
     // Try Anthropic first, fall back to OpenAI-compatible endpoint
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
-    const systemPrompt = buildSystemPrompt(rolledValue || "[value]", rolledContext || "[context]");
+    const systemPrompt = buildSystemPrompt(rolledValue || "[value]", rolledContext || "[context]", coreValues || []);
     const cappedMessages = capMessages(messages);
 
     let response: Response;

@@ -140,6 +140,7 @@ function extractBookingSummary(content: string): Record<string, string> | null {
     ['offering', /\*\*Offering:\*\*\s*(.+)/i],
     ['date_time', /\*\*Date & Time:\*\*\s*(.+)/i],
     ['participant_role', /\*\*Participant Role:\*\*\s*(.+)/i],
+    ['intention', /\*\*Intention:\*\*\s*(.+)/i],
     ['name', /\*\*Name:\*\*\s*(.+)/i],
     ['contact_preference', /\*\*Contact Preference:\*\*\s*(.+)/i],
     ['core_values', /\*\*Core Values:\*\*\s*(.+)/i],
@@ -262,7 +263,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
       contact_method: summary.contact_preference?.split('(')[0]?.trim() || null,
       contact_info: summary.contact_preference?.match(/\(([^)]+)\)/)?.[1] || null,
       customer_type: summary.participant_role || null,
-      intention: null,
+      intention: summary.intention || null,
       support_type: null,
       offering: summary.session_type || summary.offering || null,
       timing: summary.date_time || null,
@@ -316,6 +317,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         messages: msgs,
         rolledValue,
         rolledContext,
+        coreValues: coreValues || [],
       }),
     });
 
