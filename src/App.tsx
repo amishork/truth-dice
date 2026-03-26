@@ -9,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageTransition from "./components/PageTransition";
 import { Analytics } from "@vercel/analytics/react";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -52,12 +53,14 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AnimatedRoutes />
-          </BrowserRouter>
-          <Analytics />
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AnimatedRoutes />
+            </BrowserRouter>
+            <Analytics />
+          </AuthProvider>
         </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>

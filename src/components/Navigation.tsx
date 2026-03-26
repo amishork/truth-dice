@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
-import { Flame, Menu } from "lucide-react";
+import { Flame, Menu, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "./CartDrawer";
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -22,6 +24,10 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
   useCartSync();
   const cartItemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
+  const { isAuthenticated, user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const emailInitial = user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
     <motion.nav
@@ -62,6 +68,38 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
 
             <div className="flex items-center gap-2">
               {cartItemCount > 0 && <CartDrawer />}
+
+              {/* Auth UI */}
+              {isAuthenticated ? (
+                <div className="hidden md:flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate("/quiz")}
+                    className="text-sm font-medium"
+                  >
+                    My Values
+                  </Button>
+                  <button
+                    onClick={() => signOut()}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                    title={user?.email}
+                  >
+                    {emailInitial}
+                  </button>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/quiz")}
+                  className="hidden md:flex text-sm font-medium"
+                >
+                  <User className="h-3.5 w-3.5 mr-1.5" />
+                  Sign In
+                </Button>
+              )}
+
               <div className="md:hidden">
                 <Sheet>
                   <SheetTrigger asChild>
@@ -87,6 +125,30 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                             {item.label}
                           </NavLink>
                         ))}
+                        <div className="h-px w-full bg-border" />
+                        {isAuthenticated ? (
+                          <>
+                            <button
+                              onClick={() => navigate("/quiz")}
+                              className="text-left text-base font-medium text-muted-foreground"
+                            >
+                              My Values
+                            </button>
+                            <button
+                              onClick={() => signOut()}
+                              className="text-left text-base font-medium text-muted-foreground"
+                            >
+                              Sign Out
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => navigate("/quiz")}
+                            className="text-left text-base font-medium text-muted-foreground"
+                          >
+                            Sign In / Create Account
+                          </button>
+                        )}
                       </nav>
                     </div>
                   </SheetContent>
