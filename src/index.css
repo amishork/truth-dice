@@ -388,10 +388,121 @@
 
 /* Header */
 .chat-header {
-  padding: 1rem 1.25rem;
+  padding: 1rem 1.25rem 0.75rem;
   border-bottom: 1px solid hsl(var(--border));
   background: hsl(var(--background));
   flex-shrink: 0;
+}
+
+/* ─── Progress Bar ─── */
+.chat-progress {
+  padding: 0.85rem 0.25rem 0.5rem;
+}
+
+.chat-progress-track {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* Phase node — dot + label */
+.chat-progress-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.chat-progress-node-dot {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Future node */
+.chat-progress-node.is-future .chat-progress-node-dot {
+  border: 1.5px solid hsl(var(--border));
+  background: hsl(var(--background));
+}
+
+/* Active node — crimson ring with pulse */
+.chat-progress-node.is-active .chat-progress-node-dot {
+  border: 2px solid hsl(var(--primary));
+  background: hsl(var(--background));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12), 0 0 8px hsl(var(--primary) / 0.15);
+  animation: chat-node-pulse 2.5s ease-in-out infinite;
+}
+
+.chat-progress-node.is-active .chat-progress-node-dot::after {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+}
+
+/* Complete node — filled crimson */
+.chat-progress-node.is-complete .chat-progress-node-dot {
+  border: 2px solid hsl(var(--primary));
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+@keyframes chat-node-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12), 0 0 8px hsl(var(--primary) / 0.15); }
+  50% { box-shadow: 0 0 0 5px hsl(var(--primary) / 0.08), 0 0 14px hsl(var(--primary) / 0.1); }
+}
+
+/* Phase label */
+.chat-progress-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 300ms;
+}
+
+.chat-progress-node.is-future .chat-progress-label {
+  color: hsl(var(--muted-foreground) / 0.5);
+}
+
+.chat-progress-node.is-active .chat-progress-label {
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+.chat-progress-node.is-complete .chat-progress-label {
+  color: hsl(var(--primary));
+}
+
+/* Connecting segment between nodes */
+.chat-progress-segment {
+  flex: 1;
+  height: 2px;
+  background: hsl(var(--border));
+  margin-top: 0.5rem; /* vertically center with dot */
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+}
+
+.chat-progress-segment-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: hsl(var(--primary));
+  border-radius: 1px;
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chat-header-icon {

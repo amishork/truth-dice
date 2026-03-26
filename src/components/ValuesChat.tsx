@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Send, Sparkles, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
-// A display message can carry extra metadata for Q/A rendering
 interface DisplayMsg extends Msg {
-  question?: string; // The question this answer responded to
+  question?: string;
 }
 
 interface ParsedMessage {
@@ -15,15 +14,115 @@ interface ParsedMessage {
   options?: string[];
 }
 
+type Phase = 'reflect' | 'discover' | 'book' | 'complete';
+
+interface ProgressState {
+  step: number;
+  phase: Phase;
+}
+
+// Parse the <!-- STEP:N PHASE:xxx --> marker from assistant content
+function extractProgressMarker(content: string): ProgressState | null {
+  const match = content.match(/<!--\s*STEP:(\d+)\s+PHASE:(\w+)\s*-->/);
+  if (!match) return null;
+  const step = parseInt(match[1], 10);
+  const phase = match[2] as Phase;
+  if (isNaN(step) || !['reflect', 'discover', 'book', 'complete'].includes(phase)) return null;
+  return { step, phase };
+}
+
+// Strip progress marker from display content
+function stripProgressMarker(content: string): string {
+  return content.replace(/<!--\s*STEP:\d+\s+PHASE:\w+\s*-->/g, '').trim();
+}
+
+// Fallback: infer progress from user message count
+function inferProgressFromMessageCount(userMsgCount: number): ProgressState {
+  if (userMsgCount <= 0) return { step: 1, phase: 'reflect' };
+  if (userMsgCount <= 8) return { step: userMsgCount, phase: 'reflect' };
+  if (userMsgCount <= 13) return { step: userMsgCount, phase: 'discover' };
+  if (userMsgCount <= 20) return { step: userMsgCount, phase: 'book' };
+  return { step: 21, phase: 'complete' };
+}
+
+// Phase config
+const PHASES: { key: Phase; label: string; stepRange: [number, number] }[] = [
+  { key: 'reflect', label: 'Reflect', stepRange: [1, 8] },
+  { key: 'discover', label: 'Discover', stepRange: [9, 13] },
+  { key: 'book', label: 'Book', stepRange: [14, 21] },
+];
+
+function getPhaseProgress(progress: ProgressState, phaseKey: Phase): 'future' | 'active' | 'complete' {
+  const phaseOrder: Phase[] = ['reflect', 'discover', 'book', 'complete'];
+  const currentIdx = phaseOrder.indexOf(progress.phase);
+  const targetIdx = phaseOrder.indexOf(phaseKey);
+
+  if (progress.phase === 'complete') return 'complete';
+  if (targetIdx < currentIdx) return 'complete';
+  if (targetIdx === currentIdx) return 'active';
+  return 'future';
+}
+
+function getPhasePercent(progress: ProgressState, phase: { key: Phase; stepRange: [number, number] }): number {
+  const status = getPhaseProgress(progress, phase.key);
+  if (status === 'complete') return 100;
+  if (status === 'future') return 0;
+  // Active phase — calculate internal progress
+  const [start, end] = phase.stepRange;
+  const range = end - start + 1;
+  const stepsIn = Math.max(0, Math.min(progress.step - start, range));
+  return Math.round((stepsIn / range) * 100);
+}
+
+// Progress bar component
+const ChatProgressBar: React.FC<{ progress: ProgressState }> = ({ progress }) => {
+  return (
+    <div className="chat-progress">
+      <div className="chat-progress-track">
+        {PHASES.map((phase, i) => {
+          const status = getPhaseProgress(progress, phase.key);
+          const percent = getPhasePercent(progress, phase);
+          const isLast = i === PHASES.length - 1;
+
+          return (
+            <React.Fragment key={phase.key}>
+              {/* Node */}
+              <div className={`chat-progress-node ${status === 'complete' ? 'is-complete' : status === 'active' ? 'is-active' : 'is-future'}`}>
+                <div className="chat-progress-node-dot">
+                  {status === 'complete' && (
+                    <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                      <path d="M1.5 4L3.2 5.7L6.5 2.3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+                <span className="chat-progress-label">{phase.label}</span>
+              </div>
+
+              {/* Connecting segment */}
+              {!isLast && (
+                <div className="chat-progress-segment">
+                  <div className="chat-progress-segment-fill" style={{ width: `${status === 'complete' ? 100 : status === 'active' ? percent : 0}%` }} />
+                </div>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 function parseAssistantMessage(content: string): ParsedMessage {
+  // Strip progress marker first
+  const clean = stripProgressMarker(content);
   const optionsRegex = /```options\s*\n\s*QUESTION:\s*(.+?)\n([\s\S]*?)```/;
-  const match = content.match(optionsRegex);
+  const match = clean.match(optionsRegex);
   
   if (!match) {
-    return { body: content };
+    return { body: clean };
   }
 
-  const body = content.slice(0, match.index).trim();
+  const body = clean.slice(0, match.index).trim();
   const question = match[1].trim();
   const optionLines = match[2]
     .split('\n')
@@ -34,7 +133,6 @@ function parseAssistantMessage(content: string): ParsedMessage {
   return { body, question, options: optionLines.length > 0 ? optionLines : undefined };
 }
 
-// Detect booking summary in assistant message and extract fields
 function extractBookingSummary(content: string): Record<string, string> | null {
   const fields: Record<string, string> = {};
   const patterns: [string, RegExp][] = [
@@ -48,6 +146,7 @@ function extractBookingSummary(content: string): Record<string, string> | null {
     ['value_explored', /\*\*Value Explored:\*\*\s*(.+)/i],
     ['insight', /\*\*Insight:\*\*\s*(.+)/i],
     ['desired_outcome', /\*\*Desired Outcome:\*\*\s*(.+)/i],
+    ['notes', /\*\*Notes:\*\*\s*(.+)/i],
   ];
 
   for (const [key, regex] of patterns) {
@@ -55,7 +154,6 @@ function extractBookingSummary(content: string): Record<string, string> | null {
     if (match) fields[key] = match[1].trim();
   }
 
-  // Need at least name + some offering info to count as a booking
   if (fields.name && (fields.session_type || fields.offering)) return fields;
   return null;
 }
@@ -71,25 +169,30 @@ interface ValuesChatProps {
 }
 
 export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, coreValues, onTriggerProductPopup }) => {
-  // Messages sent to the API (raw)
   const [apiMessages, setApiMessages] = useState<Msg[]>([]);
-  // Messages displayed in the UI (with Q/A metadata)
   const [displayMessages, setDisplayMessages] = useState<DisplayMsg[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [progress, setProgress] = useState<ProgressState>({ step: 0, phase: 'reflect' });
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const popupTriggeredRef = useRef(false);
   const bookingSavedRef = useRef(false);
-  // Track the last question asked so we can pair it with the user's answer
   const lastQuestionRef = useRef<string | null>(null);
+
+  // Count user messages for fallback progress
+  const userMsgCount = useMemo(
+    () => displayMessages.filter(m => m.role === 'user' && !m.content.startsWith('Rolled:')).length,
+    [displayMessages]
+  );
 
   useEffect(() => {
     if (rolledValue && rolledContext && !hasStarted) {
       setHasStarted(true);
       setApiMessages([]);
       setDisplayMessages([]);
+      setProgress({ step: 1, phase: 'reflect' });
       startConversation();
     }
   }, [rolledValue, rolledContext]);
@@ -150,7 +253,6 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     URL.revokeObjectURL(url);
   };
 
-  // Save booking to Supabase and trigger email notifications
   const saveBooking = async (summary: Record<string, string>) => {
     if (bookingSavedRef.current) return;
     bookingSavedRef.current = true;
@@ -187,7 +289,6 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         body: JSON.stringify(bookingData),
       });
 
-      // Send email notifications
       await fetch(NOTIFY_URL, {
         method: 'POST',
         headers: {
@@ -275,16 +376,20 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             });
             scrollToBottom();
 
-            // Trigger product popup
             if (!popupTriggeredRef.current && assistantSoFar.includes('At Words Incarnate, everything we create')) {
               popupTriggeredRef.current = true;
               onTriggerProductPopup?.();
             }
 
-            // Track the latest question for Q/A pairing
             const latestParsed = parseAssistantMessage(assistantSoFar);
             if (latestParsed.question) {
               lastQuestionRef.current = latestParsed.question;
+            }
+
+            // Update progress from LLM marker (primary)
+            const marker = extractProgressMarker(assistantSoFar);
+            if (marker) {
+              setProgress(marker);
             }
           }
         } catch {
@@ -294,7 +399,16 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
       }
     }
 
-    // After stream completes, check for booking summary
+    // Final progress update: prefer LLM marker, fall back to message count
+    const finalMarker = extractProgressMarker(assistantSoFar);
+    if (finalMarker) {
+      setProgress(finalMarker);
+    } else {
+      // Fallback: will use current userMsgCount + 1 on next render
+      const currentUserCount = displayMessages.filter(m => m.role === 'user' && !m.content.startsWith('Rolled:')).length;
+      setProgress(inferProgressFromMessageCount(currentUserCount));
+    }
+
     const summary = extractBookingSummary(assistantSoFar);
     if (summary) {
       saveBooking(summary);
@@ -322,7 +436,6 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     const msgText = text || input.trim();
     if (!msgText || isLoading) return;
 
-    // Build display message with Q/A format
     const displayMsg: DisplayMsg = {
       role: 'user',
       content: msgText,
@@ -390,6 +503,10 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             </button>
           )}
         </div>
+
+        {/* Progress bar */}
+        {hasStarted && <ChatProgressBar progress={progress} />}
+
         <div className="chat-header-badge">
           <span className="text-[0.55rem] font-mono tracking-[0.15em] uppercase text-muted-foreground">Exploring</span>
           <span className="font-serif text-sm text-foreground font-medium">{rolledValue}</span>
@@ -398,7 +515,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         </div>
       </div>
 
-      {/* Messages — scrollable area */}
+      {/* Messages */}
       <div ref={scrollRef} className="chat-messages">
         {displayMessages.map((msg, i) => {
           const isLastAssistant = msg.role === 'assistant' && i === displayMessages.length - 1;
@@ -406,11 +523,10 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
           const showOptions = isLastAssistant && !isLoading && parsed?.options;
           const isRolledBadge = msg.content.startsWith('Rolled:');
 
-          if (isRolledBadge) return null; // Rolled badge is in the header
+          if (isRolledBadge) return null;
 
           return (
             <div key={i} className="chat-msg-group">
-              {/* User message with Q/A format */}
               {msg.role === 'user' && (
                 <div className="chat-msg-user-wrap">
                   <div className="chat-msg-user">
@@ -432,20 +548,18 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
                 </div>
               )}
 
-              {/* Assistant message */}
               {msg.role === 'assistant' && (
                 <div className="chat-msg-assistant-wrap">
                   <div className="chat-msg-assistant">
                     <div className="prose-sketch max-w-none text-sm leading-relaxed">
                       <ReactMarkdown>
-                        {parsed ? parsed.body : msg.content}
+                        {parsed ? parsed.body : stripProgressMarker(msg.content)}
                       </ReactMarkdown>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Question + Options */}
               {showOptions && parsed?.question && (
                 <div className="chat-options-block">
                   <p className="chat-options-question">{parsed.question}</p>
