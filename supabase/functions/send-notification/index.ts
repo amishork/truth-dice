@@ -17,10 +17,10 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-// CHANGE THESE TWO LINES once send.wordsincarnate.com is verified in Resend:
-// 1. Set DOMAIN_VERIFIED to true
-// 2. Owner notifications will go to alex@wordsincarnate.com and customers get auto-replies
-const DOMAIN_VERIFIED = false;
+// DOMAIN_VERIFIED is set via Supabase secret. Once send.wordsincarnate.com is verified in Resend,
+// set the secret to "true" via: supabase secrets set DOMAIN_VERIFIED=true
+// Owner notifications will then go to alex@wordsincarnate.com and customers get auto-replies
+const DOMAIN_VERIFIED = Deno.env.get("DOMAIN_VERIFIED") === "true";
 
 const OWNER_EMAIL = DOMAIN_VERIFIED ? "alex@wordsincarnate.com" : "alexandermishork@gmail.com";
 const FROM_EMAIL = "Words Incarnate <hello@send.wordsincarnate.com>";
