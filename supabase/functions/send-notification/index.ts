@@ -17,13 +17,13 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-const OWNER_EMAIL = "alexandermishork@gmail.com";
-const FROM_EMAIL = "Words Incarnate <hello@wordsincarnate.com>";
-// Until domain is verified in Resend, use their onboarding address:
-const FROM_EMAIL_FALLBACK = "Words Incarnate <onboarding@resend.dev>";
-
-// Set to true once you verify a domain in Resend
+// CHANGE THESE TWO LINES once send.wordsincarnate.com is verified in Resend:
+// 1. Set DOMAIN_VERIFIED to true
+// 2. Owner notifications will go to alex@wordsincarnate.com and customers get auto-replies
 const DOMAIN_VERIFIED = false;
+
+const OWNER_EMAIL = DOMAIN_VERIFIED ? "alex@wordsincarnate.com" : "alexandermishork@gmail.com";
+const FROM_EMAIL = "Words Incarnate <hello@send.wordsincarnate.com>";
 
 async function sendEmail(apiKey: string, to: string, subject: string, html: string) {
   const res = await fetch("https://api.resend.com/emails", {
@@ -33,7 +33,7 @@ async function sendEmail(apiKey: string, to: string, subject: string, html: stri
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: FROM_EMAIL_FALLBACK, // Switch to FROM_EMAIL after domain verification
+      from: DOMAIN_VERIFIED ? FROM_EMAIL : "Words Incarnate <onboarding@resend.dev>",
       to: [to],
       subject,
       html,
