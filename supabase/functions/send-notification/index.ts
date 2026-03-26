@@ -149,6 +149,51 @@ serve(async (req) => {
         `New Lead Magnet Download: ${data.email}`,
         `<p>Lead magnet requested by: <strong>${data.email}</strong> (${data.name || "no name"})</p>`
       );
+    } else if (type === "booking") {
+      // Notify owner about new chatbot booking
+      const summary = data.raw_summary || {};
+      const rows = Object.entries(summary)
+        .map(([k, v]) => `<tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;white-space:nowrap;color:#333;">${k.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${v}</td></tr>`)
+        .join("");
+
+      await sendEmail(
+        RESEND_API_KEY,
+        OWNER_EMAIL,
+        `New Booking: ${data.name || "Unknown"} — ${data.offering || "Unknown offering"}`,
+        `
+        <h2 style="color:#333;font-family:Georgia,serif;">New Values Coach Booking</h2>
+        <table style="border-collapse:collapse;width:100%;max-width:600px;font-family:Arial,sans-serif;font-size:14px;">
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Name</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.name || "Not provided"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Contact Method</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.contact_method || "Not provided"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Contact Info</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.contact_info || "Not provided"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Customer Type</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.customer_type || "Not specified"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Offering</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.offering || "Not specified"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Timing</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.timing || "Not specified"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Desired Outcome</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.desired_outcome || "Not specified"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Value Explored</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.value_explored || "Not specified"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Insight</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${data.insight || "Not specified"}</td></tr>
+          <tr><td style="padding:6px 12px;border:1px solid #e5e5e5;font-weight:600;color:#333;">Core Values</td><td style="padding:6px 12px;border:1px solid #e5e5e5;color:#555;">${Array.isArray(data.core_values) ? data.core_values.join(", ") : "Not specified"}</td></tr>
+        </table>
+        ${rows ? `<h3 style="margin-top:20px;color:#333;">Raw Summary</h3><table style="border-collapse:collapse;width:100%;max-width:600px;font-family:Arial,sans-serif;font-size:14px;">${rows}</table>` : ""}
+        `
+      );
+
+      // Send confirmation to customer if we have their email and domain is verified
+      if (DOMAIN_VERIFIED && data.contact_method?.toLowerCase() === 'email' && data.contact_info) {
+        await sendEmail(
+          RESEND_API_KEY,
+          data.contact_info,
+          `Your ${data.offering || "session"} is being scheduled — Words Incarnate`,
+          `
+          <p>Hi ${data.name || "there"},</p>
+          <p>Thank you for booking your <strong>${data.offering || "session"}</strong> with Words Incarnate.</p>
+          <p>Your advisor will be in touch within 24 hours to confirm the details.</p>
+          <br />
+          <p>Connection · Delight · Belonging</p>
+          <p><em>Words Incarnate</em></p>
+          `
+        );
+      }
     } else {
       throw new Error(`Unknown notification type: ${type}`);
     }

@@ -492,8 +492,9 @@ const Quiz = () => {
             <ValuesPosterGenerator values={finalSixValues} open={showPosterGen} onClose={() => setShowPosterGen(false)} />
           </Suspense>
           <DiceProductPopup values={finalSixValues} visible={showDicePopup} />
-          <div className="pt-20 lg:flex lg:min-h-[calc(100vh-5rem)]">
-            <div className="w-full p-6 lg:w-1/2 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:p-10">
+          <div className="pt-20 lg:flex">
+            {/* Left column — scrolls naturally */}
+            <div className="w-full p-6 lg:w-1/2 lg:p-10">
               <div className="mx-auto w-full max-w-md space-y-8">
                 <div className="text-center">
                   <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
@@ -520,7 +521,7 @@ const Quiz = () => {
 
                 <CommitmentEscalation onAction={(milestone) => {
                   if (milestone === "chat_used") {
-                    const chatEl = document.querySelector('[class*="lg:border-l"]');
+                    const chatEl = document.querySelector('.chat-callout');
                     chatEl?.scrollIntoView({ behavior: "smooth" });
                   }
                 }} />
@@ -561,9 +562,16 @@ const Quiz = () => {
                 <ShareableValuesCard values={finalSixValues} />
               </div>
             </div>
-            <div className="w-full border-t border-border lg:w-1/2 lg:border-t-0 lg:border-l">
-              <div className="min-h-[520px] lg:min-h-[calc(100vh-5rem)]">
-                <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} onTriggerProductPopup={() => setShowDicePopup(true)} />
+
+            {/* Right column — sticky chat callout */}
+            <div className="w-full lg:w-1/2 px-4 lg:px-6 pb-6 lg:pb-0">
+              <div className="chat-callout lg:sticky lg:top-[5.5rem] lg:h-[calc(100vh-6.5rem)]">
+                <ValuesChat
+                  rolledValue={dice1Result}
+                  rolledContext={dice2Result}
+                  coreValues={finalSixValues}
+                  onTriggerProductPopup={() => setShowDicePopup(true)}
+                />
               </div>
             </div>
           </div>

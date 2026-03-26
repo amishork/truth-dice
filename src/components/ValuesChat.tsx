@@ -1,8 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Sparkles, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
+
+// A display message can carry extra metadata for Q/A rendering
+interface DisplayMsg extends Msg {
+  question?: string; // The question this answer responded to
+}
 
 interface ParsedMessage {
   body: string;
@@ -29,39 +34,74 @@ function parseAssistantMessage(content: string): ParsedMessage {
   return { body, question, options: optionLines.length > 0 ? optionLines : undefined };
 }
 
+// Detect booking summary in assistant message and extract fields
+function extractBookingSummary(content: string): Record<string, string> | null {
+  const fields: Record<string, string> = {};
+  const patterns: [string, RegExp][] = [
+    ['session_type', /\*\*Session Type:\*\*\s*(.+)/i],
+    ['offering', /\*\*Offering:\*\*\s*(.+)/i],
+    ['date_time', /\*\*Date & Time:\*\*\s*(.+)/i],
+    ['participant_role', /\*\*Participant Role:\*\*\s*(.+)/i],
+    ['name', /\*\*Name:\*\*\s*(.+)/i],
+    ['contact_preference', /\*\*Contact Preference:\*\*\s*(.+)/i],
+    ['core_values', /\*\*Core Values:\*\*\s*(.+)/i],
+    ['value_explored', /\*\*Value Explored:\*\*\s*(.+)/i],
+    ['insight', /\*\*Insight:\*\*\s*(.+)/i],
+    ['desired_outcome', /\*\*Desired Outcome:\*\*\s*(.+)/i],
+  ];
+
+  for (const [key, regex] of patterns) {
+    const match = content.match(regex);
+    if (match) fields[key] = match[1].trim();
+  }
+
+  // Need at least name + some offering info to count as a booking
+  if (fields.name && (fields.session_type || fields.offering)) return fields;
+  return null;
+}
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/values-chat`;
+const NOTIFY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`;
 
 interface ValuesChatProps {
   rolledValue: string;
   rolledContext: string;
+  coreValues?: string[];
   onTriggerProductPopup?: () => void;
 }
 
-export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, onTriggerProductPopup }) => {
-  const [messages, setMessages] = useState<Msg[]>([]);
+export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, coreValues, onTriggerProductPopup }) => {
+  // Messages sent to the API (raw)
+  const [apiMessages, setApiMessages] = useState<Msg[]>([]);
+  // Messages displayed in the UI (with Q/A metadata)
+  const [displayMessages, setDisplayMessages] = useState<DisplayMsg[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const popupTriggeredRef = useRef(false);
+  const bookingSavedRef = useRef(false);
+  // Track the last question asked so we can pair it with the user's answer
+  const lastQuestionRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (rolledValue && rolledContext && !hasStarted) {
       setHasStarted(true);
-      setMessages([]);
+      setApiMessages([]);
+      setDisplayMessages([]);
       startConversation();
     }
   }, [rolledValue, rolledContext]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     });
-  };
+  }, []);
 
   const exportConversation = () => {
-    if (messages.length === 0) return;
+    if (displayMessages.length === 0) return;
     
     const lines = [
       "═══════════════════════════════════════",
@@ -76,12 +116,17 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
       "",
     ];
 
-    messages.forEach((msg) => {
+    displayMessages.forEach((msg) => {
       if (msg.content.startsWith("Rolled:")) return;
       const parsed = msg.role === "assistant" ? parseAssistantMessage(msg.content) : null;
       const label = msg.role === "user" ? "YOU" : "VALUES COACH";
       lines.push(`[${label}]`);
-      lines.push(parsed ? parsed.body : msg.content);
+      if (msg.role === 'user' && msg.question) {
+        lines.push(`Q: ${msg.question}`);
+        lines.push(`A: ${msg.content}`);
+      } else {
+        lines.push(parsed ? parsed.body : msg.content);
+      }
       if (parsed?.question) {
         lines.push("");
         lines.push(`Question: ${parsed.question}`);
@@ -103,6 +148,60 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     a.download = `values-reflection-${rolledValue.toLowerCase().replace(/\s+/g, "-")}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Save booking to Supabase and trigger email notifications
+  const saveBooking = async (summary: Record<string, string>) => {
+    if (bookingSavedRef.current) return;
+    bookingSavedRef.current = true;
+
+    const bookingData = {
+      name: summary.name || null,
+      contact_method: summary.contact_preference?.split('(')[0]?.trim() || null,
+      contact_info: summary.contact_preference?.match(/\(([^)]+)\)/)?.[1] || null,
+      customer_type: summary.participant_role || null,
+      intention: null,
+      support_type: null,
+      offering: summary.session_type || summary.offering || null,
+      timing: summary.date_time || null,
+      desired_outcome: summary.desired_outcome || null,
+      value_explored: summary.value_explored || rolledValue,
+      context_explored: rolledContext,
+      insight: summary.insight || null,
+      core_values: coreValues || [],
+      raw_summary: summary,
+    };
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      await fetch(`${supabaseUrl}/rest/v1/chat_bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      // Send email notifications
+      await fetch(NOTIFY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({
+          type: 'booking',
+          data: { ...bookingData, raw_summary: summary },
+        }),
+      });
+    } catch (e) {
+      console.error('Failed to save booking:', e);
+    }
   };
 
   const streamChat = async (msgs: Msg[]) => {
@@ -155,20 +254,37 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
           const content = parsed.choices?.[0]?.delta?.content as string | undefined;
           if (content) {
             assistantSoFar += content;
-            setMessages(prev => {
+            const updateFn = (prev: DisplayMsg[]) => {
               const last = prev[prev.length - 1];
               if (last?.role === 'assistant') {
                 return prev.map((m, i) =>
                   i === prev.length - 1 ? { ...m, content: assistantSoFar } : m
                 );
               }
-              return [...prev, { role: 'assistant', content: assistantSoFar }];
+              return [...prev, { role: 'assistant' as const, content: assistantSoFar }];
+            };
+            setDisplayMessages(updateFn);
+            setApiMessages(prev => {
+              const last = prev[prev.length - 1];
+              if (last?.role === 'assistant') {
+                return prev.map((m, i) =>
+                  i === prev.length - 1 ? { ...m, content: assistantSoFar } : m
+                );
+              }
+              return [...prev, { role: 'assistant' as const, content: assistantSoFar }];
             });
             scrollToBottom();
-            // Trigger product popup when specific phrase appears
+
+            // Trigger product popup
             if (!popupTriggeredRef.current && assistantSoFar.includes('At Words Incarnate, everything we create')) {
               popupTriggeredRef.current = true;
               onTriggerProductPopup?.();
+            }
+
+            // Track the latest question for Q/A pairing
+            const latestParsed = parseAssistantMessage(assistantSoFar);
+            if (latestParsed.question) {
+              lastQuestionRef.current = latestParsed.question;
             }
           }
         } catch {
@@ -177,17 +293,27 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         }
       }
     }
+
+    // After stream completes, check for booking summary
+    const summary = extractBookingSummary(assistantSoFar);
+    if (summary) {
+      saveBooking(summary);
+    }
   };
 
   const startConversation = async () => {
     setIsLoading(true);
     try {
       const initMsgs: Msg[] = [{ role: 'user', content: `I just rolled the value "${rolledValue}" with the context "${rolledContext}". Begin the reflection.` }];
-      setMessages([{ role: 'user', content: `Rolled: ${rolledValue} × ${rolledContext}` }]);
+      const rolledMsg: DisplayMsg = { role: 'user', content: `Rolled: ${rolledValue} × ${rolledContext}` };
+      setApiMessages([rolledMsg]);
+      setDisplayMessages([rolledMsg]);
       await streamChat(initMsgs);
     } catch (e) {
       console.error(e);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I had trouble connecting. Please try rolling again.' }]);
+      const errMsg: DisplayMsg = { role: 'assistant', content: 'Sorry, I had trouble connecting. Please try rolling again.' };
+      setDisplayMessages(prev => [...prev, errMsg]);
+      setApiMessages(prev => [...prev, errMsg]);
     }
     setIsLoading(false);
   };
@@ -195,18 +321,31 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   const sendMessage = async (text?: string) => {
     const msgText = text || input.trim();
     if (!msgText || isLoading) return;
-    const userMsg: Msg = { role: 'user', content: msgText };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
+
+    // Build display message with Q/A format
+    const displayMsg: DisplayMsg = {
+      role: 'user',
+      content: msgText,
+      question: lastQuestionRef.current || undefined,
+    };
+    const apiMsg: Msg = { role: 'user', content: msgText };
+
+    const newDisplayMessages = [...displayMessages, displayMsg];
+    const newApiMessages = [...apiMessages, apiMsg];
+    setDisplayMessages(newDisplayMessages);
+    setApiMessages(newApiMessages);
     setInput('');
     setIsLoading(true);
+    lastQuestionRef.current = null;
     scrollToBottom();
 
     try {
-      await streamChat(newMessages.filter(m => m.content && !m.content.startsWith('Rolled:')));
+      await streamChat(newApiMessages.filter(m => m.content && !m.content.startsWith('Rolled:')));
     } catch (e) {
       console.error(e);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
+      const errMsg: DisplayMsg = { role: 'assistant', content: 'Something went wrong. Please try again.' };
+      setDisplayMessages(prev => [...prev, errMsg]);
+      setApiMessages(prev => [...prev, errMsg]);
     }
     setIsLoading(false);
   };
@@ -217,13 +356,12 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
 
   if (!rolledValue || !rolledContext) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
-        <div className="w-16 h-16 sketch-card flex items-center justify-center mb-6 animate-float">
-          <div className="absolute top-0 right-0 w-6 h-6 cross-hatch opacity-20 pointer-events-none" />
+      <div className="chat-container chat-empty-state">
+        <div className="chat-empty-icon">
           <Sparkles className="w-5 h-5 text-muted-foreground" />
         </div>
-        <p className="text-lg font-serif text-foreground/60 italic">Roll the dice to begin</p>
-        <p className="text-[0.6rem] font-mono mt-3 max-w-[240px] text-muted-foreground tracking-[0.15em] uppercase">
+        <p className="font-serif text-lg text-foreground/60 italic">Roll the dice to begin</p>
+        <p className="text-[0.6rem] font-mono mt-3 max-w-[240px] text-muted-foreground tracking-[0.15em] uppercase text-center">
           Your coach will guide a Socratic exploration of your values
         </p>
       </div>
@@ -231,18 +369,20 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="chat-container">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-foreground/12">
+      <div className="chat-header">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <h3 className="font-serif text-lg text-foreground">Values Coach</h3>
+          <div className="flex items-center gap-2.5">
+            <div className="chat-header-icon">
+              <Sparkles className="w-3 h-3" />
+            </div>
+            <h3 className="font-serif text-lg text-foreground tracking-wide">Values Coach</h3>
           </div>
-          {messages.length > 1 && (
+          {displayMessages.length > 1 && (
             <button
               onClick={exportConversation}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+              className="chat-export-btn"
               title="Export conversation"
             >
               <Download className="w-3.5 h-3.5" />
@@ -250,56 +390,71 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             </button>
           )}
         </div>
-        <p className="text-[0.6rem] text-muted-foreground mt-1 font-mono tracking-[0.12em] uppercase">
-          Exploring <span className="ink-red font-medium">{rolledValue}</span> × <span className="ink-red font-medium">{rolledContext}</span>
-        </p>
-      </div>
-
-      {/* Rolled badge */}
-      <div className="px-5 py-3 border-b border-foreground/8">
-        <div className="inline-flex items-center gap-2 sketch-card px-3 py-1.5">
-          <span className="text-[0.55rem] font-mono tracking-[0.15em] uppercase text-muted-foreground">Rolled</span>
+        <div className="chat-header-badge">
+          <span className="text-[0.55rem] font-mono tracking-[0.15em] uppercase text-muted-foreground">Exploring</span>
           <span className="font-serif text-sm text-foreground font-medium">{rolledValue}</span>
           <span className="text-muted-foreground text-xs">×</span>
           <span className="font-serif text-sm ink-red italic">{rolledContext}</span>
         </div>
       </div>
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5">
-        {messages.map((msg, i) => {
-          const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1;
+      {/* Messages — scrollable area */}
+      <div ref={scrollRef} className="chat-messages">
+        {displayMessages.map((msg, i) => {
+          const isLastAssistant = msg.role === 'assistant' && i === displayMessages.length - 1;
           const parsed = msg.role === 'assistant' ? parseAssistantMessage(msg.content) : null;
           const showOptions = isLastAssistant && !isLoading && parsed?.options;
+          const isRolledBadge = msg.content.startsWith('Rolled:');
+
+          if (isRolledBadge) return null; // Rolled badge is in the header
 
           return (
-            <div key={i}>
-              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[85%] px-4 py-3 text-sm ${
-                    msg.role === 'user'
-                      ? 'sketch-card pencil-shade text-foreground font-sans'
-                      : 'border-l-2 border-primary/40 bg-transparent text-foreground pl-4 pr-0 py-2'
-                  }`}
-                >
-                  <div className="prose-sketch max-w-none text-sm leading-relaxed">
-                    <ReactMarkdown>
-                      {parsed ? parsed.body : msg.content}
-                    </ReactMarkdown>
+            <div key={i} className="chat-msg-group">
+              {/* User message with Q/A format */}
+              {msg.role === 'user' && (
+                <div className="chat-msg-user-wrap">
+                  <div className="chat-msg-user">
+                    {msg.question ? (
+                      <div className="chat-qa-block">
+                        <div className="chat-qa-question">
+                          <span className="chat-qa-label">Q:</span>
+                          <span>{msg.question}</span>
+                        </div>
+                        <div className="chat-qa-answer">
+                          <span className="chat-qa-label">A:</span>
+                          <span>{msg.content}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <span>{msg.content}</span>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Assistant message */}
+              {msg.role === 'assistant' && (
+                <div className="chat-msg-assistant-wrap">
+                  <div className="chat-msg-assistant">
+                    <div className="prose-sketch max-w-none text-sm leading-relaxed">
+                      <ReactMarkdown>
+                        {parsed ? parsed.body : msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Question + Options */}
               {showOptions && parsed?.question && (
-                <div className="mt-4 ml-4 pl-4 border-l-2 border-primary/40">
-                  <p className="text-sm font-serif text-foreground mb-3">{parsed.question}</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="chat-options-block">
+                  <p className="chat-options-question">{parsed.question}</p>
+                  <div className="chat-options-list">
                     {parsed.options!.map((opt, j) => (
                       <button
                         key={j}
                         onClick={() => handleOptionClick(opt)}
-                        className="sketch-card px-4 py-2 text-sm font-sans text-foreground hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+                        className="chat-option-btn"
                       >
                         {opt}
                       </button>
@@ -310,14 +465,13 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             </div>
           );
         })}
-        {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
-          <div className="flex justify-start">
-            <div className="border-l-2 border-primary/40 pl-4 py-2">
-              <div className="flex gap-2">
-                <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full animate-pulse" />
-                <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.2s]" />
-                <span className="w-1.5 h-1.5 bg-foreground/30 rounded-full animate-pulse [animation-delay:0.4s]" />
-              </div>
+
+        {isLoading && displayMessages[displayMessages.length - 1]?.role !== 'assistant' && (
+          <div className="chat-msg-assistant-wrap">
+            <div className="chat-typing-indicator">
+              <span className="chat-typing-dot" />
+              <span className="chat-typing-dot" style={{ animationDelay: '0.2s' }} />
+              <span className="chat-typing-dot" style={{ animationDelay: '0.4s' }} />
             </div>
           </div>
         )}
@@ -325,26 +479,26 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-foreground/12">
+      <div className="chat-input-area">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             sendMessage();
           }}
-          className="flex gap-2"
+          className="chat-input-form"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Share your thoughts..."
+            placeholder="Type your own answer..."
             disabled={isLoading}
-            className="flex-1 bg-card border-[1.5px] border-foreground/20 rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary disabled:opacity-50 transition-colors font-sans"
+            className="chat-input"
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="shrink-0 w-10 h-10 flex items-center justify-center btn-sketch-primary disabled:opacity-40"
+            className="chat-send-btn"
           >
             <Send className="h-3.5 w-3.5" />
           </button>
