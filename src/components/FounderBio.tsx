@@ -5,25 +5,25 @@ const FounderBio = () => {
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
-        <div className="mx-auto grid max-w-4xl items-center gap-12 md:grid-cols-[280px_1fr]">
+        <div className="mx-auto grid max-w-4xl items-center gap-12 md:grid-cols-[260px_1fr]">
           {/* Photo */}
           <motion.div
-            className="relative mx-auto w-[220px] md:mx-0 md:w-full"
+            className="relative mx-auto w-[220px] md:mx-0 md:w-[260px]"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6 }}
           >
-            <div className="aspect-[4/5] overflow-hidden rounded-xl border border-border">
+            <div className="aspect-square overflow-hidden rounded-full shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.25)]">
               <img
                 src={founderPhoto}
-                alt="Founder of Words Incarnate"
+                alt="Alex Mishork, Founder of Words Incarnate"
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
             </div>
-            {/* Decorative offset border */}
-            <div className="absolute -bottom-3 -right-3 -z-10 h-full w-full rounded-xl border border-primary/20" />
+            {/* Subtle ring accent */}
+            <div className="absolute -inset-2 -z-10 rounded-full border border-primary/10" />
           </motion.div>
 
           {/* Bio text */}
