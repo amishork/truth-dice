@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
-import { ChevronRight, Dices, Zap, Image, Plus, Lock } from "lucide-react";
+import { ChevronRight, Dices, Plus, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -9,9 +9,7 @@ import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
 import CommitmentEscalation from "@/components/CommitmentEscalation";
-import SpeedRound from "@/components/SpeedRound";
 import DiceProductPopup from "@/components/DiceProductPopup";
-import ShareableValuesCard from "@/components/ShareableValuesCard";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
 import QuizMilestone from "@/components/QuizMilestone";
@@ -34,7 +32,6 @@ import {
 import type { QuizSession } from "@/lib/quizSessions";
 
 const ValuesChordDiagram = lazy(() => import("@/components/ValuesChordDiagram"));
-const ValuesPosterGenerator = lazy(() => import("@/components/ValuesPosterGenerator"));
 
 type Stage =
   | "auth"
@@ -178,8 +175,6 @@ const Quiz = () => {
   const [dice2Result, setDice2Result] = useState<string>("");
   const [isRolling, setIsRolling] = useState(false);
   const [showDicePopup, setShowDicePopup] = useState(false);
-  const [showSpeedRound, setShowSpeedRound] = useState(false);
-  const [showPosterGen, setShowPosterGen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // ─── Timing state ─────────────────────────────────────────────────────────
@@ -669,82 +664,75 @@ const Quiz = () => {
       {stage === "dice" && (
         <div className="min-h-screen bg-background">
           <Navigation />
-          <Suspense fallback={null}>
-            <ValuesPosterGenerator values={activeValues} open={showPosterGen} onClose={() => setShowPosterGen(false)} />
-          </Suspense>
           <DiceProductPopup values={activeValues} visible={showDicePopup} />
-          <div className="pt-20 lg:flex">
+          <div className="pt-20 hub-layout">
 
-            {/* Left column */}
-            <div className="w-full p-6 lg:w-1/2 lg:p-10">
-              <div className="mx-auto w-full max-w-md space-y-8">
+            {/* ─── Column 1: Discoveries sidebar ─── */}
+            <div className="hub-sidebar">
+              {!isAuthenticated && (
+                <motion.div className="hub-sidebar-card" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+                  <p className="text-sm text-foreground leading-relaxed">
+                    <span className="font-medium">Save your results.</span>{" "}
+                    Create an account to discover your values across every area of life.
+                  </p>
+                  <button onClick={() => setShowAuthModal(true)} className="mt-3 text-sm font-medium text-primary hover:underline">
+                    Create free account →
+                  </button>
+                </motion.div>
+              )}
 
-                {!isAuthenticated && (
-                  <motion.div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 px-5 py-4" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-                    <p className="text-sm text-foreground leading-relaxed">
-                      <span className="font-medium">Save your results.</span>{" "}
-                      Create an account to discover your values across every area of life and track how they evolve.
-                    </p>
-                    <button onClick={() => setShowAuthModal(true)} className="mt-3 text-sm font-medium text-primary hover:underline">
-                      Create free account →
+              {isAuthenticated && userSessions.length > 0 && (
+                <div className="hub-sidebar-card">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="label-technical">Your Discoveries</h3>
+                    <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                      <Plus className="h-3 w-3" /> New
                     </button>
-                  </motion.div>
-                )}
-
-                {isAuthenticated && userSessions.length > 0 && (
-                  <div>
-                    <div className="mb-3 flex items-center justify-between">
-                      <h3 className="label-technical">Your Discoveries</h3>
-                      <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                        <Plus className="h-3 w-3" /> New Quiz
-                      </button>
-                    </div>
-                    <div className="space-y-2">
-                      {userSessions.map((session) => {
-                        const area = AREAS_OF_LIFE.find((a) => a.id === session.area_of_life);
-                        const label = area ? getAreaLabel(area, gender) : session.area_of_life;
-                        const isActive = session.id === selectedSessionId;
-                        return (
-                          <button key={session.id} onClick={() => handleSessionSelect(session)}
-                            className={`w-full rounded-lg border px-4 py-3 text-left transition-all ${isActive ? "border-primary/40 bg-primary/10 shadow-sm" : "border-border bg-background hover:border-foreground/20 hover:shadow-sm"}`}
-                          >
-                            <div className="mb-2 flex items-center gap-2.5">
-                              <span className="text-base">{area?.icon ?? "🪞"}</span>
-                              <span className="text-sm font-medium text-foreground truncate">{label}</span>
-                              {isActive && <span className="ml-auto label-technical text-primary">Active</span>}
-                            </div>
-                            <div className="flex flex-wrap gap-1.5">
-                              {session.final_six_values.map((v) => (
-                                <span key={v} className="rounded-sm bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{v}</span>
-                              ))}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).length > 0 && (
-                      <div className="mt-4">
-                        <p className="label-technical mb-2 text-muted-foreground/60">Still to explore</p>
-                        <div className="space-y-1.5">
-                          {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).map((area) => {
-                            const label = getAreaLabel(area, gender);
-                            const isLocked = area.requiresPersonal && !completedAreas.includes("personal");
-                            return (
-                              <button key={area.id} onClick={() => !isLocked && setStage("area-of-life")} disabled={isLocked}
-                                className={`flex w-full items-center gap-2.5 rounded-lg border border-dashed px-4 py-2.5 text-left transition-colors ${isLocked ? "border-border/30 cursor-not-allowed" : "border-border/50 hover:border-primary/30"}`}
-                              >
-                                <span className={`text-sm ${isLocked ? "opacity-30 grayscale" : "opacity-60"}`}>{area.icon}</span>
-                                <span className={`text-xs ${isLocked ? "text-muted-foreground/30" : "text-muted-foreground/60"}`}>{label}</span>
-                                {isLocked && <Lock className="ml-auto h-3 w-3 text-muted-foreground/20" />}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
                   </div>
-                )}
+                  <div className="space-y-1.5">
+                    {userSessions.map((session) => {
+                      const area = AREAS_OF_LIFE.find((a) => a.id === session.area_of_life);
+                      const label = area ? getAreaLabel(area, gender) : session.area_of_life;
+                      const isActive = session.id === selectedSessionId;
+                      return (
+                        <button key={session.id} onClick={() => handleSessionSelect(session)}
+                          className={`hub-session-btn ${isActive ? "hub-session-active" : ""}`}
+                        >
+                          <span className="text-sm">{area?.icon ?? "🪞"}</span>
+                          <span className="text-xs font-medium text-foreground truncate">{label}</span>
+                          {isActive && <span className="ml-auto hub-active-badge">Active</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).length > 0 && (
+                    <div className="mt-4 pt-3 border-t border-border/40">
+                      <p className="label-technical mb-2 text-muted-foreground/50">Still to explore</p>
+                      <div className="space-y-1">
+                        {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).map((area) => {
+                          const label = getAreaLabel(area, gender);
+                          const isLocked = area.requiresPersonal && !completedAreas.includes("personal");
+                          return (
+                            <button key={area.id} onClick={() => !isLocked && setStage("area-of-life")} disabled={isLocked}
+                              className={`hub-explore-btn ${isLocked ? "hub-explore-locked" : ""}`}
+                            >
+                              <span className={`text-xs ${isLocked ? "opacity-25 grayscale" : "opacity-50"}`}>{area.icon}</span>
+                              <span className={`text-[0.7rem] ${isLocked ? "text-muted-foreground/25" : "text-muted-foreground/55"}`}>{label}</span>
+                              {isLocked && <Lock className="ml-auto h-2.5 w-2.5 text-muted-foreground/15" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ─── Column 2: Dice + Diagram + Journey ─── */}
+            <div className="hub-center">
+              <div className="mx-auto w-full max-w-md space-y-6">
 
                 {(!isAuthenticated || userSessions.length === 0) && (
                   <div className="text-center">
@@ -753,6 +741,7 @@ const Quiz = () => {
                   </div>
                 )}
 
+                {/* Dice */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="sketch-card p-6 text-center">
                     <p className="label-technical">Value</p>
@@ -771,36 +760,23 @@ const Quiz = () => {
                   <Dices /> Roll dice
                 </Button>
 
+                {/* Chord Diagram */}
+                <Suspense fallback={<div className="h-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>}>
+                  <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
+                </Suspense>
+
+                {/* Your Journey */}
                 <CommitmentEscalation onAction={(milestone) => {
                   if (milestone === "chat_used") {
                     const chatEl = document.querySelector(".chat-callout");
                     chatEl?.scrollIntoView({ behavior: "smooth" });
                   }
                 }} />
-
-                <Suspense fallback={<div className="h-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>}>
-                  <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
-                </Suspense>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" size="sm" onClick={() => setShowSpeedRound((s) => !s)} className="text-xs">
-                    <Zap className="h-3.5 w-3.5" /> Speed Round
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowPosterGen(true)} className="text-xs">
-                    <Image className="h-3.5 w-3.5" /> Create Poster
-                  </Button>
-                </div>
-
-                {showSpeedRound && (
-                  <SpeedRound values={activeAllWinners} deliberateValues={activeValues} onClose={() => setShowSpeedRound(false)} />
-                )}
-
-                <ShareableValuesCard values={activeValues} />
               </div>
             </div>
 
-            {/* Right column — sticky chat */}
-            <div className="w-full lg:w-1/2 px-4 lg:px-6 pb-6 lg:pb-0">
+            {/* ─── Column 3: Chat ─── */}
+            <div className="hub-chat">
               <div className="chat-callout lg:sticky lg:top-[5.5rem] lg:h-[calc(100vh-6.5rem)]">
                 <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} onTriggerProductPopup={() => setShowDicePopup(true)} />
               </div>
