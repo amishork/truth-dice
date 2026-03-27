@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
-import { ChevronRight, Dices, Plus, Lock } from "lucide-react";
+import { ChevronRight, ChevronDown, Dices, Plus, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -176,6 +176,7 @@ const Quiz = () => {
   const [isRolling, setIsRolling] = useState(false);
   const [showDicePopup, setShowDicePopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
 
   // ─── Timing state ─────────────────────────────────────────────────────────
   const quizStartTime = useRef<number | null>(null);
@@ -665,12 +666,14 @@ const Quiz = () => {
         <div className="min-h-screen bg-background">
           <Navigation />
           <DiceProductPopup values={activeValues} visible={showDicePopup} />
-          <div className="pt-20 hub-layout">
 
-            {/* ─── Column 1: Discoveries sidebar ─── */}
-            <div className="hub-sidebar">
+          <div className="hub-page">
+            {/* ─── Left half: sidebar + dice + diagram + journey ─── */}
+            <div className="hub-left">
+
+              {/* Discoveries panel */}
               {!isAuthenticated && (
-                <motion.div className="hub-sidebar-card" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+                <motion.div className="hub-sidebar-card mb-6" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
                   <p className="text-sm text-foreground leading-relaxed">
                     <span className="font-medium">Save your results.</span>{" "}
                     Create an account to discover your values across every area of life.
@@ -682,34 +685,80 @@ const Quiz = () => {
               )}
 
               {isAuthenticated && userSessions.length > 0 && (
-                <div className="hub-sidebar-card">
-                  <div className="mb-3 flex items-center justify-between">
+                <div className="hub-sidebar-card mb-6">
+                  <div className="mb-4 flex items-center justify-between">
                     <h3 className="label-technical">Your Discoveries</h3>
-                    <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                      <Plus className="h-3 w-3" /> New
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => {
+                          const allIds = userSessions.map(s => s.id);
+                          const allExpanded = allIds.every(id => expandedSessions.has(id));
+                          setExpandedSessions(allExpanded ? new Set() : new Set(allIds));
+                        }}
+                        className="text-[0.6rem] font-mono tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                      >
+                        {userSessions.every(s => expandedSessions.has(s.id)) ? "Collapse all" : "Expand all"}
+                      </button>
+                      <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        <Plus className="h-3 w-3" /> New
+                      </button>
+                    </div>
                   </div>
-                  <div className="space-y-1.5">
+
+                  <div className="space-y-1">
                     {userSessions.map((session) => {
                       const area = AREAS_OF_LIFE.find((a) => a.id === session.area_of_life);
                       const label = area ? getAreaLabel(area, gender) : session.area_of_life;
                       const isActive = session.id === selectedSessionId;
+                      const isExpanded = expandedSessions.has(session.id);
                       return (
-                        <button key={session.id} onClick={() => handleSessionSelect(session)}
-                          className={`hub-session-btn ${isActive ? "hub-session-active" : ""}`}
-                        >
-                          <span className="text-sm">{area?.icon ?? "🪞"}</span>
-                          <span className="text-xs font-medium text-foreground truncate">{label}</span>
-                          {isActive && <span className="ml-auto hub-active-badge">Active</span>}
-                        </button>
+                        <div key={session.id}>
+                          <div className={`hub-session-btn ${isActive ? "hub-session-active" : ""}`}>
+                            <button
+                              onClick={() => {
+                                setExpandedSessions(prev => {
+                                  const next = new Set(prev);
+                                  next.has(session.id) ? next.delete(session.id) : next.add(session.id);
+                                  return next;
+                                });
+                              }}
+                              className="flex items-center justify-center w-5 h-5 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                            >
+                              <ChevronRight className={`h-3 w-3 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
+                            </button>
+                            <button
+                              onClick={() => handleSessionSelect(session)}
+                              className="flex items-center gap-2 flex-1 min-w-0"
+                            >
+                              <span className="text-sm">{area?.icon ?? "🪞"}</span>
+                              <span className="text-xs font-medium text-foreground truncate">{label}</span>
+                              {isActive && <span className="ml-auto hub-active-badge">Active</span>}
+                            </button>
+                          </div>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="pl-8 pr-2 pb-2"
+                            >
+                              <div className="flex flex-wrap gap-1.5 pt-1">
+                                {session.final_six_values.map((v) => (
+                                  <span key={v} className="rounded-sm bg-background px-2 py-0.5 text-[0.65rem] text-muted-foreground border border-border/40">{v}</span>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
                       );
                     })}
                   </div>
 
                   {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).length > 0 && (
-                    <div className="mt-4 pt-3 border-t border-border/40">
-                      <p className="label-technical mb-2 text-muted-foreground/50">Still to explore</p>
-                      <div className="space-y-1">
+                    <div className="mt-4 pt-3 border-t border-border/30">
+                      <p className="label-technical mb-2 text-muted-foreground/45">Still to explore</p>
+                      <div className="space-y-0.5">
                         {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).map((area) => {
                           const label = getAreaLabel(area, gender);
                           const isLocked = area.requiresPersonal && !completedAreas.includes("personal");
@@ -717,9 +766,9 @@ const Quiz = () => {
                             <button key={area.id} onClick={() => !isLocked && setStage("area-of-life")} disabled={isLocked}
                               className={`hub-explore-btn ${isLocked ? "hub-explore-locked" : ""}`}
                             >
-                              <span className={`text-xs ${isLocked ? "opacity-25 grayscale" : "opacity-50"}`}>{area.icon}</span>
-                              <span className={`text-[0.7rem] ${isLocked ? "text-muted-foreground/25" : "text-muted-foreground/55"}`}>{label}</span>
-                              {isLocked && <Lock className="ml-auto h-2.5 w-2.5 text-muted-foreground/15" />}
+                              <span className={`text-xs ${isLocked ? "opacity-20 grayscale" : "opacity-45"}`}>{area.icon}</span>
+                              <span className={`text-[0.7rem] ${isLocked ? "text-muted-foreground/20" : "text-muted-foreground/50"}`}>{label}</span>
+                              {isLocked && <Lock className="ml-auto h-2.5 w-2.5 text-muted-foreground/12" />}
                             </button>
                           );
                         })}
@@ -728,20 +777,16 @@ const Quiz = () => {
                   )}
                 </div>
               )}
-            </div>
 
-            {/* ─── Column 2: Dice + Diagram + Journey ─── */}
-            <div className="hub-center">
-              <div className="mx-auto w-full max-w-md space-y-6">
+              {(!isAuthenticated || userSessions.length === 0) && (
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
+                </div>
+              )}
 
-                {(!isAuthenticated || userSessions.length === 0) && (
-                  <div className="text-center">
-                    <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
-                  </div>
-                )}
-
-                {/* Dice */}
+              {/* Dice */}
+              <div className="space-y-5 max-w-md">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="sketch-card p-6 text-center">
                     <p className="label-technical">Value</p>
@@ -759,13 +804,17 @@ const Quiz = () => {
                 <Button onClick={rollDice} disabled={isRolling} size="lg" className="w-full">
                   <Dices /> Roll dice
                 </Button>
+              </div>
 
-                {/* Chord Diagram */}
+              {/* Chord Diagram */}
+              <div className="mt-6">
                 <Suspense fallback={<div className="h-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>}>
                   <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
                 </Suspense>
+              </div>
 
-                {/* Your Journey */}
+              {/* Your Journey */}
+              <div className="mt-6 max-w-md">
                 <CommitmentEscalation onAction={(milestone) => {
                   if (milestone === "chat_used") {
                     const chatEl = document.querySelector(".chat-callout");
@@ -775,8 +824,8 @@ const Quiz = () => {
               </div>
             </div>
 
-            {/* ─── Column 3: Chat ─── */}
-            <div className="hub-chat">
+            {/* ─── Right half: Chat ─── */}
+            <div className="hub-right">
               <div className="chat-callout lg:sticky lg:top-[5.5rem] lg:h-[calc(100vh-6.5rem)]">
                 <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} onTriggerProductPopup={() => setShowDicePopup(true)} />
               </div>
