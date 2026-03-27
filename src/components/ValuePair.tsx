@@ -17,32 +17,29 @@ export const ValuePair: React.FC<ValuePairProps> = ({
   const [displayPair, setDisplayPair] = useState({ v1: value1, v2: value2 });
   const [selected, setSelected] = useState<string | null>(null);
   const isAnimating = useRef(false);
-  const pendingCallback = useRef<(() => void) | null>(null);
 
   const currentKey = `${value1}-${value2}`;
   const displayKey = `${displayPair.v1}-${displayPair.v2}`;
 
-  // Only update displayed pair when NOT animating
+  // When parent changes pair props, sync display and reset animation state
   useEffect(() => {
-    if (!selected && !isAnimating.current && currentKey !== displayKey) {
+    if (currentKey !== displayKey) {
       setDisplayPair({ v1: value1, v2: value2 });
+      setSelected(null);
+      isAnimating.current = false;
     }
-  }, [value1, value2, selected, currentKey, displayKey]);
+  }, [value1, value2, currentKey, displayKey]);
 
   const handleSelect = useCallback((value: string) => {
     if (selected || isAnimating.current) return;
     isAnimating.current = true;
     setSelected(value);
-    pendingCallback.current = () => onSelect(value);
+    // After animation, fire callback. Parent updates props,
+    // which triggers useEffect above to reset state.
+    setTimeout(() => {
+      onSelect(value);
+    }, 400);
   }, [selected, onSelect]);
-
-  const handleExitComplete = useCallback(() => {
-    const cb = pendingCallback.current;
-    pendingCallback.current = null;
-    setSelected(null);
-    isAnimating.current = false;
-    if (cb) cb();
-  }, []);
 
   const loser = selected === displayPair.v1 ? displayPair.v2 : selected === displayPair.v2 ? displayPair.v1 : null;
 
@@ -58,7 +55,7 @@ export const ValuePair: React.FC<ValuePairProps> = ({
     <div className="flex flex-col items-center space-y-8 w-full max-w-md mx-auto">
       <p className="text-center text-muted-foreground font-serif italic text-lg leading-relaxed">{title}</p>
 
-      <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
+      <AnimatePresence mode="wait">
         <motion.div
           key={displayKey}
           initial={{ opacity: 0, y: 16 }}
@@ -67,7 +64,6 @@ export const ValuePair: React.FC<ValuePairProps> = ({
           transition={{ duration: 0.22 }}
           className="flex flex-col gap-4 w-full"
         >
-          {/* First value */}
           <motion.button
             onClick={() => handleSelect(displayPair.v1)}
             className="quiz-pair-card"
@@ -90,7 +86,6 @@ export const ValuePair: React.FC<ValuePairProps> = ({
 
           <OrDivider />
 
-          {/* Second value */}
           <motion.button
             onClick={() => handleSelect(displayPair.v2)}
             className="quiz-pair-card"

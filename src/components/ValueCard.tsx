@@ -24,34 +24,33 @@ export const ValueCard: React.FC<ValueCardProps> = ({
   const [displayValue, setDisplayValue] = useState(value);
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
   const isAnimating = useRef(false);
-  const pendingCallback = useRef<(() => void) | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
   const minSwipeDistance = 50;
   const tooltipText = VALUE_DESCRIPTIONS[displayValue];
 
-  // Only update displayed value when NOT animating out
+  // When parent changes value prop, sync display and reset animation state
   useEffect(() => {
-    if (!exitDirection && !isAnimating.current) {
+    if (value !== displayValue) {
       setDisplayValue(value);
+      setExitDirection(null);
+      isAnimating.current = false;
     }
-  }, [value, exitDirection]);
+  }, [value, displayValue]);
 
   const triggerExit = useCallback((dir: 'left' | 'right') => {
     if (isAnimating.current) return;
     isAnimating.current = true;
-    pendingCallback.current = dir === 'left' ? onSwipeLeft : onSwipeRight;
     setExitDirection(dir);
-  }, [onSwipeLeft, onSwipeRight]);
 
-  const handleExitComplete = useCallback(() => {
-    const cb = pendingCallback.current;
-    pendingCallback.current = null;
-    setExitDirection(null);
-    isAnimating.current = false;
-    if (cb) cb();
-  }, []);
+    // After animation completes, fire callback. Parent updates value prop,
+    // which triggers the useEffect above to reset state.
+    setTimeout(() => {
+      if (dir === 'left') onSwipeLeft();
+      else onSwipeRight();
+    }, 250);
+  }, [onSwipeLeft, onSwipeRight]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEndX.current = null;
@@ -73,30 +72,22 @@ export const ValueCard: React.FC<ValueCardProps> = ({
 
   const exitVariants = {
     left: {
-      y: 600,
-      x: -120,
-      rotate: -25,
-      opacity: 0,
+      y: 600, x: -120, rotate: -25, opacity: 0,
       transition: { duration: 0.25, ease: [0.4, 0, 1, 1] as [number, number, number, number] },
     },
     right: {
-      y: -30,
-      x: 60,
-      rotate: 8,
-      opacity: 0,
-      scale: 0.95,
+      y: -30, x: 60, rotate: 8, opacity: 0, scale: 0.95,
       transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
     },
   };
 
   return (
     <div className="flex flex-col items-center space-y-8 w-full max-w-md mx-auto">
-      <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
+      <AnimatePresence mode="wait">
         <motion.div
           key={displayValue}
           initial={{ opacity: 0, y: 20, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={exitDirection ? exitVariants[exitDirection] : { opacity: 0 }}
+          animate={exitDirection ? exitVariants[exitDirection] : { opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
           className="quiz-value-card"
           onTouchStart={onTouchStart}

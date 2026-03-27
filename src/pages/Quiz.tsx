@@ -537,11 +537,11 @@ const Quiz = () => {
           <ContextBanner />
           <QuizMilestone current={currentValueIndex + 1} total={CORE_VALUES.length} />
           <QuizTop title="Does it resonate?" current={currentValueIndex + 1} total={CORE_VALUES.length} />
-          <div className="mx-auto w-full max-w-md px-6">
-            <PhaseBanner text="Trust your first instinct. If a word doesn't pull an immediate yes from you, let it pass. A maybe is a no. Move quickly — your gut knows more than you think." />
-          </div>
-          <div className="flex items-center justify-center px-6 pb-10">
+          <div className="flex items-center justify-center px-6">
             <ValueCard value={CORE_VALUES[currentValueIndex]} onSwipeLeft={handleSection1Left} onSwipeRight={handleSection1Right} leftLabel="No" rightLabel="Resonates" />
+          </div>
+          <div className="mx-auto w-full max-w-md px-6 pb-10">
+            <PhaseBanner text="Trust your first instinct. If a word doesn't pull an immediate yes from you, let it pass. A maybe is a no. Move quickly — your gut knows more than you think." />
           </div>
           <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
         </div>
@@ -560,11 +560,11 @@ const Quiz = () => {
             <>
               <QuizMilestone current={section2Index + 1} total={section1Selections.length} />
               <QuizTop title="True or aspire?" current={section2Index + 1} total={section1Selections.length} />
-              <div className="mx-auto w-full max-w-md px-6">
-                <PhaseBanner text="Now slow down. For each value your gut said yes to, ask: is this genuinely true about me, or something I aspire to live? Or do I mostly admire it when I see it in others? If it's not clearly yours, let it go." />
-              </div>
-              <div className="flex items-center justify-center px-6 pb-10">
+              <div className="flex items-center justify-center px-6">
                 <ValueCard value={section1Selections[section2Index]} onSwipeLeft={handleSection2Left} onSwipeRight={handleSection2Right} leftLabel="Admire in others" rightLabel="True / Aspire" />
+              </div>
+              <div className="mx-auto w-full max-w-md px-6 pb-10">
+                <PhaseBanner text="Now slow down. For each value your gut said yes to, ask: is this genuinely true about me, or something I aspire to live? Or do I mostly admire it when I see it in others? If it's not clearly yours, let it go." />
               </div>
               <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
             </>
@@ -577,11 +577,11 @@ const Quiz = () => {
           <Navigation quizMode />
           <ContextBanner />
           <QuizTop title="Legacy choice" current={section3PairIndex + 1} total={section3Pairs.length} />
-          <div className="mx-auto w-full max-w-md px-6">
-            <PhaseBanner text="You've already said yes to each of these twice — at the gut level and the head level. Now go deeper. If someone looked into the very core of who you are and could only find one of these two values, which would you hope they'd see?" />
-          </div>
-          <div className="flex items-center justify-center px-6 pb-10">
+          <div className="flex items-center justify-center px-6">
             <ValuePair value1={section3Pairs[section3PairIndex][0]} value2={section3Pairs[section3PairIndex][1]} onSelect={handleSection3Selection} title={section3Q} />
+          </div>
+          <div className="mx-auto w-full max-w-md px-6 pb-10">
+            <PhaseBanner text="You've already said yes to each of these twice — at the gut level and the head level. Now go deeper. If someone looked into the very core of who you are and could only find one of these two values, which would you hope they'd see?" />
           </div>
           <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
         </div>
@@ -592,11 +592,11 @@ const Quiz = () => {
           <Navigation quizMode />
           <ContextBanner />
           <QuizTop title="Runoff round" current={section3RunoffIndex + 1} total={section3RunoffPairs.length} />
-          <div className="mx-auto w-full max-w-md px-6">
-            <PhaseBanner text="You've already said yes to each of these twice — at the gut level and the head level. Now go deeper. If someone looked into the very core of who you are and could only find one of these two values, which would you hope they'd see?" />
-          </div>
-          <div className="flex items-center justify-center px-6 pb-10">
+          <div className="flex items-center justify-center px-6">
             <ValuePair value1={section3RunoffPairs[section3RunoffIndex][0]} value2={section3RunoffPairs[section3RunoffIndex][1]} onSelect={handleRunoffSelection} title={section3Q} />
+          </div>
+          <div className="mx-auto w-full max-w-md px-6 pb-10">
+            <PhaseBanner text="You've already said yes to each of these twice — at the gut level and the head level. Now go deeper. If someone looked into the very core of who you are and could only find one of these two values, which would you hope they'd see?" />
           </div>
           <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
         </div>
