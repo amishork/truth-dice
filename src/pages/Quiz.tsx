@@ -15,22 +15,25 @@ import ShareableValuesCard from "@/components/ShareableValuesCard";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
 import QuizMilestone from "@/components/QuizMilestone";
+import PhaseBanner from "@/components/PhaseBanner";
+import QuizTimer from "@/components/QuizTimer";
 import AuthModal from "@/components/AuthModal";
 import AreaOfLifePicker, { AREAS_OF_LIFE, getAreaLabel } from "@/components/AreaOfLifePicker";
 import type { AreaOfLife } from "@/components/AreaOfLifePicker";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
-import { useAmbientMood } from "@/hooks/useAmbientMood";
+
 import { useCommitmentTracker } from "@/hooks/useCommitmentTracker";
 import { CORE_VALUES, DICE_CONTEXTS } from "@/data/values";
 import {
   saveQuizSession,
   getCompletedAreas,
   getUserSessions,
+  getAvgQuizDuration,
 } from "@/lib/quizSessions";
 import type { QuizSession } from "@/lib/quizSessions";
 
-const ValuesConstellation = lazy(() => import("@/components/ValuesConstellation"));
+const ValuesChordDiagram = lazy(() => import("@/components/ValuesChordDiagram"));
 const ValuesPosterGenerator = lazy(() => import("@/components/ValuesPosterGenerator"));
 
 type Stage =
@@ -179,6 +182,10 @@ const Quiz = () => {
   const [showPosterGen, setShowPosterGen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  // ─── Timing state ─────────────────────────────────────────────────────────
+  const quizStartTime = useRef<number | null>(null);
+  const cardTimestamps = useRef<number[]>([]);
+
   const areaOfLifeData = useMemo(() => AREAS_OF_LIFE.find((a) => a.id === areaOfLife) ?? null, [areaOfLife]);
   const areaLabel = useMemo(() => areaOfLifeData ? getAreaLabel(areaOfLifeData, gender) : "", [areaOfLifeData, gender]);
   const allWinners = useMemo(() => [...section3Winners, ...section3RunoffWinners], [section3Winners, section3RunoffWinners]);
@@ -228,13 +235,6 @@ const Quiz = () => {
 
   const { markMilestone } = useCommitmentTracker();
   useEffect(() => { markMilestone("quiz_started"); }, [markMilestone]);
-
-  useAmbientMood(
-    stage !== "sorting" && stage !== "gratitude",
-    stage === "section1" ? section1Selections :
-    stage === "section2" ? section2Selections :
-    [...section3Winners, ...section3RunoffWinners]
-  );
 
   useEffect(() => {
     if (!RESUMABLE_STAGES.includes(stage)) return;
@@ -297,6 +297,8 @@ const Quiz = () => {
     setDice1Result("");
     setDice2Result("");
     setIsRolling(false);
+    quizStartTime.current = null;
+    cardTimestamps.current = [];
     clearQuizState();
   };
 
@@ -336,9 +338,18 @@ const Quiz = () => {
     }
   }, [isAuthenticated, user, authLoading, stage, showAuthModal, routeAfterAuth]);
 
+  const recordCardTimestamp = () => {
+    const now = Date.now();
+    if (!quizStartTime.current) quizStartTime.current = now;
+    cardTimestamps.current = [...cardTimestamps.current, now];
+  };
+
   const persistSessionAndContinue = useCallback(async () => {
     clearQuizState();
-    await saveQuizSession(user?.id ?? null, areaOfLife, finalSixValues, allWinners, selectionCounts);
+    const durationSeconds = quizStartTime.current
+      ? Math.round((Date.now() - quizStartTime.current) / 1000)
+      : undefined;
+    await saveQuizSession(user?.id ?? null, areaOfLife, finalSixValues, allWinners, selectionCounts, durationSeconds);
     setDashboardValues(finalSixValues);
     setDashboardAllWinners(allWinners);
     if (user) {
@@ -352,6 +363,7 @@ const Quiz = () => {
   }, [user, areaOfLife, finalSixValues, allWinners, selectionCounts]);
 
   const handleSection1Right = () => {
+    recordCardTimestamp();
     const value = CORE_VALUES[currentValueIndex];
     setSection1Selections((prev) => [...prev, value]);
     incrementCount(value);
@@ -360,11 +372,13 @@ const Quiz = () => {
   };
 
   const handleSection1Left = () => {
+    recordCardTimestamp();
     if (currentValueIndex < CORE_VALUES.length - 1) setCurrentValueIndex((v) => v + 1);
     else setStage("section2");
   };
 
   const handleSection2Right = () => {
+    recordCardTimestamp();
     const value = section1Selections[section2Index];
     if (!value) return;
     setSection2Selections((prev) => [...prev, value]);
@@ -374,11 +388,13 @@ const Quiz = () => {
   };
 
   const handleSection2Left = () => {
+    recordCardTimestamp();
     if (section2Index < section1Selections.length - 1) setSection2Index((v) => v + 1);
     else setStage("section3");
   };
 
   const handleSection3Selection = (value: string) => {
+    recordCardTimestamp();
     const currentPair = section3Pairs[section3PairIndex];
     if (!currentPair) return;
     const loser = currentPair[0] === value ? currentPair[1] : currentPair[0];
@@ -390,6 +406,7 @@ const Quiz = () => {
   };
 
   const handleRunoffSelection = (value: string) => {
+    recordCardTimestamp();
     setSection3RunoffWinners((prev) => [...prev, value]);
     incrementCount(value);
     if (section3RunoffIndex < section3RunoffPairs.length - 1) setSection3RunoffIndex((v) => v + 1);
@@ -431,21 +448,23 @@ const Quiz = () => {
     </div>
   );
 
-  const QuizTop = ({ title, current, total, subtitle }: { title: string; current: number; total: number; subtitle?: string }) => (
-    <div className="mx-auto w-full max-w-3xl px-6 pt-24">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/")}>Exit Quiz</Button>
-        <span className="label-technical">{current} / {Math.max(total, 1)}</span>
+  const QuizTop = ({ title, current, total }: { title: string; current: number; total: number }) => {
+    const pct = Math.round((current / Math.max(total, 1)) * 100);
+    return (
+      <div className="mx-auto w-full max-w-3xl px-6 pt-24">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/")}>Exit Quiz</Button>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-medium text-foreground">{title}</span>
+            <span className="label-technical">{current} of {Math.max(total, 1)}</span>
+          </div>
+        </div>
+        <div className="quiz-progress-track">
+          <div className="quiz-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
       </div>
-      <div className="mb-3 flex items-end justify-between">
-        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-      </div>
-      {subtitle && <p className="mb-4 text-sm text-muted-foreground">{subtitle}</p>}
-      <div className="relative h-px w-full bg-border">
-        <div className="absolute left-0 top-0 h-[2px] bg-primary transition-all" style={{ width: `${(current / Math.max(total, 1)) * 100}%` }} />
-      </div>
-    </div>
-  );
+    );
+  };
 
   const ContextBanner = () => {
     if (!isQuizActive || !areaOfLifeData) return null;
@@ -456,12 +475,33 @@ const Quiz = () => {
     );
   };
 
+  // ─── Timer remaining calculation ────────────────────────────────────────────
+  const timerCardsRemaining = useMemo(() => {
+    if (stage === "section1") {
+      // remaining in s1 + estimated s2 (~ half of s1 selections) + estimated s3 pairs (~ quarter)
+      const s1Remaining = CORE_VALUES.length - currentValueIndex - 1;
+      const estS2 = Math.round(section1Selections.length * 0.5);
+      const estS3 = Math.round(section1Selections.length * 0.25);
+      return s1Remaining + estS2 + estS3;
+    }
+    if (stage === "section2") {
+      const s2Remaining = section1Selections.length - section2Index - 1;
+      const estS3 = Math.round(section2Selections.length * 0.5);
+      return s2Remaining + estS3;
+    }
+    if (stage === "section3") return section3Pairs.length - section3PairIndex - 1;
+    if (stage === "section3-runoff") return section3RunoffPairs.length - section3RunoffIndex - 1;
+    return 0;
+  }, [stage, currentValueIndex, section1Selections.length, section2Index, section2Selections.length, section3PairIndex, section3Pairs.length, section3RunoffIndex, section3RunoffPairs.length]);
+
+  const showTimer = ["section1", "section2", "section3", "section3-runoff"].includes(stage);
+
   const section3Q = getSection3Question(areaOfLife, gender);
   const finalQ = getFinalQuestion(areaOfLife, gender);
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background ambient-mood">
+    <div className="min-h-screen bg-background">
 
       <AuthModal
         open={showAuthModal}
@@ -497,9 +537,13 @@ const Quiz = () => {
           <ContextBanner />
           <QuizMilestone current={currentValueIndex + 1} total={CORE_VALUES.length} />
           <QuizTop title="Does it resonate?" current={currentValueIndex + 1} total={CORE_VALUES.length} />
+          <div className="mx-auto w-full max-w-md px-6">
+            <PhaseBanner text="Trust your first instinct. If a word doesn't pull an immediate yes from you, let it pass. A maybe is a no. Move quickly — your gut knows more than you think." />
+          </div>
           <div className="flex items-center justify-center px-6 pb-10">
             <ValueCard value={CORE_VALUES[currentValueIndex]} onSwipeLeft={handleSection1Left} onSwipeRight={handleSection1Right} leftLabel="No" rightLabel="Resonates" />
           </div>
+          <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
         </div>
       )}
 
@@ -516,9 +560,13 @@ const Quiz = () => {
             <>
               <QuizMilestone current={section2Index + 1} total={section1Selections.length} />
               <QuizTop title="True or aspire?" current={section2Index + 1} total={section1Selections.length} />
-              <div className="flex items-center justify-center px-6 pb-10">
-                <ValueCard value={section1Selections[section2Index]} onSwipeLeft={handleSection2Left} onSwipeRight={handleSection2Right} leftLabel="Admire in others" rightLabel="True / Aspire" description="Is this true about you, or something you aspire to?" />
+              <div className="mx-auto w-full max-w-md px-6">
+                <PhaseBanner text="Now slow down. For each value your gut said yes to, ask: is this genuinely true about me, or something I aspire to live? Or do I mostly admire it when I see it in others? If it's not clearly yours, let it go." />
               </div>
+              <div className="flex items-center justify-center px-6 pb-10">
+                <ValueCard value={section1Selections[section2Index]} onSwipeLeft={handleSection2Left} onSwipeRight={handleSection2Right} leftLabel="Admire in others" rightLabel="True / Aspire" />
+              </div>
+              <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
             </>
           )}
         </div>
@@ -529,9 +577,13 @@ const Quiz = () => {
           <Navigation quizMode />
           <ContextBanner />
           <QuizTop title="Legacy choice" current={section3PairIndex + 1} total={section3Pairs.length} />
+          <div className="mx-auto w-full max-w-md px-6">
+            <PhaseBanner text="You've already said yes to each of these twice — at the gut level and the head level. Now go deeper. If someone looked into the very core of who you are and could only find one of these two values, which would you hope they'd see?" />
+          </div>
           <div className="flex items-center justify-center px-6 pb-10">
             <ValuePair value1={section3Pairs[section3PairIndex][0]} value2={section3Pairs[section3PairIndex][1]} onSelect={handleSection3Selection} title={section3Q} />
           </div>
+          <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
         </div>
       )}
 
@@ -539,10 +591,14 @@ const Quiz = () => {
         <div className="min-h-screen bg-background">
           <Navigation quizMode />
           <ContextBanner />
-          <QuizTop title="Runoff round" subtitle="Second chance for values that didn't win the first round" current={section3RunoffIndex + 1} total={section3RunoffPairs.length} />
+          <QuizTop title="Runoff round" current={section3RunoffIndex + 1} total={section3RunoffPairs.length} />
+          <div className="mx-auto w-full max-w-md px-6">
+            <PhaseBanner text="You've already said yes to each of these twice — at the gut level and the head level. Now go deeper. If someone looked into the very core of who you are and could only find one of these two values, which would you hope they'd see?" />
+          </div>
           <div className="flex items-center justify-center px-6 pb-10">
             <ValuePair value1={section3RunoffPairs[section3RunoffIndex][0]} value2={section3RunoffPairs[section3RunoffIndex][1]} onSelect={handleRunoffSelection} title={section3Q} />
           </div>
+          <QuizTimer cardTimestamps={cardTimestamps.current} totalCardsRemaining={timerCardsRemaining} visible={showTimer} />
         </div>
       )}
 
@@ -577,20 +633,20 @@ const Quiz = () => {
           <Navigation quizMode />
           <ContextBanner />
           <div className="mx-auto w-full max-w-3xl px-6 pt-24">
-            <div className="mb-8">
+            <div className="mb-4">
               <h2 className="text-2xl font-semibold text-foreground">Your final 6 values</h2>
-              <p className="mt-2 text-sm text-muted-foreground italic">"{finalQ}"</p>
               <p className="mt-4 text-xs text-muted-foreground">{finalSixValues.length} of 6 selected</p>
             </div>
-            <div className="sketch-card overflow-hidden">
+            <PhaseBanner text={finalQ} />
+            <div className="sketch-card overflow-hidden mt-6">
               {allWinners.map((value, index) => {
                 const isSelected = finalSixValues.includes(value);
                 const isDisabled = !isSelected && finalSixValues.length >= 6;
                 return (
                   <button key={`${value}-${index}`} onClick={() => handleFinalValueToggle(value)} disabled={isDisabled}
-                    className={`flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left last:border-b-0 transition-colors ${isSelected ? "bg-primary/10" : "hover:bg-muted/40"} ${isDisabled ? "opacity-40" : ""}`}
+                    className="quiz-final-row" data-selected={isSelected} data-disabled={isDisabled}
                   >
-                    <span className={`flex h-4 w-4 items-center justify-center rounded-sm border ${isSelected ? "border-primary bg-primary text-primary-foreground" : "border-border"}`} aria-hidden>
+                    <span className="quiz-final-checkbox" data-checked={isSelected} aria-hidden>
                       {isSelected ? "✓" : ""}
                     </span>
                     <span className="text-sm text-foreground">{value}</span>
@@ -723,7 +779,7 @@ const Quiz = () => {
                 }} />
 
                 <Suspense fallback={<div className="h-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>}>
-                  <ValuesConstellation values={activeValues} />
+                  <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
                 </Suspense>
 
                 <div className="grid grid-cols-2 gap-3">

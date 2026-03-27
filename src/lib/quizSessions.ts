@@ -15,16 +15,27 @@ export async function saveQuizSession(
   areaOfLife: string,
   finalSixValues: string[],
   allWinners: string[],
-  selectionCounts: Record<string, number>
+  selectionCounts: Record<string, number>,
+  durationSeconds?: number
 ): Promise<{ error: Error | null }> {
-  const { error } = await supabase.from('quiz_sessions').insert({
+  const row: Record<string, unknown> = {
     user_id: userId,
     area_of_life: areaOfLife,
     final_six_values: finalSixValues,
     all_winners: allWinners,
     selection_counts: selectionCounts,
-  });
+  };
+  if (durationSeconds && durationSeconds > 0) {
+    row.duration_seconds = Math.round(durationSeconds);
+  }
+  const { error } = await supabase.from('quiz_sessions').insert(row);
   return { error: error as Error | null };
+}
+
+export async function getAvgQuizDuration(): Promise<number> {
+  const { data, error } = await supabase.rpc('get_avg_quiz_duration');
+  if (error || data == null) return 720;
+  return data as number;
 }
 
 export async function getCompletedAreas(userId: string): Promise<string[]> {

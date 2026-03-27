@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ValuePairProps {
@@ -14,27 +14,37 @@ export const ValuePair: React.FC<ValuePairProps> = ({
   onSelect,
   title
 }) => {
+  const [displayPair, setDisplayPair] = useState({ v1: value1, v2: value2 });
   const [selected, setSelected] = useState<string | null>(null);
-  const [pairKey, setPairKey] = useState(`${value1}-${value2}`);
   const isAnimating = useRef(false);
+  const pendingCallback = useRef<(() => void) | null>(null);
 
   const currentKey = `${value1}-${value2}`;
-  if (currentKey !== pairKey && !selected) {
-    setPairKey(currentKey);
-  }
+  const displayKey = `${displayPair.v1}-${displayPair.v2}`;
 
-  const handleSelect = (value: string) => {
+  // Only update displayed pair when NOT animating
+  useEffect(() => {
+    if (!selected && !isAnimating.current && currentKey !== displayKey) {
+      setDisplayPair({ v1: value1, v2: value2 });
+    }
+  }, [value1, value2, selected, currentKey, displayKey]);
+
+  const handleSelect = useCallback((value: string) => {
     if (selected || isAnimating.current) return;
     isAnimating.current = true;
     setSelected(value);
-    setTimeout(() => {
-      setSelected(null);
-      isAnimating.current = false;
-      onSelect(value);
-    }, 400);
-  };
+    pendingCallback.current = () => onSelect(value);
+  }, [selected, onSelect]);
 
-  const loser = selected === value1 ? value2 : selected === value2 ? value1 : null;
+  const handleExitComplete = useCallback(() => {
+    const cb = pendingCallback.current;
+    pendingCallback.current = null;
+    setSelected(null);
+    isAnimating.current = false;
+    if (cb) cb();
+  }, []);
+
+  const loser = selected === displayPair.v1 ? displayPair.v2 : selected === displayPair.v2 ? displayPair.v1 : null;
 
   const OrDivider = () => (
     <div className="flex items-center gap-4">
@@ -47,65 +57,58 @@ export const ValuePair: React.FC<ValuePairProps> = ({
   return (
     <div className="flex flex-col items-center space-y-8 w-full max-w-md mx-auto">
       <p className="text-center text-muted-foreground font-serif italic text-lg leading-relaxed">{title}</p>
-      
-      <AnimatePresence mode="wait">
+
+      <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
         <motion.div
-          key={pairKey}
+          key={displayKey}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.22 }}
           className="flex flex-col gap-4 w-full"
         >
           {/* First value */}
           <motion.button
-            onClick={() => handleSelect(value1)}
-            className="relative group sketch-card p-8 text-lg font-serif text-foreground hover:border-primary transition-all duration-200 text-center overflow-visible"
+            onClick={() => handleSelect(displayPair.v1)}
+            className="quiz-pair-card"
             animate={
-              selected === value1
+              selected === displayPair.v1
                 ? { boxShadow: "0 0 24px -4px hsl(var(--primary) / 0.4)" }
-                : loser === value1
+                : loser === displayPair.v1
                 ? { y: 500, rotate: -15, opacity: 0 }
                 : {}
             }
             transition={
-              loser === value1
-                ? { duration: 0.4, ease: [0.4, 0, 1, 1] }
+              loser === displayPair.v1
+                ? { duration: 0.35, ease: [0.4, 0, 1, 1] }
                 : { duration: 0.2 }
             }
             whileTap={{ scale: 0.97 }}
           >
-            <div className="absolute top-0 right-0 w-10 h-10 cross-hatch opacity-20 pointer-events-none" />
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-px bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-px bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-            {value1}
+            {displayPair.v1}
           </motion.button>
 
-          {/* Or divider — between the two values */}
           <OrDivider />
 
           {/* Second value */}
           <motion.button
-            onClick={() => handleSelect(value2)}
-            className="relative group sketch-card p-8 text-lg font-serif text-foreground hover:border-primary transition-all duration-200 text-center overflow-visible"
+            onClick={() => handleSelect(displayPair.v2)}
+            className="quiz-pair-card"
             animate={
-              selected === value2
+              selected === displayPair.v2
                 ? { boxShadow: "0 0 24px -4px hsl(var(--primary) / 0.4)" }
-                : loser === value2
+                : loser === displayPair.v2
                 ? { y: 500, rotate: -15, opacity: 0 }
                 : {}
             }
             transition={
-              loser === value2
-                ? { duration: 0.4, ease: [0.4, 0, 1, 1] }
+              loser === displayPair.v2
+                ? { duration: 0.35, ease: [0.4, 0, 1, 1] }
                 : { duration: 0.2 }
             }
             whileTap={{ scale: 0.97 }}
           >
-            <div className="absolute bottom-0 left-0 w-10 h-10 cross-hatch opacity-20 pointer-events-none" />
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-px bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-px bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-            {value2}
+            {displayPair.v2}
           </motion.button>
         </motion.div>
       </AnimatePresence>
