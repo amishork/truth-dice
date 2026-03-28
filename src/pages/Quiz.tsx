@@ -668,12 +668,10 @@ const Quiz = () => {
           <DiceProductPopup values={activeValues} visible={showDicePopup} />
 
           <div className="hub-page">
-            {/* ─── Left half: sidebar + dice + diagram + journey ─── */}
-            <div className="hub-left">
-
-              {/* Discoveries panel */}
+            {/* ─── Col 1: Discoveries sidebar ─── */}
+            <aside className="hub-sidebar">
               {!isAuthenticated && (
-                <motion.div className="hub-sidebar-card mb-6" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+                <motion.div className="hub-sidebar-card" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
                   <p className="text-sm text-foreground leading-relaxed">
                     <span className="font-medium">Save your results.</span>{" "}
                     Create an account to discover your values across every area of life.
@@ -685,19 +683,19 @@ const Quiz = () => {
               )}
 
               {isAuthenticated && userSessions.length > 0 && (
-                <div className="hub-sidebar-card mb-6">
+                <div className="hub-sidebar-card">
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="label-technical">Your Discoveries</h3>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <button
                         onClick={() => {
                           const allIds = userSessions.map(s => s.id);
                           const allExpanded = allIds.every(id => expandedSessions.has(id));
                           setExpandedSessions(allExpanded ? new Set() : new Set(allIds));
                         }}
-                        className="text-[0.6rem] font-mono tracking-wider uppercase text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                        className="text-[0.55rem] font-mono tracking-wider uppercase text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                       >
-                        {userSessions.every(s => expandedSessions.has(s.id)) ? "Collapse all" : "Expand all"}
+                        {userSessions.every(s => expandedSessions.has(s.id)) ? "Collapse" : "Expand"}
                       </button>
                       <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
                         <Plus className="h-3 w-3" /> New
@@ -705,7 +703,7 @@ const Quiz = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {userSessions.map((session) => {
                       const area = AREAS_OF_LIFE.find((a) => a.id === session.area_of_life);
                       const label = area ? getAreaLabel(area, gender) : session.area_of_life;
@@ -779,42 +777,45 @@ const Quiz = () => {
               )}
 
               {(!isAuthenticated || userSessions.length === 0) && (
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-semibold text-foreground">Explore your values</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">Roll the dice to explore your values in different contexts.</p>
+                <div className="hub-sidebar-card">
+                  <h3 className="label-technical mb-2">Get Started</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Complete the values quiz to begin building your profile.</p>
                 </div>
               )}
+            </aside>
 
+            {/* ─── Col 2: Dice (top) → Diagram → Journey ─── */}
+            <div className="hub-center">
               {/* Dice */}
-              <div className="space-y-5 max-w-md">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="sketch-card p-6 text-center">
+              <div className="hub-dice-area">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="sketch-card p-5 text-center">
                     <p className="label-technical">Value</p>
-                    <div className={`mt-4 min-h-16 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
+                    <div className={`mt-3 min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
                       <p className="text-base font-medium text-foreground">{dice1Result || "?"}</p>
                     </div>
                   </div>
-                  <div className="sketch-card p-6 text-center">
+                  <div className="sketch-card p-5 text-center">
                     <p className="label-technical">Context</p>
-                    <div className={`mt-4 min-h-16 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
+                    <div className={`mt-3 min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
                       <p className="text-base font-medium text-foreground">{dice2Result || "?"}</p>
                     </div>
                   </div>
                 </div>
-                <Button onClick={rollDice} disabled={isRolling} size="lg" className="w-full">
+                <Button onClick={rollDice} disabled={isRolling} size="lg" className="w-full mt-4">
                   <Dices /> Roll dice
                 </Button>
               </div>
 
-              {/* Chord Diagram */}
-              <div className="mt-6">
+              {/* Chord Diagram — centered below dice */}
+              <div className="hub-diagram-area">
                 <Suspense fallback={<div className="h-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>}>
                   <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
                 </Suspense>
               </div>
 
-              {/* Your Journey */}
-              <div className="mt-6 max-w-md">
+              {/* Your Journey — centered below diagram */}
+              <div className="hub-dice-area mt-4">
                 <CommitmentEscalation onAction={(milestone) => {
                   if (milestone === "chat_used") {
                     const chatEl = document.querySelector(".chat-callout");
@@ -824,8 +825,8 @@ const Quiz = () => {
               </div>
             </div>
 
-            {/* ─── Right half: Chat ─── */}
-            <div className="hub-right">
+            {/* ─── Col 3: Chat ─── */}
+            <div className="hub-chat">
               <div className="chat-callout lg:sticky lg:top-[5.5rem] lg:h-[calc(100vh-6.5rem)]">
                 <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} onTriggerProductPopup={() => setShowDicePopup(true)} />
               </div>
