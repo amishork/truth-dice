@@ -171,10 +171,10 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
                 fill={completed ? meta.color : "hsl(0, 0%, 92%)"}
                 opacity={
                   selectedValue
-                    ? isSelected ? 0.85 : (completed ? 0.2 : 0.1)
+                    ? isSelected ? 0.92 : (completed ? 0.15 : 0.08)
                     : completed ? 0.6 : 0.15
                 }
-                stroke="hsl(0, 0%, 98%)"
+                stroke="hsl(var(--background))"
                 strokeWidth={1.5}
                 style={{ transition: "opacity 250ms" }}
               />
@@ -188,16 +188,16 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
               </defs>
               <text
                 fill={completed ? "hsl(0, 0%, 98%)" : "hsl(0, 0%, 78%)"}
-                fontSize={7.5}
+                fontSize={selectedValue && isSelected ? 8.5 : 7.5}
                 fontFamily="Inter, system-ui, sans-serif"
-                fontWeight={600}
+                fontWeight={selectedValue && isSelected ? 700 : 600}
                 letterSpacing="0.14em"
                 opacity={
                   selectedValue
-                    ? isSelected ? 1 : (completed ? 0.25 : 0.2)
+                    ? isSelected ? 1 : (completed ? 0.2 : 0.15)
                     : completed ? 0.9 : 0.3
                 }
-                style={{ transition: "opacity 250ms" }}
+                style={{ transition: "opacity 250ms, font-size 250ms" }}
               >
                 <textPath
                   href={`#${arcId}`}
@@ -210,6 +210,22 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
             </g>
           );
         })}
+
+        {/* Filled region between connected nodes when selected */}
+        {selectedValue && (() => {
+          const matchingNodes = nodes.filter(n => n.value.toLowerCase() === selectedValue.toLowerCase());
+          if (matchingNodes.length < 2) return null;
+          // Build a closed polygon path through all matching nodes via center
+          const polyPoints = matchingNodes.map(n => `${n.x},${n.y}`).join(" ");
+          return (
+            <polygon
+              points={polyPoints}
+              fill="hsl(var(--primary))"
+              opacity={0.06}
+              style={{ transition: "opacity 250ms" }}
+            />
+          );
+        })()}
 
         {/* Chords */}
         {chords.map((chord, i) => {
@@ -278,28 +294,42 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
+              {/* Frosted backdrop */}
+              <circle
+                cx={CX} cy={CY} r={52}
+                fill="hsl(var(--background))"
+                opacity={0.88}
+              />
+              <circle
+                cx={CX} cy={CY} r={52}
+                fill="none"
+                stroke="hsl(var(--border))"
+                strokeWidth={0.5}
+                opacity={0.3}
+              />
               <text
                 x={CX}
-                y={CY - 6}
+                y={highlightedAreas.size > 1 ? CY - 7 : CY}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fontSize={18}
                 fontFamily="EB Garamond, Georgia, serif"
-                fontWeight={500}
-                fill="hsl(0, 0%, 15%)"
+                fontWeight={600}
+                fill="hsl(var(--foreground))"
               >
                 {displayName}
               </text>
               {highlightedAreas.size > 1 && (
                 <text
                   x={CX}
-                  y={CY + 14}
+                  y={CY + 13}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fontSize={8}
+                  fontSize={7.5}
                   fontFamily="IBM Plex Mono, monospace"
-                  letterSpacing="0.08em"
-                  fill="hsl(0, 0%, 50%)"
+                  fontWeight={500}
+                  letterSpacing="0.1em"
+                  fill="hsl(var(--primary))"
                 >
                   {`ACROSS ${highlightedAreas.size} AREAS`}
                 </text>
