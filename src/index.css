@@ -966,8 +966,8 @@
 
 @media (min-width: 1024px) {
   .hub-sidebar {
-    width: 300px;
-    min-width: 280px;
+    width: 340px;
+    min-width: 320px;
     flex-shrink: 0;
     position: sticky;
     top: 5.5rem;

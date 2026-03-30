@@ -729,7 +729,7 @@ const Quiz = () => {
                               className="flex items-center gap-2.5 flex-1 min-w-0"
                             >
                               <span className="text-base">{area?.icon ?? "🪞"}</span>
-                              <span className="text-[0.8rem] font-medium text-foreground truncate">{label}</span>
+                              <span className="text-[0.8rem] font-medium text-foreground">{label}</span>
                               {isActive && <span className="ml-auto hub-active-badge">Active</span>}
                             </button>
                           </div>
