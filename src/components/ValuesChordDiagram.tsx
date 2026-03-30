@@ -149,6 +149,21 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <svg viewBox="0 0 500 500" className="w-full h-full" onClick={handleBackgroundClick}>
+        <defs>
+          {/* Radial gradient for curved chord fill region */}
+          <radialGradient id="chord-fill-gradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.12" />
+            <stop offset="60%" stopColor="hsl(var(--primary))" stopOpacity="0.06" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.02" />
+          </radialGradient>
+          {/* Radial gradient for center callout backdrop */}
+          <radialGradient id="callout-backdrop" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(var(--background))" stopOpacity="0.95" />
+            <stop offset="70%" stopColor="hsl(var(--background))" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="hsl(var(--background))" stopOpacity="0.6" />
+          </radialGradient>
+        </defs>
+
         {/* Outer ring segments + area labels inside them */}
         {ALL_AREAS.map((area) => {
           const seg = segmentAngles[area];
@@ -211,17 +226,24 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
           );
         })}
 
-        {/* Filled region between connected nodes when selected */}
+        {/* Filled curved region between connected chord paths */}
         {selectedValue && (() => {
-          const matchingNodes = nodes.filter(n => n.value.toLowerCase() === selectedValue.toLowerCase());
+          const matchingNodes = nodes
+            .filter(n => n.value.toLowerCase() === selectedValue.toLowerCase())
+            .sort((a, b) => a.angle - b.angle);
           if (matchingNodes.length < 2) return null;
-          // Build a closed polygon path through all matching nodes via center
-          const polyPoints = matchingNodes.map(n => `${n.x},${n.y}`).join(" ");
+          // Build closed path following the actual bezier curves through center
+          const first = matchingNodes[0];
+          let d = `M ${first.x} ${first.y}`;
+          for (let i = 1; i < matchingNodes.length; i++) {
+            d += ` Q ${CX} ${CY} ${matchingNodes[i].x} ${matchingNodes[i].y}`;
+          }
+          // Close back to first node via center
+          d += ` Q ${CX} ${CY} ${first.x} ${first.y} Z`;
           return (
-            <polygon
-              points={polyPoints}
-              fill="hsl(var(--primary))"
-              opacity={0.06}
+            <path
+              d={d}
+              fill="url(#chord-fill-gradient)"
               style={{ transition: "opacity 250ms" }}
             />
           );
@@ -294,18 +316,17 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Frosted backdrop */}
+              {/* Gradient backdrop */}
               <circle
-                cx={CX} cy={CY} r={52}
-                fill="hsl(var(--background))"
-                opacity={0.88}
+                cx={CX} cy={CY} r={55}
+                fill="url(#callout-backdrop)"
               />
               <circle
-                cx={CX} cy={CY} r={52}
+                cx={CX} cy={CY} r={55}
                 fill="none"
                 stroke="hsl(var(--border))"
                 strokeWidth={0.5}
-                opacity={0.3}
+                opacity={0.2}
               />
               <text
                 x={CX}
