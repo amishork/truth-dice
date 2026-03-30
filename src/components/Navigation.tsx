@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
-import { Flame, Menu, User } from "lucide-react";
+import { Flame, Menu, User, Moon, Sun } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "./CartDrawer";
@@ -8,6 +8,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -26,8 +27,12 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
   const cartItemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
   const { isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
 
   const emailInitial = user?.email?.[0]?.toUpperCase() ?? "?";
+  const isDark = theme === "dark";
+
+  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
 
   return (
     <motion.nav
@@ -47,9 +52,20 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
         </NavLink>
 
         {quizMode ? (
-          <Button variant="ghost" size="sm" asChild>
-            <a href="/">Exit Quiz</a>
-          </Button>
+          <div className="flex items-center gap-2">
+            {isAuthenticated && (
+              <button
+                onClick={toggleTheme}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+              </button>
+            )}
+            <Button variant="ghost" size="sm" asChild>
+              <a href="/">Exit Quiz</a>
+            </Button>
+          </div>
         ) : (
           <>
             <div className="hidden items-center gap-8 md:flex">
@@ -68,6 +84,17 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
 
             <div className="flex items-center gap-2">
               {cartItemCount > 0 && <CartDrawer />}
+
+              {/* Dark mode toggle — only when authenticated */}
+              {isAuthenticated && (
+                <button
+                  onClick={toggleTheme}
+                  className="hidden md:flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Toggle dark mode"
+                >
+                  {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                </button>
+              )}
 
               {/* Auth UI */}
               {isAuthenticated ? (
@@ -133,6 +160,13 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                               className="text-left text-base font-medium text-muted-foreground"
                             >
                               My Values
+                            </button>
+                            <button
+                              onClick={toggleTheme}
+                              className="flex items-center gap-2 text-left text-base font-medium text-muted-foreground"
+                            >
+                              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                              {isDark ? "Light Mode" : "Dark Mode"}
                             </button>
                             <button
                               onClick={() => signOut()}
