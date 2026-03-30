@@ -684,26 +684,26 @@ const Quiz = () => {
 
               {isAuthenticated && userSessions.length > 0 && (
                 <div className="hub-sidebar-card">
-                  <div className="mb-4 flex items-center justify-between">
+                  <div className="mb-5 flex items-center justify-between">
                     <h3 className="label-technical">Your Discoveries</h3>
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                       <button
                         onClick={() => {
                           const allIds = userSessions.map(s => s.id);
                           const allExpanded = allIds.every(id => expandedSessions.has(id));
                           setExpandedSessions(allExpanded ? new Set() : new Set(allIds));
                         }}
-                        className="text-[0.55rem] font-mono tracking-wider uppercase text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                        className="text-[0.58rem] font-mono tracking-wider uppercase text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                       >
                         {userSessions.every(s => expandedSessions.has(s.id)) ? "Collapse" : "Expand"}
                       </button>
-                      <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                        <Plus className="h-3 w-3" /> New
+                      <button onClick={() => setStage("area-of-life")} className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                        <Plus className="h-3 w-3" /> New Quiz
                       </button>
                     </div>
                   </div>
 
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {userSessions.map((session) => {
                       const area = AREAS_OF_LIFE.find((a) => a.id === session.area_of_life);
                       const label = area ? getAreaLabel(area, gender) : session.area_of_life;
@@ -720,16 +720,16 @@ const Quiz = () => {
                                   return next;
                                 });
                               }}
-                              className="flex items-center justify-center w-5 h-5 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                              className="flex items-center justify-center w-5 h-5 text-muted-foreground/35 hover:text-muted-foreground transition-colors"
                             >
-                              <ChevronRight className={`h-3 w-3 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
+                              <ChevronRight className={`h-3.5 w-3.5 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
                             </button>
                             <button
                               onClick={() => handleSessionSelect(session)}
-                              className="flex items-center gap-2 flex-1 min-w-0"
+                              className="flex items-center gap-2.5 flex-1 min-w-0"
                             >
-                              <span className="text-sm">{area?.icon ?? "🪞"}</span>
-                              <span className="text-xs font-medium text-foreground truncate">{label}</span>
+                              <span className="text-base">{area?.icon ?? "🪞"}</span>
+                              <span className="text-[0.8rem] font-medium text-foreground truncate">{label}</span>
                               {isActive && <span className="ml-auto hub-active-badge">Active</span>}
                             </button>
                           </div>
@@ -739,11 +739,11 @@ const Quiz = () => {
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
                               transition={{ duration: 0.2 }}
-                              className="pl-8 pr-2 pb-2"
+                              className="pl-9 pr-2 pb-3 pt-1"
                             >
-                              <div className="flex flex-wrap gap-1.5 pt-1">
+                              <div className="flex flex-wrap gap-1.5">
                                 {session.final_six_values.map((v) => (
-                                  <span key={v} className="rounded-sm bg-background px-2 py-0.5 text-[0.65rem] text-muted-foreground border border-border/40">{v}</span>
+                                  <span key={v} className="rounded bg-background px-2.5 py-1 text-[0.68rem] text-muted-foreground border border-border/30 leading-none">{v}</span>
                                 ))}
                               </div>
                             </motion.div>
@@ -754,8 +754,8 @@ const Quiz = () => {
                   </div>
 
                   {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).length > 0 && (
-                    <div className="mt-4 pt-3 border-t border-border/30">
-                      <p className="label-technical mb-2 text-muted-foreground/45">Still to explore</p>
+                    <div className="mt-5 pt-4 border-t border-border/25">
+                      <p className="label-technical mb-3 text-muted-foreground/40">Still to explore</p>
                       <div className="space-y-0.5">
                         {AREAS_OF_LIFE.filter((a) => !completedAreas.includes(a.id)).map((area) => {
                           const label = getAreaLabel(area, gender);
@@ -764,9 +764,9 @@ const Quiz = () => {
                             <button key={area.id} onClick={() => !isLocked && setStage("area-of-life")} disabled={isLocked}
                               className={`hub-explore-btn ${isLocked ? "hub-explore-locked" : ""}`}
                             >
-                              <span className={`text-xs ${isLocked ? "opacity-20 grayscale" : "opacity-45"}`}>{area.icon}</span>
-                              <span className={`text-[0.7rem] ${isLocked ? "text-muted-foreground/20" : "text-muted-foreground/50"}`}>{label}</span>
-                              {isLocked && <Lock className="ml-auto h-2.5 w-2.5 text-muted-foreground/12" />}
+                              <span className={`text-sm ${isLocked ? "opacity-18 grayscale" : "opacity-40"}`}>{area.icon}</span>
+                              <span className={`text-[0.75rem] ${isLocked ? "text-muted-foreground/18" : "text-muted-foreground/45"}`}>{label}</span>
+                              {isLocked && <Lock className="ml-auto h-3 w-3 text-muted-foreground/10" />}
                             </button>
                           );
                         })}
