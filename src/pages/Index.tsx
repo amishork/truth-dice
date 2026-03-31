@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import TrustedByLogos from "@/components/TrustedByLogos";
 import FloatingCTA from "@/components/FloatingCTA";
 import BackToTop from "@/components/BackToTop";
 import MorphingTagline from "@/components/MorphingTagline";
@@ -152,10 +151,7 @@ const Index = () => {
         {/* ─── PROGRAMS (commitment ladder) ─── */}
         <HomeProgramCards />
 
-        {/* ─── SOCIAL PROOF ─── */}
-        <TrustedByLogos />
-
-        {/* Testimonials will go here once real testimonials are collected */}
+        {/* Social proof (logos + testimonials) will go here once real content is collected */}
 
         {/* ─── BOTTOM CTA ─── */}
         <motion.section
