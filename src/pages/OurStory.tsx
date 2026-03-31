@@ -218,13 +218,13 @@ const OurStory = () => {
             <div className="mt-10 rounded-xl border border-border bg-card p-8">
               <h3 className="text-2xl font-semibold text-foreground">A practical next step</h3>
               <p className="mt-3 text-muted-foreground">
-                Start with a guided values discovery and walk away with 6 core values you can carry into decisions,
+                Start with a free values assessment and walk away with 6 core values you can carry into decisions,
                 relationships, and daily rhythms.
               </p>
               <div className="mt-6">
                 <Button asChild>
                   <a href="/quiz">
-                    Start values discovery
+                    Free Values Assessment
                     <ChevronRight className="h-4 w-4" />
                   </a>
                 </Button>

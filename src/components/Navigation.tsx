@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
-import { Flame, Menu, User, Moon, Sun } from "lucide-react";
+import { Flame, Menu, Moon, Sun } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "./CartDrawer";
@@ -117,13 +117,11 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                 </div>
               ) : (
                 <Button
-                  variant="ghost"
                   size="sm"
                   onClick={() => navigate("/quiz")}
-                  className="hidden md:flex text-sm font-medium"
+                  className="hidden md:flex text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  <User className="h-3.5 w-3.5 mr-1.5" />
-                  Sign In
+                  Free Values Assessment
                 </Button>
               )}
 
@@ -176,12 +174,12 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                             </button>
                           </>
                         ) : (
-                          <button
+                          <Button
                             onClick={() => navigate("/quiz")}
-                            className="text-left text-base font-medium text-muted-foreground"
+                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                           >
-                            Sign In / Create Account
-                          </button>
+                            Free Values Assessment
+                          </Button>
                         )}
                       </nav>
                     </div>

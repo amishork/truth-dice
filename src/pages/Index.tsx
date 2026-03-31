@@ -17,7 +17,6 @@ import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
 import ScrollTextReveal from "@/components/ScrollTextReveal";
 import InfiniteMarquee from "@/components/InfiniteMarquee";
-import SocialProofToasts from "@/components/SocialProofToasts";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
 import heroBg from "@/assets/hero-bg.webp";
@@ -59,7 +58,6 @@ const Index = () => {
       <Navigation />
       <ExitIntentPopup onStartQuiz={startQuiz} />
       <LeadMagnetModal open={showLeadMagnet} onClose={() => setShowLeadMagnet(false)} />
-      <SocialProofToasts />
       <WelcomeBack onStartQuiz={startQuiz} />
       <FloatingCTA onClick={startQuiz} />
       <BackToTop />
@@ -96,7 +94,7 @@ const Index = () => {
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <MagneticButton>
                 <Button size="lg" onClick={startQuiz} className="wi-cta">
-                  Start Values Discovery
+                  Free Values Assessment
                   <ChevronRight />
                 </Button>
               </MagneticButton>
@@ -115,7 +113,7 @@ const Index = () => {
               </MagneticButton>
             </div>
 
-            <p className="mt-6 text-xs text-muted-foreground">~5 minutes · guided values discovery · 6-value takeaway</p>
+            <p className="mt-6 text-xs text-muted-foreground">~5 minutes · guided assessment · 6-value takeaway</p>
           </motion.div>
         </section>
 
@@ -193,13 +191,13 @@ const Index = () => {
         <motion.section className="bg-primary py-16 text-center" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">Ready to discover what drives you?</h2>
-            <p className="mt-3 text-primary-foreground/80">Start with our free values discovery — or book a consultation to go deeper.</p>
+            <p className="mt-3 text-primary-foreground/80">Start with our free assessment — or apply to go deeper.</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" variant="secondary" onClick={startQuiz} className="wi-cta">
-                Start Values Discovery <ChevronRight />
+                Free Values Assessment <ChevronRight />
               </Button>
               <Button size="lg" variant="outline" className="wi-cta border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" onClick={() => navigate("/contact")}>
-                Book a Consultation
+                Request a Proposal
               </Button>
             </div>
           </div>

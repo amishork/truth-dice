@@ -63,7 +63,7 @@ const Footer = () => {
                 hello@wordsincarnate.com
               </a>
               <NavLink to="/contact" className="text-primary transition-colors hover:text-primary/80">
-                Book a Consultation →
+                Request a Proposal →
               </NavLink>
             </div>
           </div>

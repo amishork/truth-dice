@@ -78,7 +78,7 @@ const ExitIntentPopup = ({ onStartQuiz }: ExitIntentPopupProps) => {
                     onStartQuiz();
                   }}
                 >
-                  Start Values Discovery
+                  Start Free Assessment
                   <ChevronRight />
                 </Button>
                 <Button

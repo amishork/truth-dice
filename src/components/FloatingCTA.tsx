@@ -31,7 +31,7 @@ const FloatingCTA = ({ onClick }: FloatingCTAProps) => {
             onClick={onClick}
             className="shadow-lg wi-cta text-xs"
           >
-            Start Discovery
+            Start Assessment
             <ChevronRight className="h-4 w-4" />
           </Button>
         </motion.div>

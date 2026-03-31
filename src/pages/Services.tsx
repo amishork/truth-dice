@@ -22,7 +22,7 @@ const Services = () => {
         "Creating family mission statements",
         "Age-appropriate values activities for children"
       ],
-      cta: "Strengthen Your Family"
+      cta: "Apply Now"
     },
     {
       icon: GraduationCap,
@@ -35,7 +35,7 @@ const Services = () => {
         "School culture transformation",
         "Anti-bullying through values alignment"
       ],
-      cta: "Transform Your School"
+      cta: "Request a Proposal"
     },
     {
       icon: Building,
@@ -48,7 +48,7 @@ const Services = () => {
         "Company culture assessment",
         "Values-based decision making frameworks"
       ],
-      cta: "Elevate Your Organization"
+      cta: "Request a Proposal"
     }
   ];
 
@@ -168,8 +168,8 @@ const Services = () => {
               Start your journey toward authentic living with our interactive values discovery process.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" onClick={() => navigate("/")}>
-                Start Values Discovery
+              <Button size="lg" variant="secondary" onClick={() => navigate("/quiz")}>
+                Free Values Assessment
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button
@@ -178,7 +178,7 @@ const Services = () => {
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
                 onClick={() => navigate("/contact")}
               >
-                Schedule Consultation
+                Request a Proposal
               </Button>
             </div>
           </div>

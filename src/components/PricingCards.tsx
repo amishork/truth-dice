@@ -7,6 +7,7 @@ const tiers = [
     icon: User,
     name: "Individual",
     tagline: "Personal clarity",
+    ctaLabel: "Get Started",
     tiers: [
       { level: "Tier I", price: "$150", desc: "Values Discovery session" },
       { level: "Tier II", price: "$450", desc: "3-session deep dive" },
@@ -24,6 +25,7 @@ const tiers = [
     name: "Family",
     tagline: "Shared foundation",
     popular: true,
+    ctaLabel: "Apply Now",
     tiers: [
       { level: "Tier I", price: "$300", desc: "Family values workshop" },
       { level: "Tier II", price: "$800", desc: "3-session family formation" },
@@ -41,6 +43,7 @@ const tiers = [
     icon: GraduationCap,
     name: "School",
     tagline: "Culture of delight",
+    ctaLabel: "Request a Proposal",
     tiers: [
       { level: "Tier I", price: "$1,200", desc: "Staff workshop (half-day)" },
       { level: "Tier II", price: "$3,500", desc: "Semester-long program" },
@@ -58,6 +61,7 @@ const tiers = [
     icon: Building,
     name: "Organization",
     tagline: "Purposeful performance",
+    ctaLabel: "Request a Proposal",
     tiers: [
       { level: "Tier I", price: "$2,000", desc: "Leadership workshop" },
       { level: "Tier II", price: "$6,000", desc: "Team alignment program" },
@@ -150,7 +154,7 @@ const PricingCards = () => {
                   className="w-full"
                   onClick={() => (window.location.href = "/contact")}
                 >
-                  Get Started
+                  {tier.ctaLabel}
                 </Button>
               </motion.div>
             );

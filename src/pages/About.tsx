@@ -64,7 +64,7 @@ const About = () => {
             </ul>
             <div className="mt-8">
               <Button asChild>
-                <a href="/">Start values discovery</a>
+                <a href="/quiz">Start free assessment</a>
               </Button>
             </div>
           </motion.div>
