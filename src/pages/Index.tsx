@@ -6,17 +6,15 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import TestimonialCarousel from "@/components/TestimonialCarousel";
 import TrustedByLogos from "@/components/TrustedByLogos";
-import CaseStudyCards from "@/components/CaseStudyCards";
 import FloatingCTA from "@/components/FloatingCTA";
 import BackToTop from "@/components/BackToTop";
 import MorphingTagline from "@/components/MorphingTagline";
-import GradientBlobs from "@/components/GradientBlobs";
 import { Button } from "@/components/ui/button";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
-import ScrollTextReveal from "@/components/ScrollTextReveal";
-import InfiniteMarquee from "@/components/InfiniteMarquee";
+import HeroEmailCapture from "@/components/HeroEmailCapture";
+import HomeProgramCards from "@/components/HomeProgramCards";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
 import heroBg from "@/assets/hero-bg.webp";
@@ -45,7 +43,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <PageMeta
         title="Values Formation for Families, Schools & Organizations"
-        description="Discover your core values and build cultures of connection, delight, and belonging. Start your free values discovery today."
+        description="Discover your core values and build cultures of connection, delight, and belonging. Start your free values assessment today."
         path="/"
       />
       <a
@@ -63,7 +61,7 @@ const Index = () => {
       <BackToTop />
 
       <main id="main" className="pt-16">
-        {/* HERO */}
+        {/* ─── HERO ─── */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
           <div
             className="absolute inset-0 will-change-transform"
@@ -89,7 +87,10 @@ const Index = () => {
             <div className="mt-3 flex justify-center">
               <MorphingTagline />
             </div>
-            <p className="mt-8 text-lg text-muted-foreground">Formation, strategy, and experience design</p>
+
+            <p className="mt-8 text-lg text-muted-foreground max-w-xl mx-auto">
+              Helping families, schools, and organizations close the gap between stated values and lived reality.
+            </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <MagneticButton>
@@ -98,105 +99,89 @@ const Index = () => {
                   <ChevronRight />
                 </Button>
               </MagneticButton>
-              <MagneticButton>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="wi-cta"
-                  onClick={() => {
-                    const el = document.getElementById("making-values");
-                    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                >
-                  Learn more
-                </Button>
-              </MagneticButton>
             </div>
 
-            <p className="mt-6 text-xs text-muted-foreground">~5 minutes · guided assessment · 6-value takeaway</p>
-          </motion.div>
-        </section>
+            <p className="mt-3 text-xs text-muted-foreground">~5 minutes · guided assessment · 6-value takeaway</p>
 
-        <InfiniteMarquee />
-
-        <section id="making-values" className="relative container mx-auto space-y-16 px-4 py-20">
-          <GradientBlobs />
-
-          <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <ScrollTextReveal text="Making Values Incarnate" className="text-3xl font-semibold text-foreground" />
-            <p className="mt-4 text-muted-foreground">Formation for Families, Schools, and Organizations</p>
-            <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground">
-              <p>Words Incarnate exists to help people name what they love — and build lives and cultures that embody it.</p>
-              <p>In homes, classrooms, and workplaces, many of us are rich in words but poor in lived meaning. We speak often about values, mission, and purpose, yet struggle to see them take root in daily life.</p>
-              <p>Words Incarnate helps close that gap — by turning values into experiences, and experiences into culture.</p>
-            </div>
-          </motion.div>
-
-          <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <ScrollTextReveal text="We Are Losing What Matters Most" className="text-3xl font-semibold text-foreground" />
-            <p className="mt-4 text-muted-foreground">In a digitized and distracted world, something essential is being eroded:</p>
-            <ul className="mt-8 space-y-3 text-foreground">
-              <li>Families are together, but lack connection.</li>
-              <li>Schools teach to standards, but lose delight in the process.</li>
-              <li>Organizations pursue efficiency, but forget belonging.</li>
-            </ul>
-            <p className="mt-8 text-foreground">People are hungry for presence, meaning, and shared life — but often lack the tools, language, or structures to recover them.</p>
-            <p className="mt-4 text-muted-foreground">Words Incarnate meets this cultural and spiritual hunger by helping individuals and communities make their values concrete, livable, and shared.</p>
-          </motion.div>
-
-          <motion.div {...fadeInUp} className="mx-auto max-w-3xl">
-            <ScrollTextReveal text="How We Work" className="text-3xl font-semibold text-foreground" />
-            <p className="mt-4 text-muted-foreground">Words Incarnate approaches strategy as formation.</p>
-            <p className="mt-8 text-foreground leading-relaxed">Drawing from classical wisdom, Catholic anthropology, and lived experience, we help leaders and communities align belief, behavior, and daily life.</p>
-            <div className="mt-10 grid gap-6 sm:grid-cols-3">
-              {[
-                { title: "Connection", desc: "practicing presence and undivided attention to your unique values" },
-                { title: "Delight", desc: "restoring wonder, joy, and meaningful leisure to your routines" },
-                { title: "Belonging", desc: "creating the near occasion of communion and solidarity in purpose" },
-              ].map((x, i) => (
-                <motion.div key={x.title} className="rounded-lg border border-border bg-card p-5" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.4, delay: i * 0.1 }}>
-                  <p className="text-sm font-semibold text-foreground">{x.title}</p>
-                  <p className="mt-2 text-sm text-muted-foreground">{x.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-            <p className="mt-10 text-foreground">We put our professional passion for clarity, intelligence, and expertise at the service of these core values — in everything we do.</p>
-          </motion.div>
-
-          <motion.div {...fadeInUp} className="mx-auto max-w-3xl rounded-xl border border-border bg-card p-8">
-            <h2 className="text-3xl font-semibold text-foreground">An Invitation</h2>
-            <p className="mt-4 text-muted-foreground">Words Incarnate is not a quick fix or a branding exercise.</p>
-            <p className="mt-8 text-foreground leading-relaxed">It is an invitation to slow down, pay attention, and build something enduring — rooted in connection, animated by delight, and sustained by belonging.</p>
-            <p className="mt-4 text-foreground leading-relaxed">If you are ready to make your values visible again, to restore meaning to daily life, and to form people — not just systems — we would be honored to walk with you.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <MagneticButton>
-                <Button size="lg" onClick={startQuiz} className="wi-cta">
-                  Let's make values incarnate again
-                  <ChevronRight />
-                </Button>
-              </MagneticButton>
-              <MagneticButton>
-                <Button size="lg" variant="outline" onClick={() => setShowLeadMagnet(true)} className="wi-cta">
-                  Free worksheet
-                </Button>
-              </MagneticButton>
+            {/* Email capture */}
+            <div className="mt-10">
+              <HeroEmailCapture />
             </div>
           </motion.div>
         </section>
 
+        {/* ─── THE PROBLEM (tight) ─── */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <motion.div {...fadeInUp} className="mx-auto max-w-3xl text-center">
+              <p className="label-technical mb-3">The Gap</p>
+              <h2 className="text-3xl font-semibold text-foreground sm:text-4xl">
+                We are rich in words but poor in lived meaning.
+              </h2>
+              <p className="mt-6 text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Families talk about what matters but lack connection. Schools write mission statements
+                that never reach the hallways. Organizations pursue efficiency but forget belonging.
+                Words Incarnate helps close that gap — turning values into experiences, and experiences into culture.
+              </p>
+            </motion.div>
+
+            {/* Three pillars */}
+            <motion.div {...fadeInUp} className="mx-auto mt-14 max-w-3xl">
+              <div className="grid gap-6 sm:grid-cols-3">
+                {[
+                  { title: "Connection", desc: "Practicing presence and undivided attention to what matters most." },
+                  { title: "Delight", desc: "Restoring wonder, joy, and meaningful leisure to daily life." },
+                  { title: "Belonging", desc: "Creating communion and solidarity in shared purpose." },
+                ].map((x, i) => (
+                  <motion.div
+                    key={x.title}
+                    className="rounded-lg border border-border bg-card p-5 text-center"
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.4, delay: i * 0.1 }}
+                  >
+                    <p className="text-sm font-semibold text-foreground">{x.title}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{x.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ─── PROGRAMS (commitment ladder) ─── */}
+        <HomeProgramCards />
+
+        {/* ─── SOCIAL PROOF ─── */}
         <TrustedByLogos />
         <TestimonialCarousel />
-        <CaseStudyCards />
 
-        <motion.section className="bg-primary py-16 text-center" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+        {/* ─── BOTTOM CTA ─── */}
+        <motion.section
+          className="bg-primary py-16 text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">Ready to discover what drives you?</h2>
-            <p className="mt-3 text-primary-foreground/80">Start with our free assessment — or apply to go deeper.</p>
+            <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">
+              Ready to discover what drives you?
+            </h2>
+            <p className="mt-3 text-primary-foreground/80">
+              Start with our free assessment — or apply to go deeper.
+            </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" variant="secondary" onClick={startQuiz} className="wi-cta">
                 Free Values Assessment <ChevronRight />
               </Button>
-              <Button size="lg" variant="outline" className="wi-cta border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" onClick={() => navigate("/contact")}>
+              <Button
+                size="lg"
+                variant="outline"
+                className="wi-cta border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                onClick={() => navigate("/contact")}
+              >
                 Request a Proposal
               </Button>
             </div>

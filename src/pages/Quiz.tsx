@@ -9,6 +9,7 @@ import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
 import CommitmentEscalation from "@/components/CommitmentEscalation";
+import WhatsNext from "@/components/WhatsNext";
 import DiceProductPopup from "@/components/DiceProductPopup";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
@@ -813,6 +814,13 @@ const Quiz = () => {
                   <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
                 </Suspense>
               </div>
+
+              {/* What's Next — decision tree for services */}
+              {activeValues.length > 0 && (
+                <div className="hub-dice-area mt-4">
+                  <WhatsNext coreValues={activeValues} />
+                </div>
+              )}
 
               {/* Your Journey — centered below diagram */}
               <div className="hub-dice-area mt-4">
