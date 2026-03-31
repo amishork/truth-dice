@@ -20,15 +20,15 @@ const About = () => {
       <main className="container mx-auto px-4 pt-24 pb-20">
         <div className="mx-auto max-w-3xl">
           <motion.h1 {...fadeUp} className="text-4xl sm:text-5xl font-semibold text-foreground">
-            About Words Incarnate
+            About
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="mt-4 text-lg text-muted-foreground"
+            className="mt-4 text-muted-foreground"
           >
-            Helping people name what they love — and build lives that embody it.
+            Connection. Delight. Belonging.
           </motion.p>
 
           <motion.div
@@ -38,14 +38,15 @@ const About = () => {
             className="mt-10 space-y-5 text-foreground leading-relaxed"
           >
             <p>
-              Words Incarnate exists because most people already know what they value — they just
-              struggle to live it. We work with families, schools, and organizations to close that gap,
-              turning values from ideas we agree with into practices that shape daily life.
+              Words Incarnate exists to help people name what they love—and build lives and cultures that embody it.
             </p>
             <p>
-              Our approach treats strategy as formation: aligning belief, behavior, and the lived
-              experiences that become culture. Drawing from classical wisdom, Catholic anthropology,
-              and real operational experience, we help communities build something that lasts.
+              We work with families, schools, and organizations to translate values from "ideas we agree with" into
+              practices that shape daily life.
+            </p>
+            <p>
+              Our approach treats strategy as formation: aligning belief, behavior, and the lived experiences that
+              become culture.
             </p>
           </motion.div>
 
@@ -57,34 +58,14 @@ const About = () => {
           >
             <h2 className="text-2xl font-semibold text-foreground">How we serve</h2>
             <ul className="mt-6 space-y-3 text-muted-foreground">
-              <li>Formation experiences designed for real life — not just retreats or slogans.</li>
+              <li>Formation experiences designed for real life (not just retreats or slogans).</li>
               <li>Values discovery that produces clarity you can act on immediately.</li>
               <li>Practical rhythms that rebuild presence, joy, and shared purpose.</li>
             </ul>
             <div className="mt-8">
               <Button asChild>
-                <a href="/quiz">Free Values Assessment</a>
+                <a href="/quiz">Start free assessment</a>
               </Button>
-            </div>
-          </motion.div>
-
-          {/* ─── Invitation (from archived homepage copy) ─── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.6 }}
-            className="mt-12"
-          >
-            <div className="border-l-2 border-primary/30 pl-6 py-2">
-              <p className="text-lg italic text-foreground leading-relaxed">
-                Words Incarnate is not a quick fix or a branding exercise. It is an invitation
-                to slow down, pay attention, and build something enduring — rooted in connection,
-                animated by delight, and sustained by belonging.
-              </p>
-              <p className="mt-4 text-muted-foreground leading-relaxed">
-                If you are ready to make your values visible again, to restore meaning to daily
-                life, and to form people — not just systems — we would be honored to walk with you.
-              </p>
             </div>
           </motion.div>
         </div>

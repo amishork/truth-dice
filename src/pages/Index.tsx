@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import TestimonialCarousel from "@/components/TestimonialCarousel";
 import TrustedByLogos from "@/components/TrustedByLogos";
 import FloatingCTA from "@/components/FloatingCTA";
 import BackToTop from "@/components/BackToTop";
@@ -155,7 +154,8 @@ const Index = () => {
 
         {/* ─── SOCIAL PROOF ─── */}
         <TrustedByLogos />
-        <TestimonialCarousel />
+
+        {/* Testimonials will go here once real testimonials are collected */}
 
         {/* ─── BOTTOM CTA ─── */}
         <motion.section

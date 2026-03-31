@@ -17,7 +17,7 @@ const FounderBio = () => {
             <div className="aspect-square overflow-hidden rounded-full shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.25)]">
               <img
                 src={founderPhoto}
-                alt="Alex Mishory, Founder of Words Incarnate"
+                alt="Alex Mishork, Founder of Words Incarnate"
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
@@ -34,40 +34,30 @@ const FounderBio = () => {
             transition={{ duration: 0.6, delay: 0.15 }}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              Founder & Formation Director
+              Meet the Founder
             </p>
             <h2 className="mt-2 text-3xl font-semibold text-foreground">
-              Alex Mishory
+              A Life Rooted in Formation
             </h2>
             <div className="mt-6 space-y-4 text-base leading-relaxed text-foreground">
               <p>
-                Alex studied philosophy at the University of Dallas and spent five years in
-                seminary formation before discerning marriage. That combination — rigorous
-                classical training and deep personal formation — is the foundation of everything
-                Words Incarnate does.
+                Words Incarnate was born from a deeply personal conviction: that our highest values
+                should shape the texture of our everyday lives—not just live on a wall or in a
+                mission statement.
               </p>
               <p>
-                Before founding Words Incarnate, Alex managed 30–40 direct reports in
-                production and warehouse operations at Abbott Laboratories, then served as
-                Director of Branding &amp; Strategic Programming at Nolan Catholic High School,
-                where he built formation programs, curriculum, and institutional identity
-                from the ground up.
+                With over 15 years of experience in education, leadership formation, and
+                organizational consulting, our founder has walked alongside hundreds of families,
+                schools, and communities as they move from aspiration to incarnation.
               </p>
               <p className="text-muted-foreground">
-                He brings a rare combination: the intellectual depth of the classical Catholic
-                tradition (Aquinas, Chesterton, Pieper) with the operational discipline of
-                scaling real organizations. Husband to Dani, father to Joel, and committed
-                to the conviction that our highest values should shape the texture of
-                everyday life — not just live on a wall.
+                Drawing from classical wisdom, Catholic anthropology, and years of lived experience
+                in both the classroom and the boardroom, Words Incarnate brings a rare combination
+                of intellectual depth and practical warmth to every engagement.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              {[
-                "B.A. Philosophy, University of Dallas",
-                "5 Years Seminary Formation",
-                "Director, Nolan Catholic High School",
-                "Operations, Abbott Laboratories",
-              ].map((cred) => (
+              {["B.A. Philosophy, University of Dallas", "Seminary Formation", "15+ Years Formation Work"].map((cred) => (
                 <span
                   key={cred}
                   className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"

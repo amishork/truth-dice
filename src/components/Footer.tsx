@@ -27,6 +27,7 @@ const Footer = () => {
                 { to: "/about", label: "About" },
                 { to: "/our-story", label: "Our Story" },
                 { to: "/services", label: "Services" },
+                { to: "/testimonials", label: "Wall of Love" },
                 { to: "/contact", label: "Contact" },
               ].map((item) => (
                 <NavLink
@@ -43,12 +44,12 @@ const Footer = () => {
           {/* Services */}
           <div>
             <p className="label-technical mb-4">Services</p>
-            <ul className="flex flex-col gap-2.5 text-sm text-muted-foreground">
-              <li>Family Formation</li>
-              <li>School Culture Advisory</li>
-              <li>Organizational Strategy</li>
-              <li>Values Discovery</li>
-            </ul>
+            <nav className="flex flex-col gap-2.5">
+              <NavLink to="/services" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Family Formation</NavLink>
+              <NavLink to="/schools" className="text-sm text-muted-foreground transition-colors hover:text-foreground">School Culture Advisory</NavLink>
+              <NavLink to="/services" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Organizational Strategy</NavLink>
+              <NavLink to="/quiz" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Values Assessment</NavLink>
+            </nav>
           </div>
 
           {/* Newsletter + Contact */}
