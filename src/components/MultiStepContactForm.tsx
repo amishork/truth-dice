@@ -34,11 +34,22 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir > 0 ? -120 : 120, opacity: 0 }),
 };
 
-const MultiStepContactForm = () => {
+const MultiStepContactForm = ({ initialInterest }: { initialInterest?: string }) => {
+  // Map URL param to form values
+  const interestMap: Record<string, { service_interest: string; role?: string }> = {
+    personal: { service_interest: "values-discovery", role: "individual" },
+    family: { service_interest: "family", role: "parent" },
+    school: { service_interest: "school", role: "educator" },
+  };
+  const preset = initialInterest ? interestMap[initialInterest] : undefined;
+
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [form, setForm] = useState<ContactForm>({
-    name: "", email: "", phone: "", role: "", message: "", service_interest: "",
+    name: "", email: "", phone: "",
+    role: preset?.role ?? "",
+    message: "",
+    service_interest: preset?.service_interest ?? "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof ContactForm, string>>>({});
   const [submitting, setSubmitting] = useState(false);

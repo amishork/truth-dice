@@ -13,8 +13,9 @@ import { useTheme } from "next-themes";
 const navItems = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
-  { to: "/our-story", label: "Our Story" },
   { to: "/services", label: "Services" },
+  { to: "/schools", label: "For Schools" },
+  { to: "/testimonials", label: "Wall of Love" },
   { to: "/contact", label: "Contact" },
 ];
 

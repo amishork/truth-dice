@@ -22,6 +22,7 @@ const Services = lazy(() => import("./pages/Services"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Schools = lazy(() => import("./pages/Schools"));
 const WallOfLove = lazy(() => import("./pages/WallOfLove"));
+const FreeWorkshop = lazy(() => import("./pages/FreeWorkshop"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const PageLoader = () => (
@@ -45,6 +46,7 @@ const AnimatedRoutes = () => {
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/schools" element={<PageTransition><Schools /></PageTransition>} />
           <Route path="/testimonials" element={<PageTransition><WallOfLove /></PageTransition>} />
+          <Route path="/workshop" element={<PageTransition><FreeWorkshop /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>

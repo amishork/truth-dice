@@ -47,7 +47,7 @@ const Footer = () => {
             <nav className="flex flex-col gap-2.5">
               <NavLink to="/services" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Family Formation</NavLink>
               <NavLink to="/schools" className="text-sm text-muted-foreground transition-colors hover:text-foreground">School Culture Advisory</NavLink>
-              <NavLink to="/services" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Organizational Strategy</NavLink>
+              <NavLink to="/workshop" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Workshop</NavLink>
               <NavLink to="/quiz" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Values Assessment</NavLink>
             </nav>
           </div>

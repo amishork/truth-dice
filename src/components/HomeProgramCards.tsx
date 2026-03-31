@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, GraduationCap, Building } from "lucide-react";
+import { ArrowRight, Sparkles, Users, GraduationCap, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const programs = [
@@ -15,23 +15,23 @@ const programs = [
     free: true,
   },
   {
-    icon: Users,
-    step: "Go deeper",
-    name: "Personal & Family Workshops",
-    desc: "Live formation experiences that turn your discovered values into a shared family language and daily practice.",
-    cta: "Apply Now",
+    icon: Video,
+    step: "Experience the work",
+    name: "Free Workshop",
+    desc: "A live, interactive session where you experience values formation firsthand. No commitment — just come curious.",
+    cta: "Get Notified",
     ctaVariant: "outline" as const,
-    href: "/contact",
-    free: false,
+    href: "/workshop",
+    free: true,
   },
   {
-    icon: GraduationCap,
-    step: "Institutional",
-    name: "School & Organization Formation",
-    desc: "Values architecture for Catholic schools and mission-driven organizations — from faculty workshops to full-year transformation.",
-    cta: "Request a Proposal",
+    icon: Users,
+    step: "Go deeper",
+    name: "Paid Formation Programs",
+    desc: "Personal workshops, family formation journeys, and institutional consulting — tailored to your context.",
+    cta: "View Programs",
     ctaVariant: "outline" as const,
-    href: "/contact",
+    href: "/services",
     free: false,
   },
 ];
@@ -72,7 +72,7 @@ const HomeProgramCards = () => {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.12 }}
               >
-                {i === 0 && (
+                {p.free && (
                   <span className="mb-3 self-start rounded-full bg-primary px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
                     Free
                   </span>
@@ -108,7 +108,7 @@ const HomeProgramCards = () => {
         {/* Connector line visual on desktop */}
         <div className="hidden md:flex items-center justify-center mt-8 gap-2 text-muted-foreground/50">
           <div className="h-px w-16 bg-border" />
-          <p className="text-xs">free → formation → transformation</p>
+          <p className="text-xs">free assessment → free workshop → paid programs</p>
           <div className="h-px w-16 bg-border" />
         </div>
       </div>

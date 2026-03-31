@@ -83,10 +83,10 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                   <Download className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Free Values Discovery Worksheet
+                  Free Formation Resources
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  A printable guide to help you and your family identify, discuss, and live your core values together.
+                  Get access to values discovery tools, workshop invitations, and formation resources — delivered to your inbox.
                 </p>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
                   <input type="text" name="organization" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }} aria-hidden="true" />
@@ -109,7 +109,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                     />
                   </div>
                   <Button type="submit" size="lg" className="w-full wi-cta" disabled={loading}>
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send me the worksheet"}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get free resources"}
                   </Button>
                   <p className="text-center text-xs text-muted-foreground">No spam. Unsubscribe anytime.</p>
                 </form>
@@ -119,9 +119,9 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Download className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">Check your inbox!</h3>
+                <h3 className="text-xl font-semibold text-foreground">You're in!</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  We've sent the Values Discovery Worksheet to your email. Start exploring your values today.
+                  You'll receive formation resources, workshop invitations, and free tools as they become available.
                 </p>
                 <Button variant="outline" className="mt-6" onClick={handleClose}>
                   Close

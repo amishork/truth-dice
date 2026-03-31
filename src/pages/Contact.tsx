@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useSearchParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
@@ -11,6 +12,8 @@ const fadeUp = {
 };
 
 const Contact = () => {
+  const [searchParams] = useSearchParams();
+  const interest = searchParams.get("interest") ?? undefined;
   return (
     <div className="min-h-screen bg-background">
       <PageMeta title="Contact" description="Ready to make your values incarnate? Get in touch with Words Incarnate to explore formation experiences for your family, school, or organization." path="/contact" />
@@ -57,7 +60,7 @@ const Contact = () => {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="lg:col-span-3"
             >
-              <MultiStepContactForm />
+              <MultiStepContactForm initialInterest={interest} />
             </motion.div>
           </div>
         </div>
