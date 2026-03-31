@@ -17,7 +17,7 @@ const FounderBio = () => {
             <div className="aspect-square overflow-hidden rounded-full shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.25)]">
               <img
                 src={founderPhoto}
-                alt="Alex Mishory, Founder of Words Incarnate"
+                alt="Alex Mishork, Founder of Words Incarnate"
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
@@ -37,7 +37,7 @@ const FounderBio = () => {
               Founder & Formation Director
             </p>
             <h2 className="mt-2 text-3xl font-semibold text-foreground">
-              Alex Mishory
+              Alex Mishork
             </h2>
             <div className="mt-6 space-y-4 text-base leading-relaxed text-foreground">
               <p>

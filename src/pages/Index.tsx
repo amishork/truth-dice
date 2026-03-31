@@ -15,7 +15,7 @@ import HeroEmailCapture from "@/components/HeroEmailCapture";
 import HomeProgramCards from "@/components/HomeProgramCards";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
-import heroBg from "@/assets/hero-bg.webp";
+import heroPoster from "@/assets/hero-poster.webp";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
@@ -65,10 +65,16 @@ const Index = () => {
             className="absolute inset-0 will-change-transform"
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
           >
-            <div
-              className="hero-bg-animated h-full w-full bg-cover bg-center"
-              style={{ backgroundImage: `url(${heroBg})` }}
-            />
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster={heroPoster}
+              className="h-full w-full object-cover"
+            >
+              <source src="/hero-video.mp4" type="video/mp4" />
+            </video>
           </div>
           <div
             className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background/90 backdrop-blur-[3px]"
