@@ -113,8 +113,9 @@ const Schools = () => {
                   translate their charism into formation that students, faculty, and parents actually feel.
                 </p>
                 <p className="text-muted-foreground">
-                  Words Incarnate provides that architecture — from discovery through integration,
-                  built around your school's unique identity and capacity.
+                  Words Incarnate provides that architecture using the HOLD method — Honor what the
+                  school truly values, Observe where it's already alive in daily life, Live it through
+                  redesigned systems and practices, and Declare it across the community.
                 </p>
               </div>
             </motion.div>

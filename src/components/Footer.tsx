@@ -75,7 +75,7 @@ const Footer = () => {
             © {new Date().getFullYear()} Words Incarnate. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
-            Connection · Delight · Belonging
+            Honor · Observe · Live · Declare
           </p>
         </div>
       </div>

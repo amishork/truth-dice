@@ -123,13 +123,15 @@ const Index = () => {
               </p>
             </motion.div>
 
-            {/* Three pillars */}
+            {/* HOLD Framework */}
             <motion.div {...fadeInUp} className="mx-auto mt-14 max-w-3xl">
-              <div className="grid gap-6 sm:grid-cols-3">
+              <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-8">The HOLD Method</p>
+              <div className="grid gap-6 sm:grid-cols-4">
                 {[
-                  { title: "Connection", desc: "Practicing presence and undivided attention to what matters most." },
-                  { title: "Delight", desc: "Restoring wonder, joy, and meaningful leisure to daily life." },
-                  { title: "Belonging", desc: "Creating communion and solidarity in shared purpose." },
+                  { letter: "H", title: "Honor", desc: "Name the one thing that matters most. Strip away the aspirational list and commit." },
+                  { letter: "O", title: "Observe", desc: "Trace the value back to where it's already alive in lived experience — even if no one has noticed." },
+                  { letter: "L", title: "Live", desc: "Build the practices, rhythms, and systems that move the value from belief into daily life." },
+                  { letter: "D", title: "Declare", desc: "Share it outward. Invite others in. Make the value communal, accountable, and visible." },
                 ].map((x, i) => (
                   <motion.div
                     key={x.title}
@@ -139,8 +141,9 @@ const Index = () => {
                     viewport={{ once: true, margin: "-60px" }}
                     transition={{ duration: 0.4, delay: i * 0.1 }}
                   >
-                    <p className="text-sm font-semibold text-foreground">{x.title}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">{x.desc}</p>
+                    <span className="text-2xl font-semibold text-primary">{x.letter}</span>
+                    <p className="mt-1 text-sm font-semibold text-foreground">{x.title}</p>
+                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{x.desc}</p>
                   </motion.div>
                 ))}
               </div>

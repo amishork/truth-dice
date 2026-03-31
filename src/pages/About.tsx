@@ -55,12 +55,27 @@ const About = () => {
             transition={{ delay: 0.45, duration: 0.6 }}
             className="mt-12 rounded-xl border border-border bg-card p-8"
           >
-            <h2 className="text-2xl font-semibold text-foreground">How we serve</h2>
-            <ul className="mt-6 space-y-3 text-muted-foreground">
-              <li>Formation experiences designed for real life — not just retreats or slogans.</li>
-              <li>Values discovery that produces clarity you can act on immediately.</li>
-              <li>Practical rhythms that rebuild presence, joy, and shared purpose.</li>
-            </ul>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-2">Our Method</p>
+            <h2 className="text-2xl font-semibold text-foreground">The HOLD Method</h2>
+            <p className="mt-3 text-muted-foreground">
+              Whether it's a single conversation or a year-long school transformation, the posture is the same.
+            </p>
+            <div className="mt-6 space-y-5">
+              {[
+                { letter: "H", word: "Honor", desc: "Name the one thing that matters most. Force a commitment — not a list of aspirations, but the single value you'd fight for." },
+                { letter: "O", word: "Observe", desc: "Follow the value into lived experience. Find where it's already alive — the small practice, the overlooked ritual, the thing you do but have never named. When this is done well, people experience permission to take something small very seriously." },
+                { letter: "L", word: "Live", desc: "Build the architecture to sustain it. Design practices, rhythms, and systems that move the value from belief into the texture of daily life." },
+                { letter: "D", word: "Declare", desc: "Share it outward. Invite others in. A value held silently is fragile. A value declared becomes accountable — and contagious." },
+              ].map((item) => (
+                <div key={item.letter} className="flex gap-4">
+                  <span className="text-2xl font-semibold text-primary shrink-0 w-8">{item.letter}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{item.word}</p>
+                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="mt-8">
               <Button asChild>
                 <a href="/quiz">Free Values Assessment</a>
