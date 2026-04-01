@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import { ValuesChat } from "@/components/ValuesChat";
@@ -163,7 +164,7 @@ const Quiz = () => {
 
   const { user, loading: authLoading, isAuthenticated, gender } = useAuth();
 
-  const [stage, setStage] = useState<Stage>(hasResumable ? saved.current!.stage : "auth");
+  const [stage, setStage] = useState<Stage>(hasResumable ? saved.current!.stage : "area-of-life");
   const [areaOfLife, setAreaOfLife] = useState<string>(saved.current?.areaOfLife ?? "personal");
   const [currentValueIndex, setCurrentValueIndex] = useState(saved.current?.currentValueIndex ?? 0);
   const [section1Selections, setSection1Selections] = useState<string[]>(saved.current?.section1Selections ?? []);
@@ -191,6 +192,7 @@ const Quiz = () => {
   const [showDicePopup, setShowDicePopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
+  const [sessionsLoading, setSessionsLoading] = useState(false);
 
   // ─── Timing state ─────────────────────────────────────────────────────────
   const quizStartTime = useRef<number | null>(null);
@@ -204,12 +206,14 @@ const Quiz = () => {
   const isQuizActive = RESUMABLE_STAGES.includes(stage);
 
   // ─── Auth-based routing ──────────────────────────────────────────────────────
+  // If authenticated with existing sessions, skip to dashboard on initial load
   useEffect(() => {
     if (authLoading) return;
     if (hasResumable) return;
-    if (stage !== "auth") return;
+    if (stage !== "area-of-life") return;
 
     if (isAuthenticated && user) {
+      setSessionsLoading(true);
       getCompletedAreas(user.id).then(async (areas) => {
         setCompletedAreas(areas);
         if (areas.length > 0) {
@@ -222,12 +226,9 @@ const Quiz = () => {
             setSelectedSessionId(latest.id);
           }
           setStage("dice");
-        } else {
-          setStage("area-of-life");
         }
+        setSessionsLoading(false);
       });
-    } else {
-      setShowAuthModal(true);
     }
   }, [authLoading, isAuthenticated, user, stage, hasResumable]);
 
@@ -336,10 +337,10 @@ const Quiz = () => {
 
   const handleGuestContinue = () => {
     setShowAuthModal(false);
-    setStage("area-of-life");
   };
 
   const routeAfterAuth = useCallback(async (userId: string) => {
+    setSessionsLoading(true);
     const areas = await getCompletedAreas(userId);
     setCompletedAreas(areas);
     if (areas.length > 0) {
@@ -351,18 +352,22 @@ const Quiz = () => {
         setDashboardAllWinners(latest.all_winners);
         setSelectedSessionId(latest.id);
         setStage("dice");
+        setSessionsLoading(false);
         return;
       }
     }
-    setStage("area-of-life");
+    setSessionsLoading(false);
+    setShowAuthModal(false);
   }, []);
 
-  // Handle OAuth redirect back to /quiz
+  // Handle auth state change (OAuth redirect or modal sign-in)
+  const prevAuthRef = useRef(isAuthenticated);
   useEffect(() => {
-    if (stage === "auth" && isAuthenticated && user && !authLoading && !showAuthModal) {
+    if (!prevAuthRef.current && isAuthenticated && user && !authLoading) {
       routeAfterAuth(user.id);
     }
-  }, [isAuthenticated, user, authLoading, stage, showAuthModal, routeAfterAuth]);
+    prevAuthRef.current = isAuthenticated;
+  }, [isAuthenticated, user, authLoading, routeAfterAuth]);
 
   const recordCardTimestamp = () => {
     const now = Date.now();
@@ -557,12 +562,6 @@ const Quiz = () => {
         onContinueAsGuest={handleGuestContinue}
       />
 
-      {stage === "auth" && !showAuthModal && authLoading && (
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        </div>
-      )}
-
       {stage === "area-of-life" && (
         <div className="min-h-screen bg-background">
           <Navigation quizMode />
@@ -570,7 +569,7 @@ const Quiz = () => {
             <AreaOfLifePicker
               completedAreas={completedAreas}
               onSelect={handleAreaSelect}
-              onBack={() => setShowAuthModal(true)}
+              onBack={() => window.location.href = "/"}
             />
           </div>
         </div>
@@ -734,7 +733,18 @@ const Quiz = () => {
                 </motion.div>
               )}
 
-              {isAuthenticated && userSessions.length > 0 && (
+              {sessionsLoading && (
+                <div className="hub-sidebar-card space-y-3">
+                  <Skeleton className="h-4 w-32" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                  </div>
+                </div>
+              )}
+
+              {!sessionsLoading && isAuthenticated && userSessions.length > 0 && (
                 <div className="hub-sidebar-card">
                   <div className="mb-5 flex items-center justify-between">
                     <h3 className="label-technical">Your Discoveries</h3>
@@ -828,7 +838,7 @@ const Quiz = () => {
                 </div>
               )}
 
-              {(!isAuthenticated || userSessions.length === 0) && (
+              {!sessionsLoading && (!isAuthenticated || userSessions.length === 0) && (
                 <div className="hub-sidebar-card">
                   <h3 className="label-technical mb-2">Get Started</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">Complete the values quiz to begin building your profile.</p>
@@ -861,7 +871,12 @@ const Quiz = () => {
 
               {/* Chord Diagram — centered below dice */}
               <div className="hub-diagram-area">
-                <Suspense fallback={<div className="h-48 flex items-center justify-center text-muted-foreground text-sm">Loading...</div>}>
+                <Suspense fallback={
+                  <div className="flex flex-col items-center gap-3 py-8">
+                    <Skeleton className="h-48 w-48 rounded-full" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                }>
                   <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
                 </Suspense>
               </div>

@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageTransition from "./components/PageTransition";
+import CookieConsent from "./components/CookieConsent";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -63,6 +64,7 @@ const App = () => (
             <BrowserRouter>
               <AnimatedRoutes />
             </BrowserRouter>
+            <CookieConsent />
             <Analytics />
           </AuthProvider>
         </ErrorBoundary>
