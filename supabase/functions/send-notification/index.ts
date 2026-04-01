@@ -103,11 +103,13 @@ serve(async (req) => {
         await sendEmail(
           RESEND_API_KEY,
           data.email,
-          "Welcome to Words Incarnate",
+          "Your free guide: Seven Conversations That Matter — Words Incarnate",
           `
           <p>Welcome to Words Incarnate.</p>
-          <p>You'll receive occasional insights on values-driven living — formation for families, schools, and organizations.</p>
-          <p>While you're here: <a href="https://wordsincarnate.com/quiz">discover your core values</a> with our free 5-minute guided quiz.</p>
+          <p>Here is your free copy of <strong>Seven Conversations That Matter</strong> — a printable family dinner guide with seven nights of guided conversation:</p>
+          <p><strong><a href="https://wordsincarnate.com/seven-conversations-that-matter.pdf">Download Your Free Guide (PDF)</a></strong></p>
+          <p>Print it out, bring it to the table tonight, and work through the six steps together. Each night takes about 20 minutes.</p>
+          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Take our free values assessment</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
           <br />
           <p>Connection · Delight · Belonging</p>
           <p><em>Words Incarnate</em></p>
@@ -119,8 +121,8 @@ serve(async (req) => {
       await sendEmail(
         RESEND_API_KEY,
         OWNER_EMAIL,
-        `New Newsletter Subscriber: ${data.email}`,
-        `<p>New newsletter signup: <strong>${data.email}</strong></p>`
+        `New Lead: ${data.email} — Seven Conversations PDF`,
+        `<p>New PDF guide request: <strong>${data.email}</strong></p><p>Source: hero email capture</p>`
       );
     } else if (type === "lead_magnet") {
       // Send worksheet to subscriber (only works with verified domain)
@@ -128,13 +130,13 @@ serve(async (req) => {
         await sendEmail(
           RESEND_API_KEY,
           data.email,
-          "Your Values Discovery Worksheet — Words Incarnate",
+          "Your free guide: Seven Conversations That Matter — Words Incarnate",
           `
           <p>Hi${data.name ? ` ${data.name}` : ""},</p>
-          <p>Thank you for your interest in values discovery. Here is your free worksheet:</p>
-          <p><strong><a href="https://wordsincarnate.com/values-worksheet.pdf">Download Your Values Discovery Worksheet</a></strong></p>
-          <p>This printable guide will help you and your family identify, discuss, and live your core values together.</p>
-          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Try our interactive values discovery quiz</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
+          <p>Here is your free copy of <strong>Seven Conversations That Matter</strong> — a printable family dinner guide with seven nights of guided conversation:</p>
+          <p><strong><a href="https://wordsincarnate.com/seven-conversations-that-matter.pdf">Download Your Free Guide (PDF)</a></strong></p>
+          <p>Print it out, bring it to the table tonight, and work through the six steps together. Each night takes about 20 minutes.</p>
+          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Take our free values assessment</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
           <br />
           <p>Connection · Delight · Belonging</p>
           <p><em>Words Incarnate</em></p>
