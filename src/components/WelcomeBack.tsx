@@ -126,7 +126,7 @@ const WelcomeBack: React.FC<WelcomeBackProps> = ({ onStartQuiz }) => {
                     onStartQuiz();
                   }}
                 >
-                  Continue Quiz
+                  Continue Assessment
                 </Button>
               )}
             </div>

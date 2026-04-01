@@ -83,10 +83,10 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                   <Download className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Free Formation Resources
+                  Seven Conversations That Matter
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  Get access to values discovery tools, workshop invitations, and formation resources — delivered to your inbox.
+                  A free printable dinner guide with seven nights of guided family conversation — designed to help you discover and live the values that matter most.
                 </p>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-3 text-left">
                   <input type="text" name="organization" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }} aria-hidden="true" />
@@ -109,7 +109,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                     />
                   </div>
                   <Button type="submit" size="lg" className="w-full wi-cta" disabled={loading}>
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get free resources"}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send me the free guide"}
                   </Button>
                   <p className="text-center text-xs text-muted-foreground">No spam. Unsubscribe anytime.</p>
                 </form>
@@ -119,13 +119,23 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Download className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">You're in!</h3>
+                <h3 className="text-xl font-semibold text-foreground">Your guide is ready!</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  You'll receive formation resources, workshop invitations, and free tools as they become available.
+                  Download your free copy of <em>Seven Conversations That Matter</em> and start tonight.
                 </p>
-                <Button variant="outline" className="mt-6" onClick={handleClose}>
-                  Close
-                </Button>
+                <a
+                  href="/seven-conversations-that-matter.pdf"
+                  download
+                  className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  <Download className="h-4 w-4" />
+                  Download PDF
+                </a>
+                <div className="mt-4">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={handleClose}>
+                    Close
+                  </Button>
+                </div>
               </div>
             )}
           </motion.div>

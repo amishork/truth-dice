@@ -67,7 +67,7 @@ const ExitIntentPopup = ({ onStartQuiz }: ExitIntentPopupProps) => {
                 Discover your core values in 5 minutes
               </h3>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                Our free guided quiz helps you name the 6 values that matter most — so you can build a life that embodies them.
+                Our free assessment helps you name the 6 values that matter most — so you can build a life that embodies them.
               </p>
               <div className="mt-6 space-y-3">
                 <Button

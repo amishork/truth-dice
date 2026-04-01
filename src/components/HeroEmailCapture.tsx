@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,9 +35,19 @@ const HeroEmailCapture = () => {
 
   if (submitted) {
     return (
-      <div className="flex items-center justify-center gap-2 text-sm text-primary">
-        <CheckCircle2 className="h-4 w-4" />
-        <span>You're in — check your inbox.</span>
+      <div className="flex flex-col items-center gap-2 text-sm">
+        <div className="flex items-center gap-2 text-primary">
+          <CheckCircle2 className="h-4 w-4" />
+          <span>You're in — here's your free guide:</span>
+        </div>
+        <a
+          href="/seven-conversations-that-matter.pdf"
+          download
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Seven Conversations That Matter (PDF)
+        </a>
       </div>
     );
   }
@@ -64,11 +74,11 @@ const HeroEmailCapture = () => {
           className="h-10 bg-background/80 text-sm backdrop-blur-sm"
         />
         <Button type="submit" size="sm" disabled={loading} className="h-10 px-5 whitespace-nowrap">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get Free Resources"}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get Free Dinner Guide"}
         </Button>
       </form>
       <p className="mt-2 text-[11px] text-muted-foreground/70">
-        Formation insights, workshop invitations, and free tools. No spam.
+        Seven nights of guided family conversation — plus formation insights and workshop invitations.
       </p>
     </div>
   );
