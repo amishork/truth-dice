@@ -98,26 +98,31 @@ serve(async (req) => {
         );
       }
     } else if (type === "newsletter") {
-      // Welcome email to new subscriber (only works with verified domain)
-      if (DOMAIN_VERIFIED) {
-        await sendEmail(
-          RESEND_API_KEY,
-          data.email,
-          "Your free guide: Seven Conversations That Matter — Words Incarnate",
-          `
+      // Welcome email with PDF to new subscriber
+      await sendEmail(
+        RESEND_API_KEY,
+        data.email,
+        "Your free guide: Seven Conversations That Matter — Words Incarnate",
+        `
+        <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #333;">
           <p>Welcome to Words Incarnate.</p>
-          <p>Here is your free copy of <strong>Seven Conversations That Matter</strong> — a printable family dinner guide with seven nights of guided conversation:</p>
-          <p><strong><a href="https://wordsincarnate.com/seven-conversations-that-matter.pdf">Download Your Free Guide (PDF)</a></strong></p>
+          <p>Here is your free copy of <strong>Seven Conversations That Matter</strong> — a printable family dinner guide with seven nights of guided reflection.</p>
+          <p style="margin: 24px 0;">
+            <a href="https://wordsincarnate.com/seven-conversations-that-matter.pdf"
+               style="display: inline-block; background-color: #9B1B3A; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 4px; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;">
+              Download Your Free Guide (PDF)
+            </a>
+          </p>
           <p>Print it out, bring it to the table tonight, and work through the six steps together. Each night takes about 20 minutes.</p>
-          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Take our free values assessment</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
+          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz" style="color: #9B1B3A;">Take our free values assessment</a> — five minutes, six core values, yours to keep.</p>
           <br />
-          <p>Connection · Delight · Belonging</p>
-          <p><em>Words Incarnate</em></p>
-          `
-        );
-      }
+          <p style="color: #999; font-size: 13px;">Connection · Delight · Belonging</p>
+          <p style="color: #999; font-size: 13px;"><em>Words Incarnate</em><br />wordsincarnate.com</p>
+        </div>
+        `
+      );
 
-      // Notify you
+      // Notify owner
       await sendEmail(
         RESEND_API_KEY,
         OWNER_EMAIL,
@@ -125,26 +130,31 @@ serve(async (req) => {
         `<p>New PDF guide request: <strong>${data.email}</strong></p><p>Source: hero email capture</p>`
       );
     } else if (type === "lead_magnet") {
-      // Send worksheet to subscriber (only works with verified domain)
-      if (DOMAIN_VERIFIED) {
-        await sendEmail(
-          RESEND_API_KEY,
-          data.email,
-          "Your free guide: Seven Conversations That Matter — Words Incarnate",
-          `
+      // Send guide to subscriber
+      await sendEmail(
+        RESEND_API_KEY,
+        data.email,
+        "Your free guide: Seven Conversations That Matter — Words Incarnate",
+        `
+        <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; color: #333;">
           <p>Hi${data.name ? ` ${data.name}` : ""},</p>
-          <p>Here is your free copy of <strong>Seven Conversations That Matter</strong> — a printable family dinner guide with seven nights of guided conversation:</p>
-          <p><strong><a href="https://wordsincarnate.com/seven-conversations-that-matter.pdf">Download Your Free Guide (PDF)</a></strong></p>
+          <p>Here is your free copy of <strong>Seven Conversations That Matter</strong> — a printable family dinner guide with seven nights of guided reflection.</p>
+          <p style="margin: 24px 0;">
+            <a href="https://wordsincarnate.com/seven-conversations-that-matter.pdf"
+               style="display: inline-block; background-color: #9B1B3A; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 4px; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;">
+              Download Your Free Guide (PDF)
+            </a>
+          </p>
           <p>Print it out, bring it to the table tonight, and work through the six steps together. Each night takes about 20 minutes.</p>
-          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz">Take our free values assessment</a> — it takes about 5 minutes and gives you a personalized 6-value profile.</p>
+          <p>Want to go deeper? <a href="https://wordsincarnate.com/quiz" style="color: #9B1B3A;">Take our free values assessment</a> — five minutes, six core values, yours to keep.</p>
           <br />
-          <p>Connection · Delight · Belonging</p>
-          <p><em>Words Incarnate</em></p>
-          `
-        );
-      }
+          <p style="color: #999; font-size: 13px;">Connection · Delight · Belonging</p>
+          <p style="color: #999; font-size: 13px;"><em>Words Incarnate</em><br />wordsincarnate.com</p>
+        </div>
+        `
+      );
 
-      // Notify you
+      // Notify owner
       await sendEmail(
         RESEND_API_KEY,
         OWNER_EMAIL,
