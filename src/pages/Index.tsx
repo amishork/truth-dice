@@ -13,6 +13,7 @@ import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
 import HeroEmailCapture from "@/components/HeroEmailCapture";
 import HomeProgramCards from "@/components/HomeProgramCards";
+import QuizPreview from "@/components/QuizPreview";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
 import heroPoster from "@/assets/hero-poster.webp";
@@ -156,6 +157,9 @@ const Index = () => {
             </motion.div>
           </div>
         </section>
+
+        {/* ─── WHAT YOU'LL DISCOVER (quiz preview) ─── */}
+        <QuizPreview />
 
         {/* ─── PROGRAMS (commitment ladder) ─── */}
         <HomeProgramCards />

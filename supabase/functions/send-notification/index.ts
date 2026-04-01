@@ -3,7 +3,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const ALLOWED_ORIGINS = [
   "https://wordsincarnate.com",
   "https://www.wordsincarnate.com",
-  "https://truth-dice.vercel.app",
   "http://localhost:5173",
   "http://localhost:4173",
 ];
@@ -49,11 +48,46 @@ async function sendEmail(apiKey: string, to: string, subject: string, html: stri
   return res.json();
 }
 
+// ─── Rate Limiter ─────────────────────────────────────────────────────────────
+const RATE_LIMIT = 10; // requests per window
+const RATE_WINDOW_MS = 60_000; // 1 minute
+const rateLimitMap = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < RATE_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT) return true;
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+  if (rateLimitMap.size > 1000) {
+    for (const [key, val] of rateLimitMap) {
+      if (val.every((t) => now - t > RATE_WINDOW_MS)) rateLimitMap.delete(key);
+    }
+  }
+  return false;
+}
+
+function getClientIp(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
 serve(async (req) => {
   const cors = getCorsHeaders(req);
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: cors });
+  }
+
+  const clientIp = getClientIp(req);
+  if (isRateLimited(clientIp)) {
+    return new Response(
+      JSON.stringify({ error: "Too many requests." }),
+      { status: 429, headers: { ...cors, "Content-Type": "application/json", "Retry-After": "60" } }
+    );
   }
 
   try {

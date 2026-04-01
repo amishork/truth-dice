@@ -8,7 +8,7 @@ import {
   trackFinalSelectionComplete,
   trackQuizSaved,
 } from "@/lib/analytics";
-import { saveQuizSession } from "@/lib/quizSessions";
+import { saveQuizSession, GUEST_SESSION_KEY } from "@/lib/quizSessions";
 import { toast } from "sonner";
 import type { AreaOfLife } from "@/components/AreaOfLifePicker";
 
@@ -253,10 +253,14 @@ export function useQuizEngine(userId: string | null, gender: "male" | "female" |
       ? Math.round((Date.now() - quizStartTime.current) / 1000)
       : undefined;
     trackFinalSelectionComplete(finalSixValues);
-    const { error } = await saveQuizSession(userId, areaOfLife, finalSixValues, allWinners, selectionCounts, durationSeconds);
+    const { error, sessionId } = await saveQuizSession(userId, areaOfLife, finalSixValues, allWinners, selectionCounts, durationSeconds);
     if (error) {
       toast.error("Your results couldn't be saved. Please check your connection and try again.");
       return false;
+    }
+    // Save guest session ID so it can be claimed after account creation
+    if (!userId && sessionId) {
+      try { localStorage.setItem(GUEST_SESSION_KEY, sessionId); } catch {}
     }
     trackQuizSaved(areaOfLife, durationSeconds);
     setStage("gratitude");

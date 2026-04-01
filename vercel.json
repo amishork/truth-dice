@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/((?!assets|favicon|android-chrome|apple-touch-icon|site\\.webmanifest|robots|sitemap|og-image|placeholder|hero-video|seven-conversations).*)", "destination": "/index.html" }
+    { "source": "/((?!assets|favicon|android-chrome|apple-touch-icon|site\\.webmanifest|robots|sitemap|og-|placeholder|hero-video|seven-conversations).*)", "destination": "/index.html" }
   ]
 }

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
-import { ValuesChat } from "@/components/ValuesChat";
 import CommitmentEscalation from "@/components/CommitmentEscalation";
 import WhatsNext from "@/components/WhatsNext";
 import DiceProductPopup from "@/components/DiceProductPopup";
@@ -28,10 +27,11 @@ import { useCommitmentTracker } from "@/hooks/useCommitmentTracker";
 import { useQuizEngine, RESUMABLE_STAGES, getSection3Question, getFinalQuestion } from "@/hooks/useQuizEngine";
 import { CORE_VALUES, DICE_CONTEXTS } from "@/data/values";
 import { trackResultsViewed, trackDiceRolled } from "@/lib/analytics";
-import { getCompletedAreas, getUserSessions } from "@/lib/quizSessions";
+import { getCompletedAreas, getUserSessions, claimGuestSession } from "@/lib/quizSessions";
 import type { QuizSession } from "@/lib/quizSessions";
 
 const ValuesChordDiagram = lazy(() => import("@/components/ValuesChordDiagram"));
+const ValuesChat = lazy(() => import("@/components/ValuesChat").then(mod => ({ default: mod.ValuesChat })));
 
 const Quiz = () => {
   const { user, loading: authLoading, isAuthenticated, gender } = useAuth();
@@ -135,6 +135,8 @@ const Quiz = () => {
 
   const routeAfterAuth = useCallback(async (userId: string) => {
     setSessionsLoading(true);
+    // Claim any guest session created before account creation
+    await claimGuestSession(userId);
     const areas = await getCompletedAreas(userId);
     setCompletedAreas(areas);
     if (areas.length > 0) {
@@ -599,7 +601,17 @@ const Quiz = () => {
             {/* ─── Col 3: Chat ─── */}
             <div className="hub-chat">
               <div className="chat-callout lg:sticky lg:top-[5.5rem] lg:h-[calc(100vh-6.5rem)]">
-                <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} onTriggerProductPopup={() => setShowDicePopup(true)} />
+                <Suspense fallback={
+                  <div className="flex flex-col gap-3 p-6">
+                    <Skeleton className="h-8 w-40" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <div className="flex-1" />
+                    <Skeleton className="h-10 w-full rounded-md" />
+                  </div>
+                }>
+                  <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} onTriggerProductPopup={() => setShowDicePopup(true)} />
+                </Suspense>
               </div>
             </div>
           </div>

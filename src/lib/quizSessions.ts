@@ -17,7 +17,7 @@ export async function saveQuizSession(
   allWinners: string[],
   selectionCounts: Record<string, number>,
   durationSeconds?: number
-): Promise<{ error: Error | null }> {
+): Promise<{ error: Error | null; sessionId: string | null }> {
   const row: Record<string, unknown> = {
     user_id: userId,
     area_of_life: areaOfLife,
@@ -28,8 +28,8 @@ export async function saveQuizSession(
   if (durationSeconds && durationSeconds > 0) {
     row.duration_seconds = Math.round(durationSeconds);
   }
-  const { error } = await supabase.from('quiz_sessions').insert(row);
-  return { error: error as Error | null };
+  const { data, error } = await supabase.from('quiz_sessions').insert(row).select('id').single();
+  return { error: error as Error | null, sessionId: data?.id ?? null };
 }
 
 export async function getAvgQuizDuration(): Promise<number> {
@@ -65,4 +65,25 @@ export async function getSessionById(sessionId: string): Promise<QuizSession | n
     .single();
   if (error || !data) return null;
   return data as QuizSession;
+}
+
+export const GUEST_SESSION_KEY = 'wi-guest-session-id';
+
+export async function claimGuestSession(userId: string): Promise<boolean> {
+  try {
+    const sessionId = localStorage.getItem(GUEST_SESSION_KEY);
+    if (!sessionId) return false;
+    const { error } = await supabase
+      .from('quiz_sessions')
+      .update({ user_id: userId })
+      .eq('id', sessionId)
+      .is('user_id', null);
+    if (!error) {
+      localStorage.removeItem(GUEST_SESSION_KEY);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
 }

@@ -33,6 +33,14 @@ CREATE POLICY "Users can read own quiz sessions"
 -- Anonymous users cannot read sessions (they use localStorage)
 -- No SELECT policy for anon role
 
+-- Authenticated users can claim unclaimed (guest) sessions by setting user_id
+CREATE POLICY "Users can claim guest sessions"
+  ON public.quiz_sessions
+  FOR UPDATE
+  TO authenticated
+  USING (user_id IS NULL)
+  WITH CHECK (user_id = auth.uid());
+
 -- Index for fast user session lookups
 CREATE INDEX IF NOT EXISTS idx_quiz_sessions_user_id
   ON public.quiz_sessions(user_id)
