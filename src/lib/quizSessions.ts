@@ -18,7 +18,9 @@ export async function saveQuizSession(
   selectionCounts: Record<string, number>,
   durationSeconds?: number
 ): Promise<{ error: Error | null; sessionId: string | null }> {
+  const sessionId = crypto.randomUUID();
   const row: Record<string, unknown> = {
+    id: sessionId,
     user_id: userId,
     area_of_life: areaOfLife,
     final_six_values: finalSixValues,
@@ -28,8 +30,8 @@ export async function saveQuizSession(
   if (durationSeconds && durationSeconds > 0) {
     row.duration_seconds = Math.round(durationSeconds);
   }
-  const { data, error } = await supabase.from('quiz_sessions').insert(row).select('id').single();
-  return { error: error as Error | null, sessionId: data?.id ?? null };
+  const { error } = await supabase.from('quiz_sessions').insert(row);
+  return { error: error as Error | null, sessionId: error ? null : sessionId };
 }
 
 export async function getAvgQuizDuration(): Promise<number> {
