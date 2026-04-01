@@ -25,18 +25,11 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
     if (honeypot) return; // Bot detected
 
     setLoading(true);
-    const { error } = await supabase.from("email_captures").insert({
-      email: email.trim(),
-      name: name.trim() || null,
-      source: "lead_magnet",
-    });
+    await supabase.from("email_captures").upsert(
+      { email: email.trim(), name: name.trim() || null, source: "lead_magnet" },
+      { onConflict: "email" }
+    );
     setLoading(false);
-
-    if (error) {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
-      return;
-    }
-
     setSubmitted(true);
     sendNotification("lead_magnet", { email: email.trim(), name: name.trim() || null });
   };

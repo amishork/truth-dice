@@ -18,17 +18,12 @@ const HeroEmailCapture = () => {
     if (honeypot) return;
 
     setLoading(true);
-    const { error } = await supabase.from("email_captures").insert({
-      email: email.trim(),
-      source: "hero",
-    });
+    // Use upsert to handle duplicate emails gracefully
+    await supabase.from("email_captures").upsert(
+      { email: email.trim(), source: "hero" },
+      { onConflict: "email" }
+    );
     setLoading(false);
-
-    if (error) {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
-      return;
-    }
-
     setSubmitted(true);
     sendNotification("newsletter", { email: email.trim() });
   };
