@@ -13,6 +13,8 @@ import WhatsNext from "@/components/WhatsNext";
 import DiceProductPopup from "@/components/DiceProductPopup";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
+import ShareableValuesCard from "@/components/ShareableValuesCard";
+import EmailMyResults from "@/components/EmailMyResults";
 import QuizMilestone from "@/components/QuizMilestone";
 import PhaseBanner from "@/components/PhaseBanner";
 import QuizTimer from "@/components/QuizTimer";
@@ -21,9 +23,20 @@ import AreaOfLifePicker, { AREAS_OF_LIFE, getAreaLabel } from "@/components/Area
 import type { AreaOfLife } from "@/components/AreaOfLifePicker";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
+import { toast } from "@/hooks/use-toast";
 
 import { useCommitmentTracker } from "@/hooks/useCommitmentTracker";
 import { CORE_VALUES, DICE_CONTEXTS } from "@/data/values";
+import {
+  trackAreaSelected,
+  trackSection1Complete,
+  trackSection2Complete,
+  trackSection3Complete,
+  trackFinalSelectionComplete,
+  trackQuizSaved,
+  trackResultsViewed,
+  trackDiceRolled,
+} from "@/lib/analytics";
 import {
   saveQuizSession,
   getCompletedAreas,
@@ -269,8 +282,11 @@ const Quiz = () => {
   }, [stage, section3Losers, section3RunoffPairs.length]);
 
   useEffect(() => {
-    if (stage === "dice") markMilestone("results_viewed");
-  }, [stage, markMilestone]);
+    if (stage === "dice") {
+      markMilestone("results_viewed");
+      trackResultsViewed(areaOfLife);
+    }
+  }, [stage, markMilestone, areaOfLife]);
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
   const incrementCount = (value: string) => {
@@ -302,6 +318,7 @@ const Quiz = () => {
   const handleAreaSelect = (area: AreaOfLife) => {
     setAreaOfLife(area.id);
     resetQuiz();
+    trackAreaSelected(area.id);
     setStage("sorting");
   };
 
@@ -346,7 +363,17 @@ const Quiz = () => {
     const durationSeconds = quizStartTime.current
       ? Math.round((Date.now() - quizStartTime.current) / 1000)
       : undefined;
-    await saveQuizSession(user?.id ?? null, areaOfLife, finalSixValues, allWinners, selectionCounts, durationSeconds);
+    trackFinalSelectionComplete(finalSixValues);
+    const { error } = await saveQuizSession(user?.id ?? null, areaOfLife, finalSixValues, allWinners, selectionCounts, durationSeconds);
+    if (error) {
+      toast({
+        title: "Your results couldn't be saved",
+        description: "Please check your connection and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    trackQuizSaved(areaOfLife, durationSeconds);
     setDashboardValues(finalSixValues);
     setDashboardAllWinners(allWinners);
     if (user) {
@@ -365,13 +392,19 @@ const Quiz = () => {
     setSection1Selections((prev) => [...prev, value]);
     incrementCount(value);
     if (currentValueIndex < CORE_VALUES.length - 1) setCurrentValueIndex((v) => v + 1);
-    else setStage("section2");
+    else {
+      trackSection1Complete(section1Selections.length + 1, CORE_VALUES.length);
+      setStage("section2");
+    }
   };
 
   const handleSection1Left = () => {
     recordCardTimestamp();
     if (currentValueIndex < CORE_VALUES.length - 1) setCurrentValueIndex((v) => v + 1);
-    else setStage("section2");
+    else {
+      trackSection1Complete(section1Selections.length, CORE_VALUES.length);
+      setStage("section2");
+    }
   };
 
   const handleSection2Right = () => {
@@ -381,13 +414,19 @@ const Quiz = () => {
     setSection2Selections((prev) => [...prev, value]);
     incrementCount(value);
     if (section2Index < section1Selections.length - 1) setSection2Index((v) => v + 1);
-    else setStage("section3");
+    else {
+      trackSection2Complete(section2Selections.length + 1, section1Selections.length);
+      setStage("section3");
+    }
   };
 
   const handleSection2Left = () => {
     recordCardTimestamp();
     if (section2Index < section1Selections.length - 1) setSection2Index((v) => v + 1);
-    else setStage("section3");
+    else {
+      trackSection2Complete(section2Selections.length, section1Selections.length);
+      setStage("section3");
+    }
   };
 
   const handleSection3Selection = (value: string) => {
@@ -407,7 +446,10 @@ const Quiz = () => {
     setSection3RunoffWinners((prev) => [...prev, value]);
     incrementCount(value);
     if (section3RunoffIndex < section3RunoffPairs.length - 1) setSection3RunoffIndex((v) => v + 1);
-    else setStage("section4");
+    else {
+      trackSection3Complete(section3Winners.length + section3RunoffWinners.length + 1);
+      setStage("section4");
+    }
   };
 
   const handleFinalValueToggle = (value: string) => {
@@ -427,6 +469,7 @@ const Quiz = () => {
   const rollDice = () => {
     if (activeValues.length === 0) return;
     setIsRolling(true);
+    trackDiceRolled();
     const randomDice1 = activeValues[Math.floor(Math.random() * activeValues.length)];
     const randomDice2 = DICE_CONTEXTS[Math.floor(Math.random() * DICE_CONTEXTS.length)];
     window.setTimeout(() => {
@@ -814,6 +857,16 @@ const Quiz = () => {
                   <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
                 </Suspense>
               </div>
+
+              {/* Share & Save — below diagram */}
+              {activeValues.length >= 6 && (
+                <div className="hub-dice-area mt-4 space-y-5">
+                  <ShareableValuesCard values={activeValues} />
+                  {!isAuthenticated && (
+                    <EmailMyResults values={activeValues} areaLabel={areaLabel} />
+                  )}
+                </div>
+              )}
 
               {/* What's Next — decision tree for services */}
               {activeValues.length > 0 && (

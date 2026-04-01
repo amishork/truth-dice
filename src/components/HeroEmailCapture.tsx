@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
+import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
 import { toast } from "@/hooks/use-toast";
 
 const HeroEmailCapture = () => {
@@ -25,6 +26,7 @@ const HeroEmailCapture = () => {
     );
     setLoading(false);
     setSubmitted(true);
+    trackEmailCaptured("hero");
     sendNotification("newsletter", { email: email.trim() });
   };
 
@@ -38,6 +40,7 @@ const HeroEmailCapture = () => {
         <a
           href="/seven-conversations-that-matter.pdf"
           download
+          onClick={() => trackLeadMagnetDownloaded()}
           className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-4 py-2 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
         >
           <Download className="h-3.5 w-3.5" />

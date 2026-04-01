@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Send, Sparkles, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { trackChatEngaged, trackBookingSubmitted } from '@/lib/analytics';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -301,6 +302,8 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
           data: { ...bookingData, raw_summary: summary },
         }),
       });
+
+      trackBookingSubmitted();
     } catch (e) {
       console.error('Failed to save booking:', e);
     }
@@ -437,6 +440,11 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   const sendMessage = async (text?: string) => {
     const msgText = text || input.trim();
     if (!msgText || isLoading) return;
+
+    // Track first user-initiated message
+    if (apiMessages.filter(m => m.role === 'user').length === 0) {
+      trackChatEngaged();
+    }
 
     const displayMsg: DisplayMsg = {
       role: 'user',

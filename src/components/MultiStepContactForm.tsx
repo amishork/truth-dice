@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
+import { trackContactSubmitted } from "@/lib/analytics";
 import { toast } from "sonner";
 import { Send, ChevronRight, ChevronLeft, CheckCircle, User, Briefcase, MessageSquare } from "lucide-react";
 import Confetti from "@/components/Confetti";
@@ -122,6 +123,7 @@ const MultiStepContactForm = ({ initialInterest }: { initialInterest?: string })
     setShowConfetti(true);
     setSubmitted(true);
     toast.success("Your message has been sent!");
+    trackContactSubmitted(result.data.service_interest || undefined);
     sendNotification("contact", result.data);
   };
 

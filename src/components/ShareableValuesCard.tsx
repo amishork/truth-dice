@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Download, Share2, Heart, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { trackResultsShared } from "@/lib/analytics";
 
 interface ShareableValuesCardProps {
   values: string[];
@@ -133,6 +134,7 @@ const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => 
       link.download = "my-core-values-words-incarnate.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
+      trackResultsShared("download");
       toast.success("Your values card has been downloaded!");
     } catch {
       toast.error("Failed to generate image. Please try again.");

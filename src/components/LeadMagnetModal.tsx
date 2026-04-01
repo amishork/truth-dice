@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
+import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
 import { toast } from "@/hooks/use-toast";
 
 interface LeadMagnetModalProps {
@@ -31,6 +32,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
     );
     setLoading(false);
     setSubmitted(true);
+    trackEmailCaptured("lead_magnet");
     sendNotification("lead_magnet", { email: email.trim(), name: name.trim() || null });
   };
 
@@ -119,6 +121,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
                 <a
                   href="/seven-conversations-that-matter.pdf"
                   download
+                  onClick={() => trackLeadMagnetDownloaded()}
                   className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
                 >
                   <Download className="h-4 w-4" />
