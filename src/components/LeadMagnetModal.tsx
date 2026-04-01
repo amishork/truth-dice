@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
-import { toast } from "@/hooks/use-toast";
 
 interface LeadMagnetModalProps {
   open: boolean;

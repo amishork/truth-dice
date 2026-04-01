@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Accordion,
@@ -33,7 +34,33 @@ const faqs = [
   },
 ];
 
+// Inject FAQ structured data for Google rich results
+const FAQ_SCHEMA_ID = "wi-faq-schema";
+
 const FAQ = () => {
+  useEffect(() => {
+    if (document.getElementById(FAQ_SCHEMA_ID)) return;
+    const script = document.createElement("script");
+    script.id = FAQ_SCHEMA_ID;
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.a,
+        },
+      })),
+    });
+    document.head.appendChild(script);
+    return () => {
+      const el = document.getElementById(FAQ_SCHEMA_ID);
+      if (el) el.remove();
+    };
+  }, []);
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">

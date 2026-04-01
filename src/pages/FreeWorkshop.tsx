@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ArrowRight, CheckCircle2, Loader2, Clock, Users, Video } from "lucide-react";
 
 const fadeUp = {
@@ -32,15 +32,14 @@ const FreeWorkshop = () => {
     if (honeypot) return;
 
     setLoading(true);
-    const { error } = await supabase.from("email_captures").insert({
-      email: email.trim(),
-      name: name.trim() || null,
-      source: "free_workshop",
-    });
+    const { error } = await supabase.from("email_captures").upsert(
+      { email: email.trim(), name: name.trim() || null, source: "free_workshop" },
+      { onConflict: "email" }
+    );
     setLoading(false);
 
     if (error) {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+      toast.error("Something went wrong. Please try again.");
       return;
     }
 

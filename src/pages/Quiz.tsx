@@ -23,7 +23,7 @@ import AreaOfLifePicker, { AREAS_OF_LIFE, getAreaLabel } from "@/components/Area
 import type { AreaOfLife } from "@/components/AreaOfLifePicker";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDynamicTabTitle, useAnimatedFavicon } from "@/hooks/useDynamicTabTitle";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 import { useCommitmentTracker } from "@/hooks/useCommitmentTracker";
 import { CORE_VALUES, DICE_CONTEXTS } from "@/data/values";
@@ -265,6 +265,12 @@ const Quiz = () => {
       for (let i = 0; i < section2Selections.length; i += 2) {
         if (i + 1 < section2Selections.length) pairs.push([section2Selections[i], section2Selections[i + 1]]);
       }
+      // If odd count, auto-advance the unpaired value as a winner
+      if (section2Selections.length % 2 === 1) {
+        const byeValue = section2Selections[section2Selections.length - 1];
+        setSection3Winners((prev) => [...prev, byeValue]);
+        incrementCount(byeValue);
+      }
       setSection3Pairs(pairs);
       if (pairs.length === 0) setStage("section4");
     }
@@ -275,6 +281,12 @@ const Quiz = () => {
       const pairs: [string, string][] = [];
       for (let i = 0; i < section3Losers.length; i += 2) {
         if (i + 1 < section3Losers.length) pairs.push([section3Losers[i], section3Losers[i + 1]]);
+      }
+      // If odd count, auto-advance the unpaired value as a runoff winner
+      if (section3Losers.length % 2 === 1) {
+        const byeValue = section3Losers[section3Losers.length - 1];
+        setSection3RunoffWinners((prev) => [...prev, byeValue]);
+        incrementCount(byeValue);
       }
       setSection3RunoffPairs(pairs);
       if (pairs.length === 0) setStage("section4");
@@ -366,11 +378,7 @@ const Quiz = () => {
     trackFinalSelectionComplete(finalSixValues);
     const { error } = await saveQuizSession(user?.id ?? null, areaOfLife, finalSixValues, allWinners, selectionCounts, durationSeconds);
     if (error) {
-      toast({
-        title: "Your results couldn't be saved",
-        description: "Please check your connection and try again.",
-        variant: "destructive",
-      });
+      toast.error("Your results couldn't be saved. Please check your connection and try again.");
       return;
     }
     trackQuizSaved(areaOfLife, durationSeconds);

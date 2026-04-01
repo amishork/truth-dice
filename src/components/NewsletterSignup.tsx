@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
@@ -18,14 +18,14 @@ const NewsletterSignup = () => {
     if (honeypot) return; // Bot detected
 
     setLoading(true);
-    const { error } = await supabase.from("email_captures").insert({
-      email: email.trim(),
-      source: "newsletter",
-    });
+    const { error } = await supabase.from("email_captures").upsert(
+      { email: email.trim(), source: "newsletter" },
+      { onConflict: "email" }
+    );
     setLoading(false);
 
     if (error) {
-      toast({ title: "Something went wrong", description: "Please try again.", variant: "destructive" });
+      toast.error("Something went wrong. Please try again.");
       return;
     }
 
