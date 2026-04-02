@@ -1,187 +1,57 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingCart, Loader2 } from "lucide-react";
+import { X, ShoppingCart, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useCartStore } from "@/stores/cartStore";
-import { storefrontApiRequest, STOREFRONT_QUERY, ShopifyProduct } from "@/lib/shopify";
-import { supabase } from "@/integrations/supabase/client";
-import diceProductImg from "@/assets/dice-product.webp";
+import { SHOPIFY_STORE_PERMANENT_DOMAIN } from "@/lib/shopify";
+import diceProductImage from "@/assets/dice-product.webp";
 
 interface DiceProductPopupProps {
-  values: string[];
-  visible: boolean;
+  coreValues: string[];
 }
 
-export default function DiceProductPopup({ values, visible }: DiceProductPopupProps) {
+const DiceProductPopup: React.FC<DiceProductPopupProps> = ({ coreValues }) => {
   const [dismissed, setDismissed] = useState(false);
-  const [show, setShow] = useState(false);
-  const [product, setProduct] = useState<ShopifyProduct | null>(null);
-  const addItem = useCartStore((s) => s.addItem);
-  const isLoading = useCartStore((s) => s.isLoading);
-  const [added, setAdded] = useState(false);
 
-  // AI image state
-  const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState(false);
-  const imageGeneratedRef = useRef(false);
-
-  // Delay appearance by 2s after becoming visible
-  useEffect(() => {
-    if (!visible || dismissed) return;
-    const timer = setTimeout(() => setShow(true), 2000);
-    return () => clearTimeout(timer);
-  }, [visible, dismissed]);
-
-  // Fetch product from Shopify
-  useEffect(() => {
-    if (!show) return;
-    storefrontApiRequest(STOREFRONT_QUERY, { first: 1, query: "title:Values Dice" })
-      .then((data) => {
-        const edge = data?.data?.products?.edges?.[0];
-        if (edge) setProduct({ node: edge.node });
-      })
-      .catch(console.error);
-  }, [show]);
-
-  // Generate AI dice image
-  useEffect(() => {
-    if (!show || imageGeneratedRef.current || values.length < 3) return;
-    imageGeneratedRef.current = true;
-    setImageLoading(true);
-
-    supabase.functions
-      .invoke("generate-dice-image", {
-        body: { values: values.slice(0, 3) },
-      })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Dice image generation error:", error);
-        } else if (data?.imageUrl) {
-          setAiImageUrl(data.imageUrl);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setImageLoading(false));
-  }, [show, values]);
-
-  const handleAddToCart = async () => {
-    if (!product) return;
-    const variant = product.node.variants.edges[0]?.node;
-    if (!variant) return;
-    await addItem({
-      product,
-      variantId: variant.id,
-      variantTitle: variant.title,
-      price: variant.price,
-      quantity: 1,
-      selectedOptions: variant.selectedOptions || [],
-    });
-    setAdded(true);
-  };
-
-  const displayValues = values.slice(0, 3);
-  const price = product?.node.variants.edges[0]?.node.price;
-
-  // Determine which image to show
-  const imageSrc = aiImageUrl || product?.node.images?.edges?.[0]?.node.url || diceProductImg;
+  if (dismissed || coreValues.length < 6) return null;
 
   return (
-    <AnimatePresence>
-      {show && !dismissed && (
-        <motion.div
-          initial={{ y: 120, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 120, opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="fixed bottom-4 left-4 z-40 w-[280px] rounded-xl border border-border bg-card shadow-xl overflow-hidden"
-        >
-          {/* Dismiss */}
-          <button
-            onClick={() => setDismissed(true)}
-            className="absolute top-2 right-2 z-10 rounded-full bg-background/80 p-1 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Dismiss"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
+    <motion.div
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 40, scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      className="fixed bottom-4 left-4 z-50 w-72 rounded-lg border border-border bg-card shadow-2xl overflow-hidden"
+    >
+      <button
+        onClick={() => setDismissed(true)}
+        className="absolute top-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-background/80 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <X className="h-3 w-3" />
+      </button>
 
-          {/* Product image */}
-          <div className="relative h-36 overflow-hidden">
-            {imageLoading ? (
-              <div className="h-full w-full flex items-center justify-center bg-muted">
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  <span className="text-[10px] text-muted-foreground">Generating your custom dice…</span>
-                </div>
-              </div>
-            ) : (
-              <img
-                src={imageSrc}
-                alt="Values Dice Conversation Game"
-                className="h-full w-full object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent" />
-          </div>
+      <div className="relative h-28 bg-muted/30 flex items-center justify-center overflow-hidden">
+        <img src={diceProductImage} alt="Conversation Dice" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent" />
+      </div>
 
-          {/* Content */}
-          <div className="p-4 space-y-3">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground leading-tight">
-                Custom Engraved Values Dice
-              </h3>
-              <p className="mt-1 text-xs text-muted-foreground leading-snug">
-                Your values, carved in wood. Spark real conversations at the table.
-              </p>
-            </div>
-
-            {/* Value tags */}
-            {displayValues.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {displayValues.map((v) => (
-                  <span
-                    key={v}
-                    className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
-                  >
-                    {v}
-                  </span>
-                ))}
-                {values.length > 3 && (
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                    +{values.length - 3} more
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* Price + CTA */}
-            <div className="flex items-center justify-between gap-2">
-              {price && (
-                <span className="text-sm font-bold text-foreground">
-                  ${parseFloat(price.amount).toFixed(2)}
-                </span>
-              )}
-              <Button
-                size="sm"
-                className="text-xs h-8"
-                onClick={handleAddToCart}
-                disabled={isLoading || !product || added}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : added ? (
-                  "Added ✓"
-                ) : (
-                  <>
-                    <ShoppingCart className="h-3 w-3" />
-                    Add to Cart
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      <div className="p-3 space-y-2">
+        <p className="text-xs font-semibold text-foreground leading-tight">
+          A Custom Game — To Share Your Values
+        </p>
+        <p className="text-[10px] text-muted-foreground leading-relaxed">
+          Your 6 core values, engraved on real dice.
+        </p>
+        <div className="flex flex-wrap gap-0.5">
+          {coreValues.map((v) => (
+            <span key={v} className="text-[8px] font-medium bg-primary/10 text-primary rounded px-1 py-px">{v}</span>
+          ))}
+        </div>
+        <Button size="sm" className="w-full gap-1.5 text-xs" onClick={() => window.open(`https://${SHOPIFY_STORE_PERMANENT_DOMAIN}`, "_blank")}>
+          <ShoppingCart className="h-3 w-3" /> Shop Now <ExternalLink className="h-2.5 w-2.5 ml-auto opacity-50" />
+        </Button>
+      </div>
+    </motion.div>
   );
-}
+};
+
+export default DiceProductPopup;

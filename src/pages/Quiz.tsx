@@ -32,7 +32,9 @@ import type { QuizSession } from "@/lib/quizSessions";
 
 const ValuesChordDiagram = lazy(() => import("@/components/ValuesChordDiagram"));
 const ValuesChat = lazy(() => import("@/components/ValuesChat").then(mod => ({ default: mod.ValuesChat })));
+const InteractiveDie = lazy(() => import("@/components/InteractiveDie"));
 import ShareValues from "@/components/ShareValues";
+import type { DieHandle } from "@/components/InteractiveDie";
 
 const Quiz = () => {
   const { user, loading: authLoading, isAuthenticated, gender } = useAuth();
@@ -62,12 +64,15 @@ const Quiz = () => {
   const [dice1Result, setDice1Result] = useState<string>("");
   const [dice2Result, setDice2Result] = useState<string>("");
   const [isRolling, setIsRolling] = useState(false);
-  const [showDicePopup, setShowDicePopup] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [highlightedValue, setHighlightedValue] = useState<string | null>(null);
   const [confirmedCoreValues, setConfirmedCoreValues] = useState<string[] | null>(null);
+  const [coreSlots, setCoreSlots] = useState<string[]>([]);
+  const [coreLocked, setCoreLocked] = useState(false);
+  const valueDieRef = useRef<DieHandle>(null);
+  const contextDieRef = useRef<DieHandle>(null);
 
   // ─── Derived ────────────────────────────────────────────────────────────────
   const areaOfLifeData = useMemo(() => AREAS_OF_LIFE.find((a) => a.id === areaOfLife) ?? null, [areaOfLife]);
@@ -196,13 +201,29 @@ const Quiz = () => {
     if (diceValues.length === 0) return;
     setIsRolling(true);
     trackDiceRolled();
-    const randomDice1 = diceValues[Math.floor(Math.random() * diceValues.length)];
-    const randomDice2 = DICE_CONTEXTS[Math.floor(Math.random() * DICE_CONTEXTS.length)];
-    window.setTimeout(() => {
-      setDice1Result(randomDice1);
-      setDice2Result(randomDice2);
-      setIsRolling(false);
-    }, 600);
+
+    const valueIdx = Math.floor(Math.random() * diceValues.length);
+    const contextIdx = Math.floor(Math.random() * DICE_CONTEXTS.length);
+    const valueResult = diceValues[valueIdx];
+    const contextResult = DICE_CONTEXTS[contextIdx];
+
+    // Trigger 3D dice animations if refs are available
+    if (confirmedCoreValues && valueDieRef.current && contextDieRef.current) {
+      Promise.all([
+        valueDieRef.current.roll(valueIdx),
+        contextDieRef.current.roll(contextIdx),
+      ]).then(() => {
+        setDice1Result(valueResult);
+        setDice2Result(contextResult);
+        setIsRolling(false);
+      });
+    } else {
+      window.setTimeout(() => {
+        setDice1Result(valueResult);
+        setDice2Result(contextResult);
+        setIsRolling(false);
+      }, 600);
+    }
   };
 
   // ─── Sub-components ─────────────────────────────────────────────────────────
@@ -409,7 +430,9 @@ const Quiz = () => {
       {stage === "dice" && (
         <div className="min-h-screen bg-background">
           <Navigation />
-          <DiceProductPopup values={activeValues} visible={showDicePopup} />
+          {confirmedCoreValues && confirmedCoreValues.length === 6 && (
+            <DiceProductPopup coreValues={confirmedCoreValues} />
+          )}
 
           <div className="hub-page">
             {/* ─── Col 1: Discoveries sidebar ─── */}
@@ -546,26 +569,80 @@ const Quiz = () => {
               )}
             </aside>
 
-            {/* ─── Col 2: Dice (top) → Diagram → Journey ─── */}
+            {/* ─── Col 2: Slots → Dice → Diagram → Share → Journey ─── */}
             <div className="hub-center">
-              {/* Dice */}
+
+              {/* ─── Confirmed Core 6 Slots (large, top of column) ─── */}
+              {coreLocked && confirmedCoreValues && confirmedCoreValues.length === 6 && (
+                <div className="mb-5">
+                  <p className="label-technical text-center mb-2">Your Core Values</p>
+                  <div className="grid grid-cols-6 gap-2">
+                    {confirmedCoreValues.map((value, i) => (
+                      <motion.div
+                        key={`slot-${i}-${value}`}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: i * 0.06, type: "spring", stiffness: 300 }}
+                        className="aspect-square rounded-lg border border-primary/30 bg-primary/5 flex items-center justify-center p-1.5"
+                      >
+                        <span className="text-[9px] sm:text-[10px] font-bold text-foreground text-center leading-tight break-words uppercase">
+                          {value}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ─── Dice Area ─── */}
               <div className="hub-dice-area">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="sketch-card p-5 text-center">
-                    <p className="label-technical">Value</p>
-                    <div className={`mt-3 min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
-                      <p className="text-base font-medium text-foreground">{dice1Result || "?"}</p>
-                    </div>
+                  {/* Value die box */}
+                  <div className="sketch-card p-3 text-center flex flex-col items-center">
+                    <p className="label-technical mb-1">Value</p>
+                    {confirmedCoreValues && coreLocked ? (
+                      <Suspense fallback={<Skeleton className="h-28 w-28 rounded-md" />}>
+                        <InteractiveDie
+                          ref={valueDieRef}
+                          faceLabels={confirmedCoreValues}
+                          variant="dark"
+                          size={130}
+                        />
+                      </Suspense>
+                    ) : (
+                      <div className={`min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
+                        <p className="text-base font-medium text-foreground">{dice1Result || "?"}</p>
+                      </div>
+                    )}
+                    {dice1Result && (
+                      <p className="text-xs font-semibold text-foreground mt-1">{dice1Result}</p>
+                    )}
                   </div>
-                  <div className="sketch-card p-5 text-center">
-                    <p className="label-technical">Context</p>
-                    <div className={`mt-3 min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
-                      <p className="text-base font-medium text-foreground">{dice2Result || "?"}</p>
-                    </div>
+
+                  {/* Context die box */}
+                  <div className="sketch-card p-3 text-center flex flex-col items-center">
+                    <p className="label-technical mb-1">Context</p>
+                    {confirmedCoreValues && coreLocked ? (
+                      <Suspense fallback={<Skeleton className="h-28 w-28 rounded-md" />}>
+                        <InteractiveDie
+                          ref={contextDieRef}
+                          faceLabels={DICE_CONTEXTS}
+                          variant="light"
+                          size={130}
+                        />
+                      </Suspense>
+                    ) : (
+                      <div className={`min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
+                        <p className="text-base font-medium text-foreground">{dice2Result || "?"}</p>
+                      </div>
+                    )}
+                    {dice2Result && (
+                      <p className="text-xs font-semibold text-foreground mt-1">{dice2Result}</p>
+                    )}
                   </div>
                 </div>
                 <Button onClick={rollDice} disabled={isRolling} size="lg" className="w-full mt-4">
-                  <Dices /> Roll dice
+                  <Dices /> {isRolling ? "Rolling..." : "Roll dice"}
                 </Button>
               </div>
 
@@ -597,6 +674,10 @@ const Quiz = () => {
                         completedAreas={completedAreas}
                         onHighlightValue={setHighlightedValue}
                         onCoreValuesConfirmed={setConfirmedCoreValues}
+                        onSelectionChange={(vals, locked) => {
+                          setCoreSlots(vals);
+                          setCoreLocked(locked);
+                        }}
                       />
                     </div>
                   )}
@@ -610,6 +691,10 @@ const Quiz = () => {
                     completedAreas={completedAreas}
                     onHighlightValue={setHighlightedValue}
                     onCoreValuesConfirmed={setConfirmedCoreValues}
+                    onSelectionChange={(vals, locked) => {
+                      setCoreSlots(vals);
+                      setCoreLocked(locked);
+                    }}
                   />
                 )}
               </div>
