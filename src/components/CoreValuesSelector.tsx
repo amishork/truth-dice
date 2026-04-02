@@ -210,6 +210,7 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
             <div
               key={v}
               className="aspect-square flex items-center justify-center rounded-lg bg-muted/30 cursor-default p-2"
+              style={{ boxShadow: "0 0 8px rgba(155, 27, 58, 0.15), 0 0 2px rgba(155, 27, 58, 0.1)" }}
               onMouseEnter={() => onHighlightValue?.(v)}
               onMouseLeave={() => onHighlightValue?.(null)}
             >
