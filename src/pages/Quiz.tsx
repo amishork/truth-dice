@@ -500,17 +500,6 @@ const Quiz = () => {
           <div className="hub-page">
             {/* ─── Col 1: Discoveries sidebar ─── */}
             <aside className="hub-sidebar">
-              {!isAuthenticated && (
-                <motion.div className="hub-sidebar-card" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-                  <p className="text-sm text-foreground leading-relaxed">
-                    <span className="font-medium">Save your results.</span>{" "}
-                    Create an account to discover your values across every area of life.
-                  </p>
-                  <button onClick={() => setShowAuthModal(true)} className="mt-3 text-sm font-medium text-primary hover:underline">
-                    Create free account →
-                  </button>
-                </motion.div>
-              )}
 
               {sessionsLoading && (
                 <div className="hub-sidebar-card space-y-3">
@@ -618,10 +607,47 @@ const Quiz = () => {
               )}
 
               {!sessionsLoading && (!isAuthenticated || userSessions.length === 0) && (
-                <div className="hub-sidebar-card">
-                  <h3 className="label-technical mb-2">Get Started</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Complete the values quiz to begin building your profile.</p>
-                </div>
+                <>
+                  {/* Account creation prompt */}
+                  {!isAuthenticated && (
+                    <div className="hub-sidebar-card">
+                      <h3 className="text-sm font-semibold text-foreground mb-2">Save your results</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Create a free account to discover your values across every area of life and unlock your full values profile.
+                      </p>
+                      <button onClick={() => setShowAuthModal(true)} className="mt-3 text-sm font-medium text-primary hover:underline">
+                        Create free account →
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Grayed-out areas of life preview */}
+                  <div className="hub-sidebar-card opacity-40">
+                    <p className="label-technical mb-3">Areas to Explore</p>
+                    <div className="space-y-0.5">
+                      {AREAS_OF_LIFE.map((area) => {
+                        const label = getAreaLabel(area, gender);
+                        const isCompleted = completedAreas.includes(area.id);
+                        return (
+                          <div
+                            key={area.id}
+                            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md"
+                          >
+                            <span className={`text-sm ${isCompleted ? "" : "grayscale opacity-50"}`}>{area.icon}</span>
+                            <span className={`text-[0.75rem] ${isCompleted ? "text-foreground font-medium" : "text-muted-foreground/60"}`}>{label}</span>
+                            {isCompleted && <span className="ml-auto text-[8px] font-mono text-primary">✓</span>}
+                            {!isCompleted && <Lock className="ml-auto h-2.5 w-2.5 text-muted-foreground/20" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {!isAuthenticated && (
+                      <p className="text-[9px] text-muted-foreground/50 text-center mt-3 italic">
+                        Create an account to unlock all areas
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
 
               {/* What's Next — decision tree for services */}
@@ -697,18 +723,64 @@ const Quiz = () => {
 
               {/* ─── Chord Diagram (centered) ─── */}
               <div className="hub-diagram-area">
-                <Suspense fallback={
-                  <div className="flex flex-col items-center gap-3 py-8">
-                    <Skeleton className="h-64 w-64 rounded-full" />
-                    <Skeleton className="h-4 w-32" />
+                {isAuthenticated && userSessions.length > 0 ? (
+                  <Suspense fallback={
+                    <div className="flex flex-col items-center gap-3 py-8">
+                      <Skeleton className="h-64 w-64 rounded-full" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  }>
+                    <ValuesChordDiagram
+                      sessions={userSessions}
+                      activeSessionId={selectedSessionId}
+                      externalHighlight={highlightedValue}
+                    />
+                  </Suspense>
+                ) : (
+                  /* Demo grayed-out chord diagram + locked value tags for guests */
+                  <div className="relative">
+                    <div className="opacity-20 pointer-events-none grayscale">
+                      <Suspense fallback={null}>
+                        <ValuesChordDiagram
+                          sessions={[
+                            { id: "demo-1", user_id: null, area_of_life: "personal", final_six_values: ["Love", "Wisdom", "Courage", "Integrity", "Faith", "Purpose"], all_winners: [], selection_counts: {}, created_at: "" },
+                            { id: "demo-2", user_id: null, area_of_life: "leader", final_six_values: ["Integrity", "Courage", "Vision", "Wisdom", "Service", "Discipline"], all_winners: [], selection_counts: {}, created_at: "" },
+                            { id: "demo-3", user_id: null, area_of_life: "work", final_six_values: ["Purpose", "Discipline", "Integrity", "Growth", "Excellence", "Courage"], all_winners: [], selection_counts: {}, created_at: "" },
+                          ] as any}
+                          activeSessionId={null}
+                        />
+                      </Suspense>
+                    </div>
+
+                    {/* Demo locked value tags — grayed out */}
+                    <div className="opacity-15 pointer-events-none mt-4">
+                      <div className="grid grid-cols-6 gap-2">
+                        {["Love", "Wisdom", "Courage", "Integrity", "Faith", "Purpose"].map((v) => (
+                          <div key={v} className="aspect-square flex items-center justify-center rounded-lg bg-muted/30 p-2"
+                            style={{ boxShadow: "0 0 8px rgba(155, 27, 58, 0.15)" }}>
+                            <span className="text-[10px] font-semibold text-foreground text-center">{v}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Unlock prompt overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center bg-background/80 backdrop-blur-sm rounded-lg px-6 py-4 border border-border shadow-lg max-w-xs">
+                        <Lock className="h-5 w-5 text-muted-foreground/50 mx-auto mb-2" />
+                        <p className="text-sm font-semibold text-foreground">Values Profile</p>
+                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                          Create an account and take the assessment for 2 more areas of life to unlock your cross-area values analysis.
+                        </p>
+                        {!isAuthenticated && (
+                          <button onClick={() => setShowAuthModal(true)} className="mt-3 text-xs font-medium text-primary hover:underline">
+                            Create free account →
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                }>
-                  <ValuesChordDiagram
-                    sessions={userSessions}
-                    activeSessionId={selectedSessionId}
-                    externalHighlight={highlightedValue}
-                  />
-                </Suspense>
+                )}
               </div>
 
               {/* Share & Save — below diagram */}
