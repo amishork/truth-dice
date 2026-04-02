@@ -901,9 +901,9 @@
 .quiz-phase-banner p {
   font-family: "EB Garamond", Georgia, serif;
   font-style: italic;
-  font-size: 0.8rem;
-  line-height: 1.6;
-  color: hsl(var(--muted-foreground) / 0.55);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: hsl(var(--muted-foreground) / 0.6);
   text-align: center;
 }
 

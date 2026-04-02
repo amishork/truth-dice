@@ -11,6 +11,7 @@ interface ValueCardProps {
   leftLabel: string;
   rightLabel: string;
   description?: string;
+  prefix?: string;
 }
 
 export const ValueCard: React.FC<ValueCardProps> = ({
@@ -19,7 +20,8 @@ export const ValueCard: React.FC<ValueCardProps> = ({
   onSwipeRight,
   leftLabel,
   rightLabel,
-  description
+  description,
+  prefix,
 }) => {
   const [displayValue, setDisplayValue] = useState(value);
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
@@ -94,6 +96,11 @@ export const ValueCard: React.FC<ValueCardProps> = ({
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
+          {prefix && (
+            <p className="text-lg font-serif text-muted-foreground/50 text-center mb-1 relative z-10 leading-tight">
+              {prefix}
+            </p>
+          )}
           <h2 className="text-3xl font-serif font-medium text-center mb-4 text-foreground leading-tight relative z-10">
             {displayValue}
           </h2>

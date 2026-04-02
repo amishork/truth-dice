@@ -235,32 +235,110 @@ const Quiz = () => {
     </div>
   );
 
-  const QuizTop = ({ title, current, total }: { title: string; current: number; total: number }) => {
+  // Quiz section definitions with disproportionate widths
+  const QUIZ_SECTIONS = [
+    { id: "section1", label: "Gut Check", width: 45 },
+    { id: "section2", label: "True Self", width: 25 },
+    { id: "section3", label: "Legacy", width: 17 },
+    { id: "final", label: "Final Cut", width: 13 },
+  ];
+
+  const getActiveSection = (): number => {
+    if (stage === "section1") return 0;
+    if (stage === "section2") return 1;
+    if (stage === "section3" || stage === "section3-runoff") return 2;
+    if (stage === "section4" || stage === "final") return 3;
+    return 0;
+  };
+
+  const QuizTop = ({ current, total }: { current: number; total: number }) => {
+    const activeIdx = getActiveSection();
     const pct = Math.round((current / Math.max(total, 1)) * 100);
+
     return (
-      <div className="mx-auto w-full max-w-3xl px-6 pt-24">
-        <div className="mb-5 flex items-center justify-between gap-3">
+      <div className="mx-auto w-full max-w-3xl px-6 pt-24 pb-2">
+        <div className="mb-6 flex items-center justify-between gap-3">
           <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/")}>Exit Quiz</Button>
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-foreground">{title}</span>
-            <span className="label-technical">{current} of {Math.max(total, 1)}</span>
+          <span className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">
+            {QUIZ_SECTIONS[activeIdx]?.label} — {current} of {Math.max(total, 1)}
+          </span>
+        </div>
+
+        {/* Segmented progress bar with dot milestones */}
+        <div className="flex items-center w-full gap-0">
+          {QUIZ_SECTIONS.map((section, i) => {
+            const isComplete = i < activeIdx;
+            const isActive = i === activeIdx;
+            const isFuture = i > activeIdx;
+
+            return (
+              <React.Fragment key={section.id}>
+                {/* Dot milestone */}
+                <div className="flex flex-col items-center shrink-0" style={{ zIndex: 2 }}>
+                  <div
+                    className={`rounded-full border-2 transition-all duration-300 ${
+                      isComplete
+                        ? "w-3 h-3 bg-primary border-primary"
+                        : isActive
+                        ? "w-3.5 h-3.5 bg-primary border-primary shadow-[0_0_6px_rgba(155,27,58,0.4)]"
+                        : "w-2.5 h-2.5 bg-muted border-border"
+                    }`}
+                  />
+                </div>
+
+                {/* Segment bar */}
+                {i < QUIZ_SECTIONS.length - 1 && (
+                  <div
+                    className="h-1 rounded-full bg-border relative overflow-hidden"
+                    style={{ width: `${section.width}%`, flexShrink: 0 }}
+                  >
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all duration-300"
+                      style={{
+                        width: isComplete ? "100%" : isActive ? `${pct}%` : "0%",
+                      }}
+                    />
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+
+          {/* Final dot */}
+          <div className="flex flex-col items-center shrink-0" style={{ zIndex: 2 }}>
+            <div className={`rounded-full border-2 transition-all duration-300 ${
+              activeIdx >= QUIZ_SECTIONS.length - 1 && pct >= 100
+                ? "w-3 h-3 bg-primary border-primary"
+                : "w-2.5 h-2.5 bg-muted border-border"
+            }`} />
           </div>
         </div>
-        <div className="quiz-progress-track">
-          <div className="quiz-progress-fill" style={{ width: `${pct}%` }} />
+
+        {/* Section labels below dots */}
+        <div className="flex items-start w-full mt-1.5" style={{ gap: 0 }}>
+          {QUIZ_SECTIONS.map((section, i) => {
+            const isActive = i === getActiveSection();
+            const isComplete = i < getActiveSection();
+            return (
+              <div
+                key={`label-${section.id}`}
+                className="text-center"
+                style={{ width: i < QUIZ_SECTIONS.length - 1 ? `${section.width}%` : "auto", flexShrink: 0 }}
+              >
+                <span className={`text-[8px] tracking-wider uppercase ${
+                  isActive ? "text-primary font-semibold" : isComplete ? "text-primary/50" : "text-muted-foreground/40"
+                }`}>
+                  {section.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
   };
 
-  const ContextBanner = () => {
-    if (!isQuizActive || !areaOfLifeData) return null;
-    return (
-      <div className="fixed top-16 left-0 right-0 z-40 border-b border-primary/20 bg-primary/5 py-1.5 text-center">
-        <p className="font-serif text-sm text-primary tracking-wide">{areaLabel}</p>
-      </div>
-    );
-  };
+  const ContextBanner = () => null; // Sentence starter moved into value cards
 
   const showTimer = ["section1", "section2", "section3", "section3-runoff"].includes(stage);
   const section3Q = getSection3Question(areaOfLife, gender);
@@ -297,9 +375,9 @@ const Quiz = () => {
           <Navigation quizMode />
           <ContextBanner />
           <QuizMilestone current={currentValueIndex + 1} total={CORE_VALUES.length} />
-          <QuizTop title="Does it resonate?" current={currentValueIndex + 1} total={CORE_VALUES.length} />
-          <div className="flex items-center justify-center px-6">
-            <ValueCard value={CORE_VALUES[currentValueIndex]} onSwipeLeft={handleSection1Left} onSwipeRight={handleSection1Right} leftLabel="No" rightLabel="Resonates" />
+          <QuizTop current={currentValueIndex + 1} total={CORE_VALUES.length} />
+          <div className="flex items-center justify-center px-6 mt-6">
+            <ValueCard value={CORE_VALUES[currentValueIndex]} onSwipeLeft={handleSection1Left} onSwipeRight={handleSection1Right} leftLabel="No" rightLabel="Resonates" prefix={areaLabel} />
           </div>
           <div className="mx-auto w-full max-w-md px-6 pb-10">
             <PhaseBanner text="Trust your first instinct. If a word doesn't pull an immediate yes from you, let it pass. A maybe is a no. Move quickly — your gut knows more than you think." />
@@ -320,9 +398,9 @@ const Quiz = () => {
           ) : (
             <>
               <QuizMilestone current={section2Index + 1} total={section1Selections.length} />
-              <QuizTop title="True or aspire?" current={section2Index + 1} total={section1Selections.length} />
-              <div className="flex items-center justify-center px-6">
-                <ValueCard value={section1Selections[section2Index]} onSwipeLeft={handleSection2Left} onSwipeRight={handleSection2Right} leftLabel="Admire in others" rightLabel="True / Aspire" />
+              <QuizTop current={section2Index + 1} total={section1Selections.length} />
+              <div className="flex items-center justify-center px-6 mt-6">
+                <ValueCard value={section1Selections[section2Index]} onSwipeLeft={handleSection2Left} onSwipeRight={handleSection2Right} leftLabel="Admire in others" rightLabel="True / Aspire" prefix={areaLabel} />
               </div>
               <div className="mx-auto w-full max-w-md px-6 pb-10">
                 <PhaseBanner text="Now slow down. For each value your gut said yes to, ask: is this genuinely true about me, or something I aspire to live? Or do I mostly admire it when I see it in others? If it's not clearly yours, let it go." />
@@ -337,8 +415,8 @@ const Quiz = () => {
         <div className="min-h-screen bg-background">
           <Navigation quizMode />
           <ContextBanner />
-          <QuizTop title="Legacy choice" current={section3PairIndex + 1} total={section3Pairs.length} />
-          <div className="flex items-center justify-center px-6">
+          <QuizTop current={section3PairIndex + 1} total={section3Pairs.length} />
+          <div className="flex items-center justify-center px-6 mt-6">
             <ValuePair value1={section3Pairs[section3PairIndex][0]} value2={section3Pairs[section3PairIndex][1]} onSelect={handleSection3Selection} title={section3Q} />
           </div>
           <div className="mx-auto w-full max-w-md px-6 pb-10">
@@ -352,8 +430,8 @@ const Quiz = () => {
         <div className="min-h-screen bg-background">
           <Navigation quizMode />
           <ContextBanner />
-          <QuizTop title="Runoff round" current={section3RunoffIndex + 1} total={section3RunoffPairs.length} />
-          <div className="flex items-center justify-center px-6">
+          <QuizTop current={section3RunoffIndex + 1} total={section3RunoffPairs.length} />
+          <div className="flex items-center justify-center px-6 mt-6">
             <ValuePair value1={section3RunoffPairs[section3RunoffIndex][0]} value2={section3RunoffPairs[section3RunoffIndex][1]} onSelect={handleRunoffSelection} title={section3Q} />
           </div>
           <div className="mx-auto w-full max-w-md px-6 pb-10">
