@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart, Flame, ChevronRight } from "lucide-react";
+import { Flame, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -66,23 +66,43 @@ const MiniChordDiagram = () => {
 
 /** Mini values card — matches the ShareableValuesCard visual */
 const MiniValuesCard = () => (
-  <div className="relative overflow-hidden rounded-lg border border-border bg-gradient-to-b from-[hsl(350,50%,8%)] to-[hsl(350,40%,6%)] p-5 text-center">
-    <div className="mb-3 flex justify-center">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15">
-        <Flame className="h-4 w-4 text-primary" />
+  <div className="relative overflow-hidden rounded-lg border border-[#C8C4BE] bg-white p-1">
+    <div className="border border-[#1A1A1A]/60 px-4 py-4 text-center">
+      {/* Cross-hatch band */}
+      <div
+        className="absolute top-1 left-1 right-1 h-2 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px), repeating-linear-gradient(-45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px)",
+        }}
+      />
+      <div className="mx-auto mb-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-[#C8C4BE]/50">
+        <svg width="10" height="13" viewBox="0 0 16 20" fill="#9B1B3A">
+          <path d="M8 0C6 4 2 8 4 14C5 17 7 16 8 14C9 16 11 17 12 14C14 8 10 4 8 0Z" />
+        </svg>
       </div>
+      <p className="text-[8px] font-extrabold tracking-[0.2em] uppercase text-[#1A1A1A]">WORDS INCARNATE</p>
+      <p className="mt-px text-[7px] font-bold tracking-[0.15em] uppercase text-[#9B1B3A]">MY CORE VALUES</p>
+      <div className="relative mt-2 mb-2 flex items-center justify-center">
+        <div className="h-px flex-1 bg-[#1A1A1A]/50" />
+        <div className="mx-1.5 h-1.5 w-1.5 rotate-45 bg-[#9B1B3A]" />
+        <div className="h-px flex-1 bg-[#1A1A1A]/50" />
+      </div>
+      <div className="space-y-1.5">
+        {SAMPLE_VALUES.map((value) => (
+          <div key={value} className="text-center">
+            <span className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[#1A1A1A]">{value}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2.5 h-px bg-[#1A1A1A]/25" />
+      <p className="mt-1.5 text-[6px] font-mono tracking-[0.12em] text-[#9E9A93] uppercase">wordsincarnate.com</p>
     </div>
-    <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/90">Words Incarnate</p>
-    <p className="mt-0.5 text-[8px] font-bold tracking-[0.15em] uppercase text-primary">My Core Values</p>
-    <div className="mt-3 space-y-2">
-      {SAMPLE_VALUES.map((value) => (
-        <div key={value} className="flex items-center justify-center gap-1.5">
-          <Heart className="h-2.5 w-2.5 text-primary/50" />
-          <span className="text-xs text-white/90">{value}</span>
-        </div>
-      ))}
-    </div>
-    <p className="mt-4 text-[7px] text-white/30 tracking-wide">wordsincarnate.com</p>
+    {/* Corner marks */}
+    <div className="absolute top-0.5 left-0.5 h-2 w-2 border-l border-t border-[#C8C4BE]" />
+    <div className="absolute top-0.5 right-0.5 h-2 w-2 border-r border-t border-[#C8C4BE]" />
+    <div className="absolute bottom-0.5 left-0.5 h-2 w-2 border-l border-b border-[#C8C4BE]" />
+    <div className="absolute bottom-0.5 right-0.5 h-2 w-2 border-r border-b border-[#C8C4BE]" />
   </div>
 );
 
