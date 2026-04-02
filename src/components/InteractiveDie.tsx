@@ -80,14 +80,16 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
           const target = FACE_TARGET[targetFaceIndex];
           if (!target) { isRolling.current = false; resolve(""); return; }
 
-          // Compute final rotation: target + full spins for drama
+          // Compute final rotation: target + exact full spins for drama
           // Find the nearest equivalent target angle from current position
           const cur = rotRef.current;
           const normX = target.x + Math.round((cur.x - target.x) / 360) * 360;
           const normY = target.y + Math.round((cur.y - target.y) / 360) * 360;
-          // Add 2-3 full spins in a random direction
-          const extraX = (Math.random() > 0.5 ? 1 : -1) * (720 + Math.random() * 360);
-          const extraY = (Math.random() > 0.5 ? 1 : -1) * (720 + Math.random() * 360);
+          // Add 2-4 full spins (MUST be exact multiples of 360°)
+          const spinsCountX = 2 + Math.floor(Math.random() * 3); // 2, 3, or 4 full turns
+          const spinsCountY = 2 + Math.floor(Math.random() * 3);
+          const extraX = (Math.random() > 0.5 ? 1 : -1) * spinsCountX * 360;
+          const extraY = (Math.random() > 0.5 ? 1 : -1) * spinsCountY * 360;
           const finalX = normX + extraX;
           const finalY = normY + extraY;
 
