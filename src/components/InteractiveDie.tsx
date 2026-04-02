@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
-import * as THREE from "three";
+import React, { useRef, useState, useCallback, useImperativeHandle, forwardRef, useEffect } from "react";
 
 export interface DieHandle {
   roll: (targetFaceIndex: number) => Promise<string>;
@@ -12,345 +11,234 @@ interface InteractiveDieProps {
   onRollComplete?: (label: string) => void;
 }
 
-// Each rotation makes material[i] face the camera at (0,0,5)
-// Three.js BoxGeometry material order: +X, -X, +Y, -Y, +Z, -Z
-const FACE_ROTATIONS: THREE.Euler[] = [
-  new THREE.Euler(0, Math.PI / 2, 0),   // mat 0 (+X) faces camera
-  new THREE.Euler(0, -Math.PI / 2, 0),  // mat 1 (-X) faces camera
-  new THREE.Euler(-Math.PI / 2, 0, 0),  // mat 2 (+Y) faces camera
-  new THREE.Euler(Math.PI / 2, 0, 0),   // mat 3 (-Y) faces camera
-  new THREE.Euler(0, 0, 0),             // mat 4 (+Z) faces camera
-  new THREE.Euler(0, Math.PI, 0),       // mat 5 (-Z) faces camera
+// To show face[i] to the viewer, rotate the cube container by these amounts
+const FACE_TARGET_ROTATIONS: { x: number; y: number }[] = [
+  { x: 0, y: 0 },       // face 0 = front → no rotation
+  { x: 0, y: 180 },     // face 1 = back → rotate 180° around Y
+  { x: 0, y: -90 },     // face 2 = right → rotate -90° around Y
+  { x: 0, y: 90 },      // face 3 = left → rotate 90° around Y
+  { x: -90, y: 0 },     // face 4 = top → rotate -90° around X
+  { x: 90, y: 0 },      // face 5 = bottom → rotate 90° around X
 ];
-
-function createFaceTexture(text: string, variant: "light" | "dark"): THREE.CanvasTexture {
-  const res = 2048;
-  const canvas = document.createElement("canvas");
-  canvas.width = res;
-  canvas.height = res;
-  const ctx = canvas.getContext("2d")!;
-  const isLight = variant === "light";
-
-  const bg = isLight ? "#FAF9F6" : "#000000";
-  const fg = isLight ? "#000000" : "#EDEBE7";
-  const pencil = isLight ? "#D8D4CC" : "#2A2A2A";
-  const hatch = isLight ? "#C8C4BC" : "#1E1E1E";
-  const red = "#9B1B3A";
-
-  // ─── Layer 0: Paper ────────────────────────────────────────────────
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, res, res);
-
-  // ─── Layer 1: Construction geometry (pencil) ───────────────────────
-  ctx.strokeStyle = pencil;
-  ctx.lineWidth = res * 0.0015;
-  ctx.globalAlpha = 0.35;
-
-  // Center crosshair
-  ctx.beginPath();
-  ctx.moveTo(res * 0.3, res / 2);
-  ctx.lineTo(res * 0.7, res / 2);
-  ctx.moveTo(res / 2, res * 0.3);
-  ctx.lineTo(res / 2, res * 0.7);
-  ctx.stroke();
-
-  // Corner registration marks
-  const m = res * 0.08;
-  const cLen = res * 0.05;
-  [[m, m], [res - m, m], [m, res - m], [res - m, res - m]].forEach(([x, y]) => {
-    ctx.beginPath();
-    ctx.moveTo(x - cLen * (x < res / 2 ? -1 : 1), y);
-    ctx.lineTo(x, y);
-    ctx.lineTo(x, y - cLen * (y < res / 2 ? -1 : 1));
-    ctx.stroke();
-  });
-
-  ctx.globalAlpha = 1;
-
-  // ─── Layer 3: Cross-hatching along edges ───────────────────────────
-  ctx.strokeStyle = hatch;
-  ctx.lineWidth = res * 0.001;
-  ctx.globalAlpha = isLight ? 0.06 : 0.08;
-
-  const hatchInset = res * 0.03;
-  const hatchDepth = res * 0.09;
-  const step = res * 0.008;
-
-  // Top edge hatching
-  for (let x = hatchInset; x < res - hatchInset; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x, hatchInset);
-    ctx.lineTo(x + hatchDepth * 0.6, hatchInset + hatchDepth);
-    ctx.stroke();
-  }
-  // Bottom edge hatching
-  for (let x = hatchInset; x < res - hatchInset; x += step) {
-    ctx.beginPath();
-    ctx.moveTo(x, res - hatchInset);
-    ctx.lineTo(x - hatchDepth * 0.6, res - hatchInset - hatchDepth);
-    ctx.stroke();
-  }
-  // Left edge hatching
-  for (let y = hatchInset; y < res - hatchInset; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(hatchInset, y);
-    ctx.lineTo(hatchInset + hatchDepth, y + hatchDepth * 0.6);
-    ctx.stroke();
-  }
-  // Right edge hatching
-  for (let y = hatchInset; y < res - hatchInset; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(res - hatchInset, y);
-    ctx.lineTo(res - hatchInset - hatchDepth, y - hatchDepth * 0.6);
-    ctx.stroke();
-  }
-
-  ctx.globalAlpha = 1;
-
-  // ─── Layer 2: Commitment border (pen) ──────────────────────────────
-  const borderInset = res * 0.055;
-  const cornerR = res * 0.045;
-  ctx.strokeStyle = fg;
-  ctx.lineWidth = res * 0.003;
-  ctx.globalAlpha = isLight ? 0.12 : 0.1;
-  ctx.beginPath();
-  ctx.roundRect(borderInset, borderInset, res - borderInset * 2, res - borderInset * 2, cornerR);
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-
-  // ─── Layer 4: Red accent — small diamond at bottom center ──────────
-  ctx.fillStyle = red;
-  ctx.globalAlpha = 0.6;
-  const dSize = res * 0.008;
-  ctx.save();
-  ctx.translate(res / 2, res - borderInset - res * 0.04);
-  ctx.rotate(Math.PI / 4);
-  ctx.fillRect(-dSize, -dSize, dSize * 2, dSize * 2);
-  ctx.restore();
-  ctx.globalAlpha = 1;
-
-  // ─── Layer 2: Text (commitment — bold, clear) ─────────────────────
-  const upperText = text.toUpperCase();
-  ctx.fillStyle = fg;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  let fontSize = res * 0.17;
-  const maxWidth = res * 0.68;
-  ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
-  let mt = ctx.measureText(upperText);
-  while (mt.width > maxWidth && fontSize > res * 0.07) {
-    fontSize -= res * 0.005;
-    ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
-    mt = ctx.measureText(upperText);
-  }
-
-  if (mt.width > maxWidth) {
-    const words = upperText.split(" ");
-    if (words.length >= 2) {
-      const mid = Math.ceil(words.length / 2);
-      fontSize = res * 0.12;
-      ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
-      const lineH = fontSize * 1.3;
-      ctx.fillText(words.slice(0, mid).join(" "), res / 2, res / 2 - lineH / 2);
-      ctx.fillText(words.slice(mid).join(" "), res / 2, res / 2 + lineH / 2);
-    } else {
-      ctx.fillText(upperText, res / 2, res / 2);
-    }
-  } else {
-    ctx.fillText(upperText, res / 2, res / 2);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = 16;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  return texture;
-}
 
 const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
   ({ faceLabels, variant, size = 160, onRollComplete }, ref) => {
-    const mountRef = useRef<HTMLDivElement>(null);
-    const internalsRef = useRef<{
-      renderer: THREE.WebGLRenderer;
-      group: THREE.Group;
-      animId: number;
-      isDragging: boolean;
-      isRolling: boolean;
-      lastMouse: { x: number; y: number };
-      velocity: { x: number; y: number };
-    } | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [rotX, setRotX] = useState(25);
+    const [rotY, setRotY] = useState(-30);
+    const isDragging = useRef(false);
+    const isRolling = useRef(false);
+    const lastMouse = useRef({ x: 0, y: 0 });
+    const velocity = useRef({ x: 0, y: 0 });
+    const animRef = useRef<number>(0);
     const labelsRef = useRef(faceLabels);
     labelsRef.current = faceLabels;
+    const rotRef = useRef({ x: 25, y: -30 });
 
-    const cleanup = useCallback(() => {
-      if (internalsRef.current) {
-        cancelAnimationFrame(internalsRef.current.animId);
-        internalsRef.current.renderer.dispose();
-        internalsRef.current = null;
-      }
-    }, []);
+    const labels = [...faceLabels];
+    while (labels.length < 6) labels.push("");
 
+    const isLight = variant === "light";
+    const half = size * 0.42; // half the cube face size
+
+    // Colors from style constitution
+    const bg = isLight ? "#FAF9F6" : "#000000";
+    const fg = isLight ? "#000000" : "#EDEBE7";
+    const pencil = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)";
+    const borderColor = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.08)";
+    const edgeColor = isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.25)";
+    const red = "#9B1B3A";
+
+    // Face style
+    const faceStyle = (label: string, transform: string): React.CSSProperties => ({
+      position: "absolute",
+      width: half * 2,
+      height: half * 2,
+      backfaceVisibility: "hidden",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: bg,
+      border: `1px solid ${edgeColor}`,
+      borderRadius: size * 0.04,
+      transform,
+      fontFamily: "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif",
+      fontWeight: 800,
+      fontSize: label.length > 10 ? size * 0.085 : size * 0.11,
+      color: fg,
+      letterSpacing: "0.02em",
+      textTransform: "uppercase" as const,
+      textAlign: "center" as const,
+      padding: size * 0.06,
+      lineHeight: 1.2,
+      boxSizing: "border-box" as const,
+    });
+
+    // Expose roll method
     useImperativeHandle(ref, () => ({
       roll: (targetFaceIndex: number) =>
         new Promise<string>((resolve) => {
-          const state = internalsRef.current;
-          if (!state || state.isRolling) { resolve(labelsRef.current[targetFaceIndex] ?? ""); return; }
-          state.isRolling = true;
-          state.velocity = { x: 0, y: 0 };
-          const group = state.group;
-          const target = FACE_ROTATIONS[targetFaceIndex];
-          if (!target) { state.isRolling = false; resolve(""); return; }
+          if (isRolling.current) {
+            resolve(labelsRef.current[targetFaceIndex] ?? "");
+            return;
+          }
+          isRolling.current = true;
+          const target = FACE_TARGET_ROTATIONS[targetFaceIndex];
+          if (!target) { isRolling.current = false; resolve(""); return; }
 
-          const spinsX = (Math.random() > 0.5 ? 1 : -1) * (Math.PI * 6 + Math.random() * Math.PI * 3);
-          const spinsY = (Math.random() > 0.5 ? 1 : -1) * (Math.PI * 6 + Math.random() * Math.PI * 3);
-          const startX = group.rotation.x, startY = group.rotation.y, startZ = group.rotation.z;
-          const finalX = target.x + spinsX, finalY = target.y + spinsY, finalZ = target.z;
-          const duration = 1600, startTime = performance.now();
+          // Add full spins for drama
+          const spinsX = (Math.random() > 0.5 ? 1 : -1) * 720 + (Math.random() * 360);
+          const spinsY = (Math.random() > 0.5 ? 1 : -1) * 720 + (Math.random() * 360);
+          const finalX = target.x + spinsX;
+          const finalY = target.y + spinsY;
+          const startX = rotRef.current.x;
+          const startY = rotRef.current.y;
+          const duration = 1600;
+          const startTime = performance.now();
           const ease = (t: number) => 1 - Math.pow(1 - t, 4);
 
           const anim = () => {
             const t = Math.min((performance.now() - startTime) / duration, 1);
             const e = ease(t);
-            group.rotation.x = startX + (finalX - startX) * e;
-            group.rotation.y = startY + (finalY - startY) * e;
-            group.rotation.z = startZ + (finalZ - startZ) * e;
-            if (t < 1) { requestAnimationFrame(anim); } else {
-              group.rotation.set(target.x, target.y, 0);
-              state.isRolling = false;
+            const x = startX + (finalX - startX) * e;
+            const y = startY + (finalY - startY) * e;
+            rotRef.current = { x, y };
+            setRotX(x);
+            setRotY(y);
+            if (t < 1) {
+              requestAnimationFrame(anim);
+            } else {
+              rotRef.current = { x: target.x, y: target.y };
+              setRotX(target.x);
+              setRotY(target.y);
+              isRolling.current = false;
+              velocity.current = { x: 0, y: 0 };
               const label = labelsRef.current[targetFaceIndex] ?? "";
               onRollComplete?.(label);
               resolve(label);
             }
           };
+          cancelAnimationFrame(animRef.current);
           requestAnimationFrame(anim);
         }),
     }));
 
+    // Idle auto-rotation
     useEffect(() => {
-      if (!mountRef.current) return;
-      cleanup();
-      const container = mountRef.current;
-      const isLight = variant === "light";
-      // Edge line color: pen black on light die, warm gray on dark die
-      const edgeColor = isLight ? 0x000000 : 0xc8c4bc;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-      camera.position.set(0, 0, 5);
-
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(size, size);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
-      renderer.setClearColor(0x000000, 0);
-      container.appendChild(renderer.domElement);
-
-      const labels = [...faceLabels];
-      while (labels.length < 6) labels.push("");
-
-      // Flat materials — no lighting, textures render exactly as drawn
-      const materials = labels.map((label) =>
-        new THREE.MeshBasicMaterial({ map: createFaceTexture(label, variant) })
-      );
-
-      const boxSize = 1.45;
-      const geo = new THREE.BoxGeometry(boxSize, boxSize, boxSize, 8, 8, 8);
-
-      // Round corners
-      const half = boxSize / 2, rr = 0.14;
-      const pos = geo.attributes.position;
-      const v = new THREE.Vector3();
-      for (let i = 0; i < pos.count; i++) {
-        v.set(pos.getX(i), pos.getY(i), pos.getZ(i));
-        const cx = Math.max(-half + rr, Math.min(half - rr, v.x));
-        const cy = Math.max(-half + rr, Math.min(half - rr, v.y));
-        const cz = Math.max(-half + rr, Math.min(half - rr, v.z));
-        const dx = v.x - cx, dy = v.y - cy, dz = v.z - cz;
-        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist > 0) { const s = rr / dist; v.set(cx + dx * s, cy + dy * s, cz + dz * s); }
-        pos.setXYZ(i, v.x, v.y, v.z);
-      }
-      geo.computeVertexNormals();
-
-      const dieMesh = new THREE.Mesh(geo, materials);
-
-      // Edge lines — commitment lines (pen strokes on the form)
-      const edgesGeo = new THREE.EdgesGeometry(geo, 12);
-      const edgesMat = new THREE.LineBasicMaterial({
-        color: edgeColor,
-        linewidth: 1,
-        transparent: true,
-        opacity: isLight ? 0.5 : 0.35,
-      });
-      const edgeLines = new THREE.LineSegments(edgesGeo, edgesMat);
-
-      const group = new THREE.Group();
-      group.add(dieMesh);
-      group.add(edgeLines);
-      scene.add(group);
-      group.rotation.set(0.35, -0.5, 0.08);
-
-      const state = {
-        renderer, group, animId: 0,
-        isDragging: false, isRolling: false,
-        lastMouse: { x: 0, y: 0 }, velocity: { x: 0, y: 0 },
-      };
-
-      const animate = () => {
-        state.animId = requestAnimationFrame(animate);
-        if (!state.isDragging && !state.isRolling) {
-          state.velocity.x *= 0.97; state.velocity.y *= 0.97;
-          if (Math.abs(state.velocity.x) + Math.abs(state.velocity.y) < 0.002) {
-            state.velocity.x = 0.0012; state.velocity.y = 0.0006;
+      const spin = () => {
+        if (!isDragging.current && !isRolling.current) {
+          velocity.current.x *= 0.97;
+          velocity.current.y *= 0.97;
+          if (Math.abs(velocity.current.x) + Math.abs(velocity.current.y) < 0.05) {
+            velocity.current.x = 0.12;
+            velocity.current.y = 0.06;
           }
-          group.rotation.y += state.velocity.x;
-          group.rotation.x += state.velocity.y;
+          rotRef.current.x += velocity.current.y;
+          rotRef.current.y += velocity.current.x;
+          setRotX(rotRef.current.x);
+          setRotY(rotRef.current.y);
         }
-        renderer.render(scene, camera);
+        animRef.current = requestAnimationFrame(spin);
       };
-      animate();
+      animRef.current = requestAnimationFrame(spin);
+      return () => cancelAnimationFrame(animRef.current);
+    }, []);
 
-      const getPos = (e: MouseEvent | TouchEvent) =>
-        "touches" in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
-      const onDown = (e: MouseEvent | TouchEvent) => {
-        if (state.isRolling) return;
-        state.isDragging = true; state.lastMouse = getPos(e); state.velocity = { x: 0, y: 0 };
-      };
-      const onMove = (e: MouseEvent | TouchEvent) => {
-        if (!state.isDragging || state.isRolling) return;
-        const p = getPos(e);
-        const dx = (p.x - state.lastMouse.x) * 0.007, dy = (p.y - state.lastMouse.y) * 0.007;
-        group.rotation.y += dx; group.rotation.x += dy;
-        state.velocity = { x: dx, y: dy }; state.lastMouse = p;
-      };
-      const onUp = () => { state.isDragging = false; };
+    // Drag interaction
+    const getPos = (e: React.MouseEvent | React.TouchEvent) => {
+      if ("touches" in e) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      return { x: e.clientX, y: e.clientY };
+    };
 
-      const el = renderer.domElement;
-      el.style.cursor = "grab"; el.style.touchAction = "none";
-      el.addEventListener("mousedown", onDown);
-      el.addEventListener("mousemove", onMove);
-      el.addEventListener("mouseup", onUp);
-      el.addEventListener("mouseleave", onUp);
-      el.addEventListener("touchstart", onDown, { passive: true });
-      el.addEventListener("touchmove", onMove, { passive: true });
-      el.addEventListener("touchend", onUp);
-      internalsRef.current = state;
+    const onDown = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+      if (isRolling.current) return;
+      isDragging.current = true;
+      lastMouse.current = getPos(e);
+      velocity.current = { x: 0, y: 0 };
+    }, []);
 
-      return () => {
-        el.removeEventListener("mousedown", onDown);
-        el.removeEventListener("mousemove", onMove);
-        el.removeEventListener("mouseup", onUp);
-        el.removeEventListener("mouseleave", onUp);
-        el.removeEventListener("touchstart", onDown);
-        el.removeEventListener("touchmove", onMove);
-        el.removeEventListener("touchend", onUp);
-        cleanup();
-        if (container.contains(el)) container.removeChild(el);
-      };
-    }, [faceLabels.join("|"), variant, size, cleanup]);
+    const onMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+      if (!isDragging.current || isRolling.current) return;
+      const p = getPos(e);
+      const dx = p.x - lastMouse.current.x;
+      const dy = p.y - lastMouse.current.y;
+      rotRef.current.x -= dy * 0.5;
+      rotRef.current.y += dx * 0.5;
+      velocity.current = { x: dx * 0.5, y: -dy * 0.5 };
+      setRotX(rotRef.current.x);
+      setRotY(rotRef.current.y);
+      lastMouse.current = p;
+    }, []);
 
-    return <div ref={mountRef} style={{ width: size, height: size }} />;
+    const onUp = useCallback(() => { isDragging.current = false; }, []);
+
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          perspective: size * 3,
+          perspectiveOrigin: "50% 50%",
+          cursor: "grab",
+          userSelect: "none",
+        }}
+        onMouseDown={onDown}
+        onMouseMove={onMove}
+        onMouseUp={onUp}
+        onMouseLeave={onUp}
+        onTouchStart={onDown}
+        onTouchMove={onMove}
+        onTouchEnd={onUp}
+      >
+        <div
+          ref={containerRef}
+          style={{
+            width: half * 2,
+            height: half * 2,
+            position: "relative",
+            transformStyle: "preserve-3d",
+            transform: `translateX(${(size - half * 2) / 2}px) translateY(${(size - half * 2) / 2}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+            transition: isRolling.current ? "none" : undefined,
+          }}
+        >
+          {/* Front — face 0 */}
+          <div style={faceStyle(labels[0], `translateZ(${half}px)`)}>
+            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
+            {labels[0]}
+          </div>
+
+          {/* Back — face 1 */}
+          <div style={faceStyle(labels[1], `rotateY(180deg) translateZ(${half}px)`)}>
+            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
+            {labels[1]}
+          </div>
+
+          {/* Right — face 2 */}
+          <div style={faceStyle(labels[2], `rotateY(90deg) translateZ(${half}px)`)}>
+            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
+            {labels[2]}
+          </div>
+
+          {/* Left — face 3 */}
+          <div style={faceStyle(labels[3], `rotateY(-90deg) translateZ(${half}px)`)}>
+            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
+            {labels[3]}
+          </div>
+
+          {/* Top — face 4 */}
+          <div style={faceStyle(labels[4], `rotateX(90deg) translateZ(${half}px)`)}>
+            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
+            {labels[4]}
+          </div>
+
+          {/* Bottom — face 5 */}
+          <div style={faceStyle(labels[5], `rotateX(-90deg) translateZ(${half}px)`)}>
+            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
+            {labels[5]}
+          </div>
+        </div>
+      </div>
+    );
   }
 );
 
