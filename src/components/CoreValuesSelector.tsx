@@ -205,16 +205,15 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
 
       {/* Locked state — horizontal row of 6 values */}
       {isLocked && !isEditing && (
-        <div className="grid grid-cols-6 gap-1.5">
-          {selectedValues.map((v, i) => (
+        <div className="grid grid-cols-6 gap-2">
+          {selectedValues.map((v) => (
             <div
               key={v}
-              className="flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded bg-muted/30 cursor-default"
+              className="aspect-square flex items-center justify-center rounded-lg bg-muted/30 cursor-default p-2"
               onMouseEnter={() => onHighlightValue?.(v)}
               onMouseLeave={() => onHighlightValue?.(null)}
             >
-              <span className="text-[7px] font-mono text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
-              <span className="text-[9px] sm:text-[10px] font-semibold text-foreground text-center leading-tight">{v}</span>
+              <span className="text-[11px] sm:text-xs font-semibold text-foreground text-center leading-tight break-words">{v}</span>
             </div>
           ))}
         </div>
