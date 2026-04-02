@@ -601,12 +601,12 @@ const Quiz = () => {
                   <div className="sketch-card p-3 text-center flex flex-col items-center">
                     <p className="label-technical mb-1">Value</p>
                     {confirmedCoreValues && coreLocked ? (
-                      <Suspense fallback={<Skeleton className="h-28 w-28 rounded-md" />}>
+                      <Suspense fallback={<Skeleton className="h-40 w-40 rounded-md" />}>
                         <InteractiveDie
                           ref={valueDieRef}
                           faceLabels={confirmedCoreValues}
                           variant="dark"
-                          size={130}
+                          size={180}
                         />
                       </Suspense>
                     ) : (
@@ -623,12 +623,12 @@ const Quiz = () => {
                   <div className="sketch-card p-3 text-center flex flex-col items-center">
                     <p className="label-technical mb-1">Context</p>
                     {confirmedCoreValues && coreLocked ? (
-                      <Suspense fallback={<Skeleton className="h-28 w-28 rounded-md" />}>
+                      <Suspense fallback={<Skeleton className="h-40 w-40 rounded-md" />}>
                         <InteractiveDie
                           ref={contextDieRef}
                           faceLabels={DICE_CONTEXTS}
                           variant="light"
-                          size={130}
+                          size={180}
                         />
                       </Suspense>
                     ) : (
