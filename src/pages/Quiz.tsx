@@ -616,9 +616,6 @@ const Quiz = () => {
                         <p className="text-base font-medium text-foreground">{dice1Result || "?"}</p>
                       </div>
                     )}
-                    {dice1Result && (
-                      <p className="text-xs font-semibold text-foreground mt-1">{dice1Result}</p>
-                    )}
                   </div>
 
                   {/* Context die box */}
@@ -637,9 +634,6 @@ const Quiz = () => {
                       <div className={`min-h-14 flex items-center justify-center ${isRolling ? "animate-dice-roll" : ""}`}>
                         <p className="text-base font-medium text-foreground">{dice2Result || "?"}</p>
                       </div>
-                    )}
-                    {dice2Result && (
-                      <p className="text-xs font-semibold text-foreground mt-1">{dice2Result}</p>
                     )}
                   </div>
                 </div>

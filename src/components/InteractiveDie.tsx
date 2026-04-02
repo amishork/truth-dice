@@ -11,19 +11,18 @@ interface InteractiveDieProps {
   onRollComplete?: (label: string) => void;
 }
 
-// To show face[i] to the viewer, rotate the cube container by these amounts
-const FACE_TARGET_ROTATIONS: { x: number; y: number }[] = [
-  { x: 0, y: 0 },       // face 0 = front → no rotation
-  { x: 0, y: 180 },     // face 1 = back → rotate 180° around Y
-  { x: 0, y: -90 },     // face 2 = right → rotate -90° around Y
-  { x: 0, y: 90 },      // face 3 = left → rotate 90° around Y
-  { x: -90, y: 0 },     // face 4 = top → rotate -90° around X
-  { x: 90, y: 0 },      // face 5 = bottom → rotate 90° around X
+// To show face[i] to the viewer, rotate container by these degrees
+const FACE_TARGET: { x: number; y: number }[] = [
+  { x: 0, y: 0 },       // 0 = front
+  { x: 0, y: 180 },     // 1 = back
+  { x: 0, y: -90 },     // 2 = right
+  { x: 0, y: 90 },      // 3 = left
+  { x: -90, y: 0 },     // 4 = top
+  { x: 90, y: 0 },      // 5 = bottom
 ];
 
 const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
   ({ faceLabels, variant, size = 160, onRollComplete }, ref) => {
-    const containerRef = useRef<HTMLDivElement>(null);
     const [rotX, setRotX] = useState(25);
     const [rotY, setRotY] = useState(-30);
     const isDragging = useRef(false);
@@ -39,17 +38,14 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
     while (labels.length < 6) labels.push("");
 
     const isLight = variant === "light";
-    const half = size * 0.42; // half the cube face size
+    const half = size * 0.42;
 
-    // Colors from style constitution
-    const bg = isLight ? "#FAF9F6" : "#000000";
-    const fg = isLight ? "#000000" : "#EDEBE7";
-    const pencil = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)";
-    const borderColor = isLight ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.08)";
-    const edgeColor = isLight ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.25)";
-    const red = "#9B1B3A";
+    // ─── Shared styles (identical on both variants, just colors inverted) ─────
+    const faceBg = isLight ? "#FFFFFF" : "#000000";
+    const faceText = isLight ? "#000000" : "#FFFFFF";
+    const faceBorder = isLight ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.18)";
+    const innerBorder = isLight ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)";
 
-    // Face style
     const faceStyle = (label: string, transform: string): React.CSSProperties => ({
       position: "absolute",
       width: half * 2,
@@ -58,59 +54,65 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: bg,
-      border: `1px solid ${edgeColor}`,
-      borderRadius: size * 0.04,
+      background: faceBg,
+      border: `1.5px solid ${faceBorder}`,
+      borderRadius: size * 0.05,
       transform,
       fontFamily: "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif",
       fontWeight: 800,
-      fontSize: label.length > 10 ? size * 0.085 : size * 0.11,
-      color: fg,
-      letterSpacing: "0.02em",
-      textTransform: "uppercase" as const,
-      textAlign: "center" as const,
-      padding: size * 0.06,
-      lineHeight: 1.2,
-      boxSizing: "border-box" as const,
+      fontSize: label.length > 12 ? size * 0.075 : label.length > 8 ? size * 0.09 : size * 0.115,
+      color: faceText,
+      letterSpacing: "0.03em",
+      textTransform: "uppercase",
+      textAlign: "center",
+      padding: size * 0.08,
+      lineHeight: 1.15,
+      boxSizing: "border-box",
     });
 
     // Expose roll method
     useImperativeHandle(ref, () => ({
       roll: (targetFaceIndex: number) =>
         new Promise<string>((resolve) => {
-          if (isRolling.current) {
-            resolve(labelsRef.current[targetFaceIndex] ?? "");
-            return;
-          }
+          if (isRolling.current) { resolve(labelsRef.current[targetFaceIndex] ?? ""); return; }
           isRolling.current = true;
-          const target = FACE_TARGET_ROTATIONS[targetFaceIndex];
+          velocity.current = { x: 0, y: 0 };
+          const target = FACE_TARGET[targetFaceIndex];
           if (!target) { isRolling.current = false; resolve(""); return; }
 
-          // Add full spins for drama
-          const spinsX = (Math.random() > 0.5 ? 1 : -1) * 720 + (Math.random() * 360);
-          const spinsY = (Math.random() > 0.5 ? 1 : -1) * 720 + (Math.random() * 360);
-          const finalX = target.x + spinsX;
-          const finalY = target.y + spinsY;
-          const startX = rotRef.current.x;
-          const startY = rotRef.current.y;
-          const duration = 1600;
+          // Compute final rotation: target + full spins for drama
+          // Find the nearest equivalent target angle from current position
+          const cur = rotRef.current;
+          const normX = target.x + Math.round((cur.x - target.x) / 360) * 360;
+          const normY = target.y + Math.round((cur.y - target.y) / 360) * 360;
+          // Add 2-3 full spins in a random direction
+          const extraX = (Math.random() > 0.5 ? 1 : -1) * (720 + Math.random() * 360);
+          const extraY = (Math.random() > 0.5 ? 1 : -1) * (720 + Math.random() * 360);
+          const finalX = normX + extraX;
+          const finalY = normY + extraY;
+
+          const startX = cur.x, startY = cur.y;
+          const duration = 2200;
           const startTime = performance.now();
-          const ease = (t: number) => 1 - Math.pow(1 - t, 4);
+
+          // Quintic ease-out — very smooth deceleration, nearly zero velocity at end
+          const ease = (t: number) => 1 - Math.pow(1 - t, 5);
 
           const anim = () => {
-            const t = Math.min((performance.now() - startTime) / duration, 1);
+            const elapsed = performance.now() - startTime;
+            const t = Math.min(elapsed / duration, 1);
             const e = ease(t);
             const x = startX + (finalX - startX) * e;
             const y = startY + (finalY - startY) * e;
             rotRef.current = { x, y };
             setRotX(x);
             setRotY(y);
+
             if (t < 1) {
-              requestAnimationFrame(anim);
+              animRef.current = requestAnimationFrame(anim);
             } else {
-              rotRef.current = { x: target.x, y: target.y };
-              setRotX(target.x);
-              setRotY(target.y);
+              // Animation naturally reached finalX/finalY — no snap needed
+              // finalX/finalY are visually identical to target (differ by full rotations)
               isRolling.current = false;
               velocity.current = { x: 0, y: 0 };
               const label = labelsRef.current[targetFaceIndex] ?? "";
@@ -119,7 +121,7 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
             }
           };
           cancelAnimationFrame(animRef.current);
-          requestAnimationFrame(anim);
+          animRef.current = requestAnimationFrame(anim);
         }),
     }));
 
@@ -178,9 +180,9 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
           width: size,
           height: size,
           perspective: size * 3,
-          perspectiveOrigin: "50% 50%",
           cursor: "grab",
           userSelect: "none",
+          WebkitUserSelect: "none",
         }}
         onMouseDown={onDown}
         onMouseMove={onMove}
@@ -191,51 +193,34 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
         onTouchEnd={onUp}
       >
         <div
-          ref={containerRef}
           style={{
             width: half * 2,
             height: half * 2,
             position: "relative",
             transformStyle: "preserve-3d",
-            transform: `translateX(${(size - half * 2) / 2}px) translateY(${(size - half * 2) / 2}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
-            transition: isRolling.current ? "none" : undefined,
+            transform: `translate(${(size - half * 2) / 2}px, ${(size - half * 2) / 2}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
           }}
         >
-          {/* Front — face 0 */}
-          <div style={faceStyle(labels[0], `translateZ(${half}px)`)}>
-            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
-            {labels[0]}
-          </div>
-
-          {/* Back — face 1 */}
-          <div style={faceStyle(labels[1], `rotateY(180deg) translateZ(${half}px)`)}>
-            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
-            {labels[1]}
-          </div>
-
-          {/* Right — face 2 */}
-          <div style={faceStyle(labels[2], `rotateY(90deg) translateZ(${half}px)`)}>
-            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
-            {labels[2]}
-          </div>
-
-          {/* Left — face 3 */}
-          <div style={faceStyle(labels[3], `rotateY(-90deg) translateZ(${half}px)`)}>
-            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
-            {labels[3]}
-          </div>
-
-          {/* Top — face 4 */}
-          <div style={faceStyle(labels[4], `rotateX(90deg) translateZ(${half}px)`)}>
-            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
-            {labels[4]}
-          </div>
-
-          {/* Bottom — face 5 */}
-          <div style={faceStyle(labels[5], `rotateX(-90deg) translateZ(${half}px)`)}>
-            <div style={{ position: "absolute", inset: 6, border: `1px solid ${borderColor}`, borderRadius: size * 0.025, pointerEvents: "none" }} />
-            {labels[5]}
-          </div>
+          {/* 6 faces */}
+          {[
+            `translateZ(${half}px)`,
+            `rotateY(180deg) translateZ(${half}px)`,
+            `rotateY(90deg) translateZ(${half}px)`,
+            `rotateY(-90deg) translateZ(${half}px)`,
+            `rotateX(90deg) translateZ(${half}px)`,
+            `rotateX(-90deg) translateZ(${half}px)`,
+          ].map((transform, i) => (
+            <div key={i} style={faceStyle(labels[i], transform)}>
+              <div style={{
+                position: "absolute",
+                inset: size * 0.04,
+                border: `1px solid ${innerBorder}`,
+                borderRadius: size * 0.03,
+                pointerEvents: "none",
+              }} />
+              {labels[i]}
+            </div>
+          ))}
         </div>
       </div>
     );
