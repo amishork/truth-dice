@@ -22,37 +22,29 @@ const FACE_ROTATIONS: THREE.Euler[] = [
 ];
 
 function createFaceTexture(text: string, variant: "light" | "dark"): THREE.CanvasTexture {
-  const res = 2048;
+  const res = 1024;
   const canvas = document.createElement("canvas");
   canvas.width = res;
   canvas.height = res;
   const ctx = canvas.getContext("2d")!;
   const isLight = variant === "light";
 
-  ctx.fillStyle = isLight ? "#F2F0EC" : "#0E0E0E";
+  // Clean flat fill
+  ctx.fillStyle = isLight ? "#FAFAF8" : "#1A1A1A";
   ctx.fillRect(0, 0, res, res);
 
-  // Subtle border
-  const inset = res * 0.065;
-  const cornerR = res * 0.055;
-  ctx.strokeStyle = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)";
-  ctx.lineWidth = res * 0.003;
-  ctx.beginPath();
-  ctx.roundRect(inset, inset, res - inset * 2, res - inset * 2, cornerR);
-  ctx.stroke();
-
-  // Text
+  // Text — large, bold, crisp
   const upperText = text.toUpperCase();
-  ctx.fillStyle = isLight ? "#1A1A1A" : "#E8E4E0";
+  ctx.fillStyle = isLight ? "#1A1A1A" : "#F0EDE8";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  let fontSize = res * 0.16;
-  const maxWidth = res * 0.68;
+  let fontSize = res * 0.18;
+  const maxWidth = res * 0.72;
   ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
   let m = ctx.measureText(upperText);
-  while (m.width > maxWidth && fontSize > res * 0.06) {
-    fontSize -= res * 0.005;
+  while (m.width > maxWidth && fontSize > res * 0.07) {
+    fontSize -= res * 0.006;
     ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
     m = ctx.measureText(upperText);
   }
@@ -61,9 +53,9 @@ function createFaceTexture(text: string, variant: "light" | "dark"): THREE.Canva
     const words = upperText.split(" ");
     if (words.length >= 2) {
       const mid = Math.ceil(words.length / 2);
-      fontSize = res * 0.11;
+      fontSize = res * 0.13;
       ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
-      const lineH = fontSize * 1.25;
+      const lineH = fontSize * 1.3;
       ctx.fillText(words.slice(0, mid).join(" "), res / 2, res / 2 - lineH / 2);
       ctx.fillText(words.slice(mid).join(" "), res / 2, res / 2 + lineH / 2);
     } else {
@@ -74,16 +66,11 @@ function createFaceTexture(text: string, variant: "light" | "dark"): THREE.Canva
   }
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = 16;
+  texture.anisotropy = 8;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.generateMipmaps = true;
   return texture;
-}
-
-/** Detect page dark/light mode from DOM */
-function isDarkMode(): boolean {
-  return document.documentElement.classList.contains("dark");
 }
 
 const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
@@ -91,9 +78,7 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
     const mountRef = useRef<HTMLDivElement>(null);
     const internalsRef = useRef<{
       renderer: THREE.WebGLRenderer;
-      die: THREE.Mesh;
-      scene: THREE.Scene;
-      camera: THREE.PerspectiveCamera;
+      group: THREE.Group;
       animId: number;
       isDragging: boolean;
       isRolling: boolean;
@@ -118,13 +103,13 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
           if (!state || state.isRolling) { resolve(labelsRef.current[targetFaceIndex] ?? ""); return; }
           state.isRolling = true;
           state.velocity = { x: 0, y: 0 };
-          const die = state.die;
+          const group = state.group;
           const target = FACE_ROTATIONS[targetFaceIndex];
           if (!target) { state.isRolling = false; resolve(""); return; }
 
           const spinsX = (Math.random() > 0.5 ? 1 : -1) * (Math.PI * 6 + Math.random() * Math.PI * 3);
           const spinsY = (Math.random() > 0.5 ? 1 : -1) * (Math.PI * 6 + Math.random() * Math.PI * 3);
-          const startX = die.rotation.x, startY = die.rotation.y, startZ = die.rotation.z;
+          const startX = group.rotation.x, startY = group.rotation.y, startZ = group.rotation.z;
           const finalX = target.x + spinsX, finalY = target.y + spinsY, finalZ = target.z;
           const duration = 1600, startTime = performance.now();
           const ease = (t: number) => 1 - Math.pow(1 - t, 4);
@@ -132,11 +117,11 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
           const anim = () => {
             const t = Math.min((performance.now() - startTime) / duration, 1);
             const e = ease(t);
-            die.rotation.x = startX + (finalX - startX) * e;
-            die.rotation.y = startY + (finalY - startY) * e;
-            die.rotation.z = startZ + (finalZ - startZ) * e;
+            group.rotation.x = startX + (finalX - startX) * e;
+            group.rotation.y = startY + (finalY - startY) * e;
+            group.rotation.z = startZ + (finalZ - startZ) * e;
             if (t < 1) { requestAnimationFrame(anim); } else {
-              die.rotation.set(target.x, target.y, 0);
+              group.rotation.set(target.x, target.y, 0);
               state.isRolling = false;
               const label = labelsRef.current[targetFaceIndex] ?? "";
               onRollComplete?.(label);
@@ -151,83 +136,38 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       if (!mountRef.current) return;
       cleanup();
       const container = mountRef.current;
-      const dark = isDarkMode();
+      const isLight = variant === "light";
+      const edgeColor = isLight ? 0x1a1a1a : 0xe0dcd8;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
       camera.position.set(0, 0, 5);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(size, size);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
       renderer.setClearColor(0x000000, 0);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = dark ? 0.9 : 1.2;
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      // Enable shadows
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       container.appendChild(renderer.domElement);
 
-      // ─── Lighting: single-source directional, environment-aware ───
-      if (dark) {
-        // DARK MODE: dramatic single key light, deep shadows
-        const key = new THREE.DirectionalLight(0xffeedd, 1.6);
-        key.position.set(3, 5, 4);
-        key.castShadow = true;
-        scene.add(key);
-
-        // Extremely subtle fill — just enough to not lose the form
-        const fill = new THREE.DirectionalLight(0x8899bb, 0.08);
-        fill.position.set(-4, 1, 2);
-        scene.add(fill);
-
-        // Minimal ambient — dark environment
-        const ambient = new THREE.AmbientLight(0x222233, 0.06);
-        scene.add(ambient);
-      } else {
-        // LIGHT MODE: bright key + strong ambient bounce (white room)
-        const key = new THREE.DirectionalLight(0xffffff, 1.2);
-        key.position.set(3, 5, 4);
-        key.castShadow = true;
-        scene.add(key);
-
-        // Ambient simulates light bouncing off white walls/table
-        const ambient = new THREE.AmbientLight(0xffffff, 0.65);
-        scene.add(ambient);
-
-        // Gentle fill from opposite side (reflected light)
-        const fill = new THREE.DirectionalLight(0xf0ece8, 0.25);
-        fill.position.set(-3, 2, 3);
-        scene.add(fill);
-
-        // Subtle ground bounce
-        const bounce = new THREE.DirectionalLight(0xf5f0eb, 0.1);
-        bounce.position.set(0, -3, 2);
-        scene.add(bounce);
-      }
-
-      // Materials
+      // ─── Build die ───────────────────────────────────────────────────
       const labels = [...faceLabels];
       while (labels.length < 6) labels.push("");
 
+      // Face materials — flat, no lighting (MeshBasicMaterial)
       const materials = labels.map((label) =>
-        new THREE.MeshPhysicalMaterial({
+        new THREE.MeshBasicMaterial({
           map: createFaceTexture(label, variant),
-          roughness: dark ? 0.2 : 0.15,
-          metalness: 0.0,
-          clearcoat: 0.8,
-          clearcoatRoughness: dark ? 0.12 : 0.06,
-          reflectivity: dark ? 0.3 : 0.5,
         })
       );
 
-      // Rounded box
       const boxSize = 1.45;
-      const geo = new THREE.BoxGeometry(boxSize, boxSize, boxSize, 8, 8, 8);
+      const geo = new THREE.BoxGeometry(boxSize, boxSize, boxSize, 1, 1, 1);
+
+      // Rounded corners via vertex manipulation
+      const rr = 0.14;
+      const half = boxSize / 2;
       const pos = geo.attributes.position;
       const v = new THREE.Vector3();
-      const half = boxSize / 2, rr = 0.13;
       for (let i = 0; i < pos.count; i++) {
         v.set(pos.getX(i), pos.getY(i), pos.getZ(i));
         const cx = Math.max(-half + rr, Math.min(half - rr, v.x));
@@ -240,12 +180,27 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       }
       geo.computeVertexNormals();
 
-      const die = new THREE.Mesh(geo, materials);
-      scene.add(die);
-      die.rotation.set(0.3, -0.45, 0.08);
+      const dieMesh = new THREE.Mesh(geo, materials);
+
+      // ─── Edge lines — the sketch/wireframe look ────────────────────
+      const edgesGeo = new THREE.EdgesGeometry(geo, 15); // threshold angle for visible edges
+      const edgesMat = new THREE.LineBasicMaterial({
+        color: edgeColor,
+        linewidth: 1,
+        transparent: true,
+        opacity: 0.7,
+      });
+      const edgeLines = new THREE.LineSegments(edgesGeo, edgesMat);
+
+      // Group die mesh + edge lines
+      const group = new THREE.Group();
+      group.add(dieMesh);
+      group.add(edgeLines);
+      scene.add(group);
+      group.rotation.set(0.35, -0.5, 0.08);
 
       const state = {
-        renderer, die, scene, camera, animId: 0,
+        renderer, group, animId: 0,
         isDragging: false, isRolling: false,
         lastMouse: { x: 0, y: 0 }, velocity: { x: 0, y: 0 },
       };
@@ -257,12 +212,14 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
           if (Math.abs(state.velocity.x) + Math.abs(state.velocity.y) < 0.002) {
             state.velocity.x = 0.0012; state.velocity.y = 0.0006;
           }
-          die.rotation.y += state.velocity.x; die.rotation.x += state.velocity.y;
+          group.rotation.y += state.velocity.x;
+          group.rotation.x += state.velocity.y;
         }
         renderer.render(scene, camera);
       };
       animate();
 
+      // Interaction
       const getPos = (e: MouseEvent | TouchEvent) =>
         "touches" in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
       const onDown = (e: MouseEvent | TouchEvent) => {
@@ -273,7 +230,7 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
         if (!state.isDragging || state.isRolling) return;
         const p = getPos(e);
         const dx = (p.x - state.lastMouse.x) * 0.007, dy = (p.y - state.lastMouse.y) * 0.007;
-        die.rotation.y += dx; die.rotation.x += dy;
+        group.rotation.y += dx; group.rotation.x += dy;
         state.velocity = { x: dx, y: dy }; state.lastMouse = p;
       };
       const onUp = () => { state.isDragging = false; };
