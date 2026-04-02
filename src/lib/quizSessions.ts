@@ -89,3 +89,39 @@ export async function claimGuestSession(userId: string): Promise<boolean> {
     return false;
   }
 }
+
+// ─── Core Values (cross-area synthesis) ───────────────────────────────────────
+
+export async function getCoreValues(userId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('core_values')
+    .select('values')
+    .eq('user_id', userId)
+    .single();
+  if (error || !data) return [];
+  return data.values as string[];
+}
+
+export async function saveCoreValues(userId: string, values: string[]): Promise<{ error: Error | null }> {
+  const { error } = await supabase
+    .from('core_values')
+    .upsert(
+      { user_id: userId, values, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    );
+  return { error: error as Error | null };
+}
+
+/** Aggregate all unique values across sessions, ranked by area count */
+export function aggregateValuesAcrossSessions(sessions: QuizSession[]): { value: string; areaCount: number; areas: string[] }[] {
+  const valueMap = new Map<string, Set<string>>();
+  for (const session of sessions) {
+    for (const value of session.final_six_values) {
+      if (!valueMap.has(value)) valueMap.set(value, new Set());
+      valueMap.get(value)!.add(session.area_of_life);
+    }
+  }
+  return Array.from(valueMap.entries())
+    .map(([value, areas]) => ({ value, areaCount: areas.size, areas: Array.from(areas) }))
+    .sort((a, b) => b.areaCount - a.areaCount || a.value.localeCompare(b.value));
+}

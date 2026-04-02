@@ -14,6 +14,7 @@ import DiceProductPopup from "@/components/DiceProductPopup";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
 import EmailMyResults from "@/components/EmailMyResults";
+import CoreValuesSelector from "@/components/CoreValuesSelector";
 import QuizMilestone from "@/components/QuizMilestone";
 import PhaseBanner from "@/components/PhaseBanner";
 import QuizTimer from "@/components/QuizTimer";
@@ -65,6 +66,8 @@ const Quiz = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
   const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [highlightedValue, setHighlightedValue] = useState<string | null>(null);
+  const [confirmedCoreValues, setConfirmedCoreValues] = useState<string[] | null>(null);
 
   // ─── Derived ────────────────────────────────────────────────────────────────
   const areaOfLifeData = useMemo(() => AREAS_OF_LIFE.find((a) => a.id === areaOfLife) ?? null, [areaOfLife]);
@@ -189,10 +192,11 @@ const Quiz = () => {
   };
 
   const rollDice = () => {
-    if (activeValues.length === 0) return;
+    const diceValues = confirmedCoreValues ?? activeValues;
+    if (diceValues.length === 0) return;
     setIsRolling(true);
     trackDiceRolled();
-    const randomDice1 = activeValues[Math.floor(Math.random() * activeValues.length)];
+    const randomDice1 = diceValues[Math.floor(Math.random() * diceValues.length)];
     const randomDice2 = DICE_CONTEXTS[Math.floor(Math.random() * DICE_CONTEXTS.length)];
     window.setTimeout(() => {
       setDice1Result(randomDice1);
@@ -565,16 +569,49 @@ const Quiz = () => {
                 </Button>
               </div>
 
-              {/* Chord Diagram — centered below dice */}
+              {/* Chord Diagram + Values List side by side */}
               <div className="hub-diagram-area">
-                <Suspense fallback={
-                  <div className="flex flex-col items-center gap-3 py-8">
-                    <Skeleton className="h-64 w-64 rounded-full" />
-                    <Skeleton className="h-4 w-32" />
+                <div className="flex gap-4 items-start">
+                  {/* Chord diagram — left */}
+                  <div className="flex-1 min-w-0">
+                    <Suspense fallback={
+                      <div className="flex flex-col items-center gap-3 py-8">
+                        <Skeleton className="h-64 w-64 rounded-full" />
+                        <Skeleton className="h-4 w-32" />
+                      </div>
+                    }>
+                      <ValuesChordDiagram
+                        sessions={userSessions}
+                        activeSessionId={selectedSessionId}
+                        externalHighlight={highlightedValue}
+                      />
+                    </Suspense>
                   </div>
-                }>
-                  <ValuesChordDiagram sessions={userSessions} activeSessionId={selectedSessionId} />
-                </Suspense>
+
+                  {/* Core Values Selector — right of diagram (only when 3+ areas) */}
+                  {completedAreas.length >= 3 && isAuthenticated && user && (
+                    <div className="w-[200px] flex-shrink-0">
+                      <CoreValuesSelector
+                        sessions={userSessions}
+                        userId={user.id}
+                        completedAreas={completedAreas}
+                        onHighlightValue={setHighlightedValue}
+                        onCoreValuesConfirmed={setConfirmedCoreValues}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Core Values teaser — below diagram when < 3 areas */}
+                {completedAreas.length < 3 && completedAreas.length >= 1 && isAuthenticated && user && (
+                  <CoreValuesSelector
+                    sessions={userSessions}
+                    userId={user.id}
+                    completedAreas={completedAreas}
+                    onHighlightValue={setHighlightedValue}
+                    onCoreValuesConfirmed={setConfirmedCoreValues}
+                  />
+                )}
               </div>
 
               {/* Share & Save — below diagram */}

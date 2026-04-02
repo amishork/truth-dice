@@ -5,6 +5,8 @@ import type { QuizSession } from "@/lib/quizSessions";
 interface ValuesChordDiagramProps {
   sessions: QuizSession[];
   activeSessionId: string | null;
+  /** Externally highlighted value (e.g., from CoreValuesSelector hover) */
+  externalHighlight?: string | null;
 }
 
 const AREA_META: Record<string, { label: string; color: string; order: number }> = {
@@ -51,8 +53,11 @@ interface NodeData {
   color: string;
 }
 
-const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activeSessionId }) => {
+const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activeSessionId, externalHighlight }) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+
+  // External highlight takes precedence when set
+  const activeHighlight = externalHighlight ?? selectedValue;
 
   const completedAreas = useMemo(() => {
     const areas = new Set<string>();
@@ -120,13 +125,13 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
 
   // Which areas contain the selected value?
   const highlightedAreas = useMemo(() => {
-    if (!selectedValue) return new Set<string>();
+    if (!activeHighlight) return new Set<string>();
     const areas = new Set<string>();
     nodes.forEach((n) => {
-      if (n.value.toLowerCase() === selectedValue.toLowerCase()) areas.add(n.area);
+      if (n.value.toLowerCase() === activeHighlight?.toLowerCase()) areas.add(n.area);
     });
     return areas;
-  }, [selectedValue, nodes]);
+  }, [activeHighlight, nodes]);
 
   const handleNodeClick = useCallback((value: string) => {
     setSelectedValue((prev) => prev?.toLowerCase() === value.toLowerCase() ? null : value);
@@ -139,7 +144,7 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
   if (sessions.length === 0) return null;
 
   // Clean display name
-  const displayName = selectedValue ? selectedValue.split("(")[0].trim() : "";
+  const displayName = activeHighlight ? activeHighlight.split("(")[0].trim() : "";
 
   return (
     <motion.div
@@ -170,7 +175,7 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
           if (!seg) return null;
           const meta = AREA_META[area];
           const completed = completedAreas.has(area);
-          const isSelected = selectedValue && highlightedAreas.has(area);
+          const isSelected = activeHighlight && highlightedAreas.has(area);
 
           // Arc path for textPath — label follows the curve inside the segment
           const arcId = `arc-${area}`;
@@ -185,7 +190,7 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
                 d={segmentPath(CX, CY, OUTER_R, INNER_R, seg.start, seg.end)}
                 fill={completed ? meta.color : "hsl(0, 0%, 92%)"}
                 opacity={
-                  selectedValue
+                  activeHighlight
                     ? isSelected ? 0.92 : (completed ? 0.15 : 0.08)
                     : completed ? 0.6 : 0.15
                 }
@@ -203,12 +208,12 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
               </defs>
               <text
                 fill={completed ? "hsl(0, 0%, 98%)" : "hsl(0, 0%, 78%)"}
-                fontSize={selectedValue && isSelected ? 8.5 : 7.5}
+                fontSize={activeHighlight && isSelected ? 8.5 : 7.5}
                 fontFamily="Inter, system-ui, sans-serif"
-                fontWeight={selectedValue && isSelected ? 700 : 600}
+                fontWeight={activeHighlight && isSelected ? 700 : 600}
                 letterSpacing="0.14em"
                 opacity={
-                  selectedValue
+                  activeHighlight
                     ? isSelected ? 1 : (completed ? 0.2 : 0.15)
                     : completed ? 0.9 : 0.3
                 }
@@ -227,9 +232,9 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
         })}
 
         {/* Filled curved region between connected chord paths */}
-        {selectedValue && (() => {
+        {activeHighlight && (() => {
           const matchingNodes = nodes
-            .filter(n => n.value.toLowerCase() === selectedValue.toLowerCase())
+            .filter(n => n.value.toLowerCase() === activeHighlight?.toLowerCase())
             .sort((a, b) => a.angle - b.angle);
           if (matchingNodes.length < 2) return null;
           // Build closed path following the actual bezier curves through center
@@ -251,8 +256,8 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
 
         {/* Chords */}
         {chords.map((chord, i) => {
-          const isHighlighted = selectedValue?.toLowerCase() === chord.value.toLowerCase();
-          const opacity = selectedValue
+          const isHighlighted = activeHighlight?.toLowerCase() === chord.value.toLowerCase();
+          const opacity = activeHighlight
             ? isHighlighted ? 0.55 : 0.02
             : 0.12;
 
@@ -271,8 +276,8 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
 
         {/* Value nodes — no labels, just dots */}
         {nodes.map((node, i) => {
-          const isMatch = selectedValue?.toLowerCase() === node.value.toLowerCase();
-          const dimmed = selectedValue && !isMatch;
+          const isMatch = activeHighlight?.toLowerCase() === node.value.toLowerCase();
+          const dimmed = activeHighlight && !isMatch;
 
           return (
             <g key={`node-${i}`}
@@ -309,7 +314,7 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
 
         {/* Center callout label */}
         <AnimatePresence>
-          {selectedValue && (
+          {activeHighlight && (
             <motion.g
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
