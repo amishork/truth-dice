@@ -533,6 +533,13 @@ const Quiz = () => {
                   <p className="text-xs text-muted-foreground leading-relaxed">Complete the values quiz to begin building your profile.</p>
                 </div>
               )}
+
+              {/* What's Next — decision tree for services */}
+              {activeValues.length > 0 && (
+                <div className="hub-sidebar-card">
+                  <WhatsNext coreValues={activeValues} />
+                </div>
+              )}
             </aside>
 
             {/* ─── Col 2: Dice (top) → Diagram → Journey ─── */}
@@ -577,13 +584,6 @@ const Quiz = () => {
                   {!isAuthenticated && (
                     <EmailMyResults values={activeValues} areaLabel={areaLabel} />
                   )}
-                </div>
-              )}
-
-              {/* What's Next — decision tree for services */}
-              {activeValues.length > 0 && (
-                <div className="hub-dice-area mt-4">
-                  <WhatsNext coreValues={activeValues} />
                 </div>
               )}
 
