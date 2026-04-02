@@ -237,7 +237,7 @@ export function useQuizEngine(userId: string | null, gender: "male" | "female" |
     if (section3RunoffIndex < section3RunoffPairs.length - 1) setSection3RunoffIndex((v) => v + 1);
     else {
       trackSection3Complete(section3Winners.length + section3RunoffWinners.length + 1);
-      setStage("section4");
+      setStage("final");
     }
   };
 
@@ -283,7 +283,7 @@ export function useQuizEngine(userId: string | null, gender: "male" | "female" |
         incrementCount(byeValue);
       }
       setSection3Pairs(pairs);
-      if (pairs.length === 0) setStage("section4");
+      if (pairs.length === 0) setStage("final");
     }
   };
 
@@ -299,7 +299,7 @@ export function useQuizEngine(userId: string | null, gender: "male" | "female" |
         incrementCount(byeValue);
       }
       setSection3RunoffPairs(pairs);
-      if (pairs.length === 0) setStage("section4");
+      if (pairs.length === 0) setStage("final");
     }
   };
 

@@ -441,65 +441,53 @@ const Quiz = () => {
         </div>
       )}
 
-      {stage === "section4" && (
-        <div className="min-h-screen bg-background">
-          <Navigation quizMode />
-          <ContextBanner />
-          <div className="mx-auto w-full max-w-3xl px-6 pt-24">
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-foreground">Your top values</h2>
-              <p className="mt-2 text-sm text-muted-foreground">These values won the most battles. The number shows how many times each was selected.</p>
-            </div>
-            <div className="sketch-card overflow-hidden">
-              {[...allWinners].sort((a, b) => (selectionCounts[b] || 0) - (selectionCounts[a] || 0)).map((value, index) => (
-                <div key={`${value}-${index}`} className="flex items-center justify-between border-b border-border px-4 py-3 last:border-b-0">
-                  <div className="flex items-center gap-3">
-                    <span className="label-technical w-6">{String(index + 1).padStart(2, "0")}</span>
-                    <span className="text-foreground">{value}</span>
-                  </div>
-                  <span className="rounded-md border border-border bg-background px-2 py-0.5 text-xs text-foreground">{selectionCounts[value] || 0}</span>
-                </div>
-              ))}
-            </div>
-            <Divider />
-            <Button onClick={() => setStage("final")} size="lg" className="w-full">Continue to final selection <ChevronRight /></Button>
-          </div>
-        </div>
-      )}
-
       {stage === "final" && (
         <div className="min-h-screen bg-background">
           <Navigation quizMode />
-          <ContextBanner />
-          <div className="mx-auto w-full max-w-3xl px-6 pt-24">
-            <div className="mb-4">
-              <h2 className="text-2xl font-semibold text-foreground">Your final 6 values</h2>
-              <p className="mt-4 text-xs text-muted-foreground">{finalSixValues.length} of 6 selected</p>
-            </div>
+          <QuizTop current={1} total={1} />
+          <div className="mx-auto w-full max-w-3xl px-6 mt-6">
             <PhaseBanner text={finalQ} />
-            <div className="sketch-card overflow-hidden mt-6">
+            <p className="text-center text-xs text-muted-foreground mt-3 mb-6">
+              {finalSixValues.length} of 6 selected
+            </p>
+
+            {/* Value card grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {allWinners.map((value, index) => {
                 const isSelected = finalSixValues.includes(value);
                 const isDisabled = !isSelected && finalSixValues.length >= 6;
                 return (
-                  <button key={`${value}-${index}`} onClick={() => handleFinalValueToggle(value)} disabled={isDisabled}
-                    className="quiz-final-row" data-selected={isSelected} data-disabled={isDisabled}
+                  <button
+                    key={`${value}-${index}`}
+                    onClick={() => handleFinalValueToggle(value)}
+                    disabled={isDisabled}
+                    className="quiz-pair-card"
+                    style={{
+                      borderColor: isSelected ? "hsl(350, 78%, 34%)" : undefined,
+                      boxShadow: isSelected
+                        ? "0 0 0 2px hsl(350, 78%, 34%, 0.3), 0 0 12px hsl(350, 78%, 34%, 0.1), 0 4px 12px -2px hsl(0, 0%, 0%, 0.06)"
+                        : undefined,
+                      opacity: isDisabled ? 0.35 : 1,
+                      cursor: isDisabled ? "not-allowed" : "pointer",
+                    }}
                   >
-                    <span className="quiz-final-checkbox" data-checked={isSelected} aria-hidden>
-                      {isSelected ? "✓" : ""}
-                    </span>
-                    <span className="text-sm text-foreground">{value}</span>
+                    {value}
+                    {isSelected && (
+                      <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px]">
+                        ✓
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
+
             {finalSixValues.length === 6 && (
-              <>
-                <Divider />
+              <div className="mt-8">
                 <Button onClick={handlePersistAndContinue} size="lg" className="w-full">
                   Continue to your results <ChevronRight />
                 </Button>
-              </>
+              </div>
             )}
           </div>
         </div>
