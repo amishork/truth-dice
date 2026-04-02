@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { NavLink } from "@/components/NavLink";
 import { Flame, Menu, Moon, Sun } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "./CartDrawer";
+import AuthModal from "./AuthModal";
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/contexts/AuthContext";
@@ -34,8 +36,15 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
   const isDark = theme === "dark";
 
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   return (
+    <>
+    <AuthModal
+      open={showAuthModal}
+      onClose={() => setShowAuthModal(false)}
+      onContinueAsGuest={() => setShowAuthModal(false)}
+    />
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 border-b border-border backdrop-blur-sm transition-all duration-500 ${
         quizMode
@@ -117,13 +126,23 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                   </button>
                 </div>
               ) : (
-                <Button
-                  size="sm"
-                  onClick={() => navigate("/quiz")}
-                  className="hidden md:flex text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Free Values Assessment
-                </Button>
+                <div className="hidden md:flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAuthModal(true)}
+                    className="text-sm font-medium"
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => navigate("/quiz")}
+                    className="text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Free Values Assessment
+                  </Button>
+                </div>
               )}
 
               <div className="md:hidden">
@@ -175,12 +194,20 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                             </button>
                           </>
                         ) : (
-                          <Button
-                            onClick={() => navigate("/quiz")}
-                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                          >
-                            Free Values Assessment
-                          </Button>
+                          <>
+                            <button
+                              onClick={() => setShowAuthModal(true)}
+                              className="text-left text-base font-medium text-muted-foreground"
+                            >
+                              Sign In
+                            </button>
+                            <Button
+                              onClick={() => navigate("/quiz")}
+                              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                            >
+                              Free Values Assessment
+                            </Button>
+                          </>
                         )}
                       </nav>
                     </div>
@@ -192,6 +219,7 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
         )}
       </div>
     </motion.nav>
+    </>
   );
 };
 
