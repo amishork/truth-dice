@@ -5,10 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const SAMPLE_VALUES = ["Love", "Wisdom", "Courage", "Integrity", "Faith", "Purpose"];
 
-const SAMPLE_CONNECTIONS: [number, number][] = [
-  [0, 1], [0, 3], [1, 2], [1, 5], [2, 3], [3, 4], [4, 5], [0, 5],
-];
-
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -16,50 +12,156 @@ const fadeInUp = {
   transition: { duration: 0.6 },
 };
 
-/** Mini chord diagram rendered as SVG — no interactivity, purely illustrative */
-const MiniChordDiagram = () => {
-  const size = 220;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 85;
+/** Static fully-completed chord diagram — illustrative, not interactive */
+const StaticChordDiagram = () => {
+  const S = 260;
+  const CX = S / 2;
+  const CY = S / 2;
+  const OR = 118; // outer ring
+  const IR = 105; // inner ring
+  const NR = 96;  // node radius
 
-  const points = SAMPLE_VALUES.map((_, i) => {
-    const angle = (i / SAMPLE_VALUES.length) * Math.PI * 2 - Math.PI / 2;
-    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  const AREAS = [
+    { label: "Personal", color: "hsl(350,78%,34%)" },
+    { label: "Leader", color: "hsl(0,0%,25%)" },
+    { label: "Spouse", color: "hsl(350,45%,55%)" },
+    { label: "Parent", color: "hsl(350,50%,20%)" },
+    { label: "Children", color: "hsl(35,30%,50%)" },
+    { label: "Family", color: "hsl(350,35%,45%)" },
+    { label: "Friends", color: "hsl(0,0%,42%)" },
+    { label: "Work", color: "hsl(0,0%,30%)" },
+    { label: "Leisure", color: "hsl(20,12%,58%)" },
+  ];
+
+  // Sample values per area (6 per area)
+  const AREA_VALUES = [
+    ["Love", "Integrity", "Faith", "Wisdom", "Growth", "Presence"],
+    ["Integrity", "Courage", "Vision", "Discipline", "Service", "Wisdom"],
+    ["Love", "Loyalty", "Humor", "Patience", "Faith", "Kindness"],
+    ["Integrity", "Patience", "Love", "Discipline", "Wisdom", "Purpose"],
+    ["Integrity", "Kindness", "Courage", "Growth", "Faith", "Joy"],
+    ["Love", "Faith", "Patience", "Integrity", "Loyalty", "Service"],
+    ["Loyalty", "Humor", "Integrity", "Fun", "Courage", "Kindness"],
+    ["Purpose", "Discipline", "Excellence", "Courage", "Growth", "Vision"],
+    ["Joy", "Fun", "Creativity", "Freedom", "Humor", "Adventure"],
+  ];
+
+  const TAU = Math.PI * 2;
+  const GAP = 0.025;
+  const segAngle = TAU / AREAS.length;
+
+  const polar = (r: number, a: number) => ({ x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) });
+
+  const arcPath = (oR: number, iR: number, start: number, end: number) => {
+    const os = polar(oR, start), oe = polar(oR, end);
+    const is_ = polar(iR, start), ie = polar(iR, end);
+    const lg = end - start > Math.PI ? 1 : 0;
+    return `M ${os.x} ${os.y} A ${oR} ${oR} 0 ${lg} 1 ${oe.x} ${oe.y} L ${ie.x} ${ie.y} A ${iR} ${iR} 0 ${lg} 0 ${is_.x} ${is_.y} Z`;
+  };
+
+  // Compute node positions
+  type Node = { value: string; x: number; y: number; areaIdx: number; isHighlighted: boolean };
+  const nodes: Node[] = [];
+
+  AREAS.forEach((_, aIdx) => {
+    const segStart = aIdx * segAngle - Math.PI / 2 + GAP;
+    const segEnd = (aIdx + 1) * segAngle - Math.PI / 2 - GAP;
+    const vals = AREA_VALUES[aIdx];
+    vals.forEach((v, vIdx) => {
+      const t = (vIdx + 0.5) / vals.length;
+      const angle = segStart + (segEnd - segStart) * t;
+      const pos = polar(NR, angle);
+      nodes.push({ value: v, x: pos.x, y: pos.y, areaIdx: aIdx, isHighlighted: v === "Integrity" });
+    });
   });
 
+  // "Integrity" nodes — connected across areas
+  const highlightedNodes = nodes.filter((n) => n.isHighlighted);
+
+  // Build chord paths between highlighted nodes
+  const chords: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  for (let i = 0; i < highlightedNodes.length; i++) {
+    for (let j = i + 1; j < highlightedNodes.length; j++) {
+      chords.push({
+        x1: highlightedNodes[i].x, y1: highlightedNodes[i].y,
+        x2: highlightedNodes[j].x, y2: highlightedNodes[j].y,
+      });
+    }
+  }
+
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[220px] mx-auto">
-      {/* Connection lines */}
-      {SAMPLE_CONNECTIONS.map(([a, b], i) => (
-        <motion.line
+    <svg viewBox={`0 0 ${S} ${S}`} className="w-full max-w-[240px] mx-auto" aria-label="Values chord diagram preview">
+      {/* Area arc segments */}
+      {AREAS.map((area, i) => {
+        const start = i * segAngle - Math.PI / 2 + GAP;
+        const end = (i + 1) * segAngle - Math.PI / 2 - GAP;
+        const hasHighlight = AREA_VALUES[i].includes("Integrity");
+        return (
+          <path
+            key={area.label}
+            d={arcPath(OR, IR, start, end)}
+            fill={area.color}
+            opacity={hasHighlight ? 0.85 : 0.2}
+          />
+        );
+      })}
+
+      {/* Non-highlighted chords (faint connections between other shared values) */}
+      {nodes.filter(n => n.value === "Love").length > 1 && (() => {
+        const loveNodes = nodes.filter(n => n.value === "Love");
+        return loveNodes.map((n, i) =>
+          loveNodes.slice(i + 1).map((m, j) => (
+            <line key={`love-${i}-${j}`} x1={n.x} y1={n.y} x2={m.x} y2={m.y}
+              stroke="hsl(350,78%,34%)" strokeWidth={0.5} opacity={0.08} />
+          ))
+        );
+      })()}
+      {nodes.filter(n => n.value === "Faith").length > 1 && (() => {
+        const faithNodes = nodes.filter(n => n.value === "Faith");
+        return faithNodes.map((n, i) =>
+          faithNodes.slice(i + 1).map((m, j) => (
+            <line key={`faith-${i}-${j}`} x1={n.x} y1={n.y} x2={m.x} y2={m.y}
+              stroke="hsl(350,78%,34%)" strokeWidth={0.5} opacity={0.06} />
+          ))
+        );
+      })()}
+
+      {/* Highlighted chords — "Integrity" across 6 areas */}
+      {chords.map((c, i) => {
+        const mx = (c.x1 + c.x2) / 2;
+        const my = (c.y1 + c.y2) / 2;
+        const cpx = CX + (mx - CX) * 0.3;
+        const cpy = CY + (my - CY) * 0.3;
+        return (
+          <path
+            key={`chord-${i}`}
+            d={`M ${c.x1} ${c.y1} Q ${cpx} ${cpy} ${c.x2} ${c.y2}`}
+            fill="none"
+            stroke="hsl(350,78%,34%)"
+            strokeWidth={1.2}
+            opacity={0.35}
+          />
+        );
+      })}
+
+      {/* All value nodes */}
+      {nodes.map((node, i) => (
+        <circle
           key={i}
-          x1={points[a].x} y1={points[a].y}
-          x2={points[b].x} y2={points[b].y}
-          stroke="hsl(350, 78%, 34%)"
-          strokeWidth={1.5}
-          strokeOpacity={0.25}
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 + i * 0.08 }}
+          cx={node.x} cy={node.y}
+          r={node.isHighlighted ? 4 : 2.5}
+          fill={node.isHighlighted ? "hsl(350,78%,34%)" : AREAS[node.areaIdx].color}
+          opacity={node.isHighlighted ? 1 : 0.3}
         />
       ))}
-      {/* Value nodes */}
-      {points.map((pt, i) => (
-        <motion.g
-          key={SAMPLE_VALUES[i]}
-          initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.2 + i * 0.06 }}
-        >
-          <circle cx={pt.x} cy={pt.y} r={20} fill="hsl(350, 78%, 34%)" fillOpacity={0.1} stroke="hsl(350, 78%, 34%)" strokeWidth={1.5} strokeOpacity={0.4} />
-          <text x={pt.x} y={pt.y + 1} textAnchor="middle" dominantBaseline="central" fill="hsl(350, 78%, 34%)" fontSize={8} fontWeight={600} fontFamily="Inter, sans-serif">
-            {SAMPLE_VALUES[i]}
-          </text>
-        </motion.g>
-      ))}
+
+      {/* Center label for highlighted value */}
+      <text x={CX} y={CY - 4} textAnchor="middle" fill="hsl(350,78%,34%)" fontSize={10} fontWeight={700} fontFamily="Inter, sans-serif">
+        Integrity
+      </text>
+      <text x={CX} y={CY + 8} textAnchor="middle" fill="hsl(350,78%,34%)" fontSize={6} fontWeight={500} fontFamily="Inter, sans-serif" opacity={0.6}>
+        ACROSS 6 AREAS
+      </text>
     </svg>
   );
 };
@@ -118,7 +220,7 @@ const QuizPreview = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <MiniChordDiagram />
+            <StaticChordDiagram />
             <p className="mt-4 text-sm font-semibold text-foreground">Values Profile</p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
               See how your values connect across different areas of life with an interactive diagram.
