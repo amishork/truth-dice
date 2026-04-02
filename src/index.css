@@ -988,15 +988,15 @@
   }
 }
 
-/* Dice area — constrained width, centered */
+/* Dice area — fill center column */
 .hub-dice-area {
-  max-width: 340px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
-/* Diagram area — can be wider */
+/* Diagram area — fill center column */
 .hub-diagram-area {
-  max-width: 420px;
+  max-width: 100%;
   margin: 1rem auto 0;
 }
 

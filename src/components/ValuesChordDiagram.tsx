@@ -143,7 +143,7 @@ const ValuesChordDiagram: React.FC<ValuesChordDiagramProps> = ({ sessions, activ
 
   return (
     <motion.div
-      className="relative mx-auto w-full max-w-md aspect-square"
+      className="relative mx-auto w-full max-w-lg aspect-square"
       initial={{ opacity: 0, scale: 0.85 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}

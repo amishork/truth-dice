@@ -569,7 +569,7 @@ const Quiz = () => {
               <div className="hub-diagram-area">
                 <Suspense fallback={
                   <div className="flex flex-col items-center gap-3 py-8">
-                    <Skeleton className="h-48 w-48 rounded-full" />
+                    <Skeleton className="h-64 w-64 rounded-full" />
                     <Skeleton className="h-4 w-32" />
                   </div>
                 }>
