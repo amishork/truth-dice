@@ -66,43 +66,35 @@ const MiniChordDiagram = () => {
 
 /** Mini values card — matches the ShareableValuesCard visual */
 const MiniValuesCard = () => (
-  <div className="relative overflow-hidden rounded-lg border border-[#C8C4BE] bg-white p-1">
-    <div className="border border-[#1A1A1A]/60 px-4 py-4 text-center">
-      {/* Cross-hatch band */}
-      <div
-        className="absolute top-1 left-1 right-1 h-2 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px), repeating-linear-gradient(-45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px)",
-        }}
-      />
-      <div className="mx-auto mb-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-[#C8C4BE]/50">
-        <svg width="10" height="13" viewBox="0 0 16 20" fill="#9B1B3A">
-          <path d="M8 0C6 4 2 8 4 14C5 17 7 16 8 14C9 16 11 17 12 14C14 8 10 4 8 0Z" />
-        </svg>
+  <div
+    className="relative bg-[#FAFAF8] rounded-md overflow-hidden"
+    style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.03)" }}
+  >
+    <div className="relative p-1.5">
+      {/* Corner marks */}
+      <div className="absolute top-1 left-1 w-2 h-2 border-l border-t border-[#D4D0C8]" />
+      <div className="absolute top-1 right-1 w-2 h-2 border-r border-t border-[#D4D0C8]" />
+      <div className="absolute bottom-1 left-1 w-2 h-2 border-l border-b border-[#D4D0C8]" />
+      <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-[#D4D0C8]" />
+
+      <div className="border border-[#1C1C1C]/50 px-3 py-3 text-center">
+        <Flame className="mx-auto h-3.5 w-3.5 text-[#9B1B3A] mb-1.5" strokeWidth={1.8} />
+        <p style={{ fontSize: "7px", letterSpacing: "0.25em" }} className="font-semibold uppercase text-[#1C1C1C]">Words Incarnate</p>
+        <p style={{ fontSize: "5.5px", letterSpacing: "0.2em" }} className="font-semibold uppercase text-[#9B1B3A] mt-px">My Core Values</p>
+        <div className="flex items-center gap-1 my-2 px-1">
+          <div className="flex-1 h-px bg-[#1C1C1C]/40" />
+          <div className="h-1 w-1 rotate-45 bg-[#9B1B3A]" />
+          <div className="flex-1 h-px bg-[#1C1C1C]/40" />
+        </div>
+        <div className="space-y-1">
+          {SAMPLE_VALUES.map((value) => (
+            <p key={value} style={{ fontSize: "9px", letterSpacing: "0.12em" }} className="font-semibold uppercase text-[#1C1C1C]">{value}</p>
+          ))}
+        </div>
+        <div className="h-px bg-[#1C1C1C]/20 mt-2 mb-1 mx-1" />
+        <p style={{ fontSize: "5px", letterSpacing: "0.18em" }} className="font-mono uppercase text-[#B0ACA4]">wordsincarnate.com</p>
       </div>
-      <p className="text-[8px] font-extrabold tracking-[0.2em] uppercase text-[#1A1A1A]">WORDS INCARNATE</p>
-      <p className="mt-px text-[7px] font-bold tracking-[0.15em] uppercase text-[#9B1B3A]">MY CORE VALUES</p>
-      <div className="relative mt-2 mb-2 flex items-center justify-center">
-        <div className="h-px flex-1 bg-[#1A1A1A]/50" />
-        <div className="mx-1.5 h-1.5 w-1.5 rotate-45 bg-[#9B1B3A]" />
-        <div className="h-px flex-1 bg-[#1A1A1A]/50" />
-      </div>
-      <div className="space-y-1.5">
-        {SAMPLE_VALUES.map((value) => (
-          <div key={value} className="text-center">
-            <span className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[#1A1A1A]">{value}</span>
-          </div>
-        ))}
-      </div>
-      <div className="mt-2.5 h-px bg-[#1A1A1A]/25" />
-      <p className="mt-1.5 text-[6px] font-mono tracking-[0.12em] text-[#9E9A93] uppercase">wordsincarnate.com</p>
     </div>
-    {/* Corner marks */}
-    <div className="absolute top-0.5 left-0.5 h-2 w-2 border-l border-t border-[#C8C4BE]" />
-    <div className="absolute top-0.5 right-0.5 h-2 w-2 border-r border-t border-[#C8C4BE]" />
-    <div className="absolute bottom-0.5 left-0.5 h-2 w-2 border-l border-b border-[#C8C4BE]" />
-    <div className="absolute bottom-0.5 right-0.5 h-2 w-2 border-r border-b border-[#C8C4BE]" />
   </div>
 );
 

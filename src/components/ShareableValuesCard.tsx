@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Share2 } from "lucide-react";
+import { Download, Share2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { trackResultsShared } from "@/lib/analytics";
@@ -9,13 +9,19 @@ interface ShareableValuesCardProps {
   values: string[];
 }
 
-// ─── Style Constitution Colors ────────────────────────────────────────────────
-const WHITE = "#FFFFFF";
-const PENCIL = "#C8C4BE";       // Layer 1: construction lines
-const PEN = "#1A1A1A";          // Layer 2: commitment lines
-const HATCH = "#9E9A93";        // Layer 3: cross-hatching
-const RED = "#9B1B3A";          // Layer 4: accent (deep cherry/maroon)
-const LIGHT_PENCIL = "#DBD8D2"; // Faint construction geometry
+// ─── Style Constitution Palette ───────────────────────────────────────────────
+const C = {
+  white: "#FFFFFF",
+  paper: "#FAFAF8",      // Warm white paper
+  pencil: "#D4D0C8",     // Layer 1
+  pencilFaint: "#E8E5DF",
+  pen: "#1C1C1C",        // Layer 2
+  hatch: "#B0ACA4",      // Layer 3
+  red: "#9B1B3A",        // Layer 4
+};
+
+// Lucide Flame path at 24x24 viewBox
+const FLAME_PATH = "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z";
 
 const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -23,217 +29,189 @@ const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => 
 
   const generateImage = async (): Promise<HTMLCanvasElement> => {
     const canvas = document.createElement("canvas");
-    const scale = 2;
+    const scale = 3; // High DPI
     const w = 600;
-    const h = 840;
+    const h = 800;
     canvas.width = w * scale;
     canvas.height = h * scale;
     const ctx = canvas.getContext("2d")!;
     ctx.scale(scale, scale);
 
-    // ─── Layer 0: White paper ──────────────────────────────────────────
-    ctx.fillStyle = WHITE;
+    // ─── Paper ─────────────────────────────────────────────────────────
+    ctx.fillStyle = C.paper;
     ctx.fillRect(0, 0, w, h);
 
-    // ─── Layer 1: Construction geometry (pencil) ───────────────────────
-    ctx.strokeStyle = LIGHT_PENCIL;
-    ctx.lineWidth = 0.5;
+    // ─── Layer 1: Construction (pencil) — minimal, purposeful ─────────
+    ctx.strokeStyle = C.pencilFaint;
+    ctx.lineWidth = 0.4;
 
-    // Vertical center line (extends past edges)
+    // Single vertical center axis — faint, extends past frame
     ctx.beginPath();
-    ctx.moveTo(w / 2, -20);
-    ctx.lineTo(w / 2, h + 20);
+    ctx.moveTo(w / 2, 24);
+    ctx.lineTo(w / 2, h - 24);
     ctx.stroke();
 
-    // Horizontal construction lines (extending past frame)
-    const constructionYs = [80, 130, 175, 210];
-    for (const y of constructionYs) {
+    // Two horizontal construction lines framing the header zone
+    for (const y of [115, 190]) {
       ctx.beginPath();
-      ctx.moveTo(-10, y);
-      ctx.lineTo(w + 10, y);
+      ctx.moveTo(50, y);
+      ctx.lineTo(w - 50, y);
       ctx.stroke();
     }
 
-    // Circle construction arc behind title area
-    ctx.strokeStyle = PENCIL;
-    ctx.lineWidth = 0.4;
+    // Construction circle — single, centered on flame
+    ctx.strokeStyle = C.pencil;
+    ctx.lineWidth = 0.35;
     ctx.beginPath();
-    ctx.arc(w / 2, 105, 55, 0, Math.PI * 2);
+    ctx.arc(w / 2, 82, 32, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Larger outer construction circle
-    ctx.strokeStyle = LIGHT_PENCIL;
-    ctx.lineWidth = 0.3;
-    ctx.beginPath();
-    ctx.arc(w / 2, 105, 80, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Corner construction marks (architectural registration)
-    const markLen = 18;
-    const inset = 35;
-    ctx.strokeStyle = PENCIL;
+    // Corner registration marks — precise L-shapes
+    ctx.strokeStyle = C.pencil;
     ctx.lineWidth = 0.5;
-    const corners: [number, number, number, number][] = [
-      [inset, inset, 1, 1],
-      [w - inset, inset, -1, 1],
-      [inset, h - inset, 1, -1],
-      [w - inset, h - inset, -1, -1],
-    ];
-    for (const [cx, cy, dx, dy] of corners) {
+    const reg = 42;
+    const regLen = 14;
+    for (const [x, y, dx, dy] of [
+      [reg, reg, 1, 1], [w - reg, reg, -1, 1],
+      [reg, h - reg, 1, -1], [w - reg, h - reg, -1, -1],
+    ] as [number, number, number, number][]) {
       ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + markLen * dx, cy);
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx, cy + markLen * dy);
+      ctx.moveTo(x + regLen * dx, y);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x, y + regLen * dy);
       ctx.stroke();
     }
 
-    // ─── Layer 2: Commitment lines (pen) ───────────────────────────────
-    // Main frame border
-    ctx.strokeStyle = PEN;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(40, 40, w - 80, h - 80);
-
-    // Inner frame (thinner)
-    ctx.strokeStyle = PEN;
-    ctx.lineWidth = 0.4;
-    ctx.strokeRect(46, 46, w - 92, h - 92);
-
-    // Horizontal rule below header
-    ctx.strokeStyle = PEN;
+    // ─── Layer 2: Commitment (pen) — clean, confident ──────────────────
+    // Outer frame
+    ctx.strokeStyle = C.pen;
     ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(80, 210);
-    ctx.lineTo(w - 80, 210);
-    ctx.stroke();
+    ctx.strokeRect(48, 48, w - 96, h - 96);
 
-    // Diamond at center of rule
-    ctx.fillStyle = RED;
+    // Flame icon — using Lucide path, centered
     ctx.save();
-    ctx.translate(w / 2, 210);
-    ctx.rotate(Math.PI / 4);
-    ctx.fillRect(-4, -4, 8, 8);
+    ctx.translate(w / 2 - 14, 62);
+    ctx.scale(1.15, 1.15);
+    ctx.fillStyle = C.red;
+    const flamePath = new Path2D(FLAME_PATH);
+    ctx.fill(flamePath);
     ctx.restore();
 
-    // Horizontal rule above footer
-    ctx.strokeStyle = PEN;
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(80, h - 105);
-    ctx.lineTo(w - 80, h - 105);
-    ctx.stroke();
-
-    // ─── Layer 3: Cross-hatching accents ───────────────────────────────
-    // Top band
-    ctx.strokeStyle = HATCH;
-    ctx.lineWidth = 0.3;
-    ctx.globalAlpha = 0.18;
-    for (let x = 42; x < w - 42; x += 4) {
-      ctx.beginPath();
-      ctx.moveTo(x, 42);
-      ctx.lineTo(x + 12, 58);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x + 12, 42);
-      ctx.lineTo(x, 58);
-      ctx.stroke();
-    }
-    // Bottom band
-    ctx.globalAlpha = 0.12;
-    for (let x = 42; x < w - 42; x += 4) {
-      ctx.beginPath();
-      ctx.moveTo(x, h - 58);
-      ctx.lineTo(x + 12, h - 42);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x + 12, h - 58);
-      ctx.lineTo(x, h - 42);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
-    // ─── Layer 4: Red accents + text ───────────────────────────────────
-    // Red circle marker behind flame
-    ctx.fillStyle = RED;
-    ctx.globalAlpha = 0.12;
-    ctx.beginPath();
-    ctx.arc(w / 2, 105, 24, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Geometric flame
-    ctx.fillStyle = RED;
-    ctx.beginPath();
-    ctx.moveTo(w / 2, 82);
-    ctx.bezierCurveTo(w / 2 - 7, 93, w / 2 - 14, 108, w / 2 - 9, 120);
-    ctx.bezierCurveTo(w / 2 - 5, 126, w / 2, 123, w / 2, 119);
-    ctx.bezierCurveTo(w / 2, 123, w / 2 + 5, 126, w / 2 + 9, 120);
-    ctx.bezierCurveTo(w / 2 + 14, 108, w / 2 + 7, 93, w / 2, 82);
-    ctx.fill();
-
-    // Brand name
-    ctx.fillStyle = PEN;
-    ctx.font = "800 13px 'Inter', system-ui, sans-serif";
+    // Brand name — tracked uppercase
+    ctx.fillStyle = C.pen;
+    ctx.font = "700 11.5px 'Inter', 'Helvetica Neue', system-ui, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("W O R D S   I N C A R N A T E", w / 2, 158);
+    ctx.fillText("W O R D S   I N C A R N A T E", w / 2, 128);
 
     // Subtitle
-    ctx.fillStyle = RED;
-    ctx.font = "700 9px 'Inter', system-ui, sans-serif";
-    ctx.fillText("M Y   C O R E   V A L U E S", w / 2, 180);
+    ctx.fillStyle = C.red;
+    ctx.font = "600 8px 'Inter', 'Helvetica Neue', system-ui, sans-serif";
+    ctx.fillText("M Y   C O R E   V A L U E S", w / 2, 146);
+
+    // Header separator — thin line, small red diamond
+    const sepY = 172;
+    ctx.strokeStyle = C.pen;
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(90, sepY);
+    ctx.lineTo(w / 2 - 8, sepY);
+    ctx.moveTo(w / 2 + 8, sepY);
+    ctx.lineTo(w - 90, sepY);
+    ctx.stroke();
+
+    ctx.fillStyle = C.red;
+    ctx.save();
+    ctx.translate(w / 2, sepY);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-3.5, -3.5, 7, 7);
+    ctx.restore();
 
     // ─── Values list ───────────────────────────────────────────────────
-    const startY = 258;
-    const spacing = 70;
+    const listTop = 218;
+    const spacing = 76;
+
     values.forEach((value, i) => {
-      const y = startY + i * spacing;
+      const y = listTop + i * spacing;
 
-      // Number (pencil)
-      ctx.fillStyle = PENCIL;
-      ctx.font = "500 9px 'Courier New', monospace";
+      // Number — small, monospace, pencil gray
+      ctx.fillStyle = C.pencil;
+      ctx.font = "400 8px 'Courier New', 'SF Mono', monospace";
       ctx.textAlign = "center";
-      ctx.fillText(String(i + 1).padStart(2, "0"), w / 2, y - 4);
+      ctx.fillText(String(i + 1).padStart(2, "0"), w / 2, y);
 
-      // Value text (pen)
-      ctx.fillStyle = PEN;
-      ctx.font = "600 17px 'Inter', system-ui, sans-serif";
-      const spaced = value.toUpperCase().split("").join(" ");
-      // Measure and fall back to unspaced if too wide
-      const textWidth = ctx.measureText(spaced).width;
-      ctx.fillText(textWidth < w - 160 ? spaced : value.toUpperCase(), w / 2, y + 18);
+      // Value name — strong, tracked
+      ctx.fillStyle = C.pen;
+      ctx.font = "600 18px 'Inter', 'Helvetica Neue', system-ui, sans-serif";
+      // Add letter spacing by manually spacing
+      const text = value.toUpperCase();
+      const measured = ctx.measureText(text).width;
+      if (measured < w - 200) {
+        // Draw with letter spacing
+        const chars = text.split("");
+        const letterSpacing = 2.5;
+        const totalWidth = measured + (chars.length - 1) * letterSpacing;
+        let cx = w / 2 - totalWidth / 2;
+        ctx.textAlign = "left";
+        for (const char of chars) {
+          ctx.fillText(char, cx, y + 22);
+          cx += ctx.measureText(char).width + letterSpacing;
+        }
+        ctx.textAlign = "center";
+      } else {
+        ctx.fillText(text, w / 2, y + 22);
+      }
 
-      // Pencil separator
+      // Subtle separator between values
       if (i < values.length - 1) {
-        ctx.strokeStyle = LIGHT_PENCIL;
-        ctx.lineWidth = 0.4;
+        ctx.strokeStyle = C.pencilFaint;
+        ctx.lineWidth = 0.3;
         ctx.beginPath();
-        ctx.moveTo(w / 2 - 80, y + 44);
-        ctx.lineTo(w / 2 + 80, y + 44);
+        ctx.moveTo(w / 2 - 60, y + 52);
+        ctx.lineTo(w / 2 + 60, y + 52);
         ctx.stroke();
       }
     });
 
-    // Small red accent dots flanking values
-    ctx.fillStyle = RED;
-    ctx.beginPath();
-    ctx.arc(w / 2 - 140, startY + 10, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(w / 2 + 140, startY + (values.length - 1) * spacing + 10, 2.5, 0, Math.PI * 2);
-    ctx.fill();
+    // ─── Layer 3: Hatching — subtle top/bottom bands inside frame ──────
+    ctx.globalAlpha = 0.06;
+    ctx.strokeStyle = C.hatch;
+    ctx.lineWidth = 0.5;
+    // Top band (inside frame, thin strip)
+    for (let x = 50; x < w - 50; x += 5) {
+      ctx.beginPath();
+      ctx.moveTo(x, 50);
+      ctx.lineTo(x + 6, 56);
+      ctx.stroke();
+    }
+    // Bottom band
+    for (let x = 50; x < w - 50; x += 5) {
+      ctx.beginPath();
+      ctx.moveTo(x, h - 56);
+      ctx.lineTo(x + 6, h - 50);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
 
     // ─── Footer ────────────────────────────────────────────────────────
-    ctx.fillStyle = HATCH;
-    ctx.font = "500 8px 'Courier New', monospace";
+    // Bottom separator
+    ctx.strokeStyle = C.pen;
+    ctx.lineWidth = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(90, h - 100);
+    ctx.lineTo(w - 90, h - 100);
+    ctx.stroke();
+
+    ctx.fillStyle = C.hatch;
+    ctx.font = "500 7.5px 'Courier New', 'SF Mono', monospace";
     ctx.textAlign = "center";
-    ctx.fillText("W O R D S I N C A R N A T E . C O M", w / 2, h - 74);
+    ctx.fillText("W O R D S I N C A R N A T E . C O M", w / 2, h - 76);
 
     const date = new Date()
       .toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
       .toUpperCase();
-    ctx.fillStyle = PENCIL;
-    ctx.font = "400 7px 'Courier New', monospace";
-    ctx.fillText(date, w / 2, h - 60);
+    ctx.fillStyle = C.pencil;
+    ctx.font = "400 6.5px 'Courier New', 'SF Mono', monospace";
+    ctx.fillText(date, w / 2, h - 62);
 
     return canvas;
   };
@@ -291,83 +269,116 @@ const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => 
     >
       <p className="label-technical">Share your values</p>
 
-      {/* Preview card — Style Constitution aesthetic */}
+      {/* ─── Preview card ─── */}
       <div
         ref={cardRef}
-        className="relative overflow-hidden rounded-lg border border-[#C8C4BE] bg-white p-1.5"
+        className="relative bg-[#FAFAF8] rounded-md overflow-hidden"
+        style={{
+          boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)",
+        }}
       >
-        {/* Inner frame */}
-        <div className="relative border border-[#1A1A1A]/70 px-6 py-5 text-center">
-          {/* Cross-hatch band top */}
-          <div
-            className="absolute top-0 left-0 right-0 h-3 opacity-[0.08]"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px), repeating-linear-gradient(-45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px)",
-            }}
-          />
-
-          {/* Construction circle + flame */}
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-[#C8C4BE]/50">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#9B1B3A]/10">
-              <svg width="14" height="18" viewBox="0 0 16 20" fill="#9B1B3A">
-                <path d="M8 0C6 4 2 8 4 14C5 17 7 16 8 14C9 16 11 17 12 14C14 8 10 4 8 0Z" />
-              </svg>
-            </div>
+        {/* Outer padding with corner marks */}
+        <div className="relative p-3">
+          {/* Corner registration marks */}
+          <div className="absolute top-2 left-2 w-3 h-3">
+            <div className="absolute top-0 left-0 w-full h-px bg-[#D4D0C8]" />
+            <div className="absolute top-0 left-0 w-px h-full bg-[#D4D0C8]" />
+          </div>
+          <div className="absolute top-2 right-2 w-3 h-3">
+            <div className="absolute top-0 right-0 w-full h-px bg-[#D4D0C8]" />
+            <div className="absolute top-0 right-0 w-px h-full bg-[#D4D0C8]" />
+          </div>
+          <div className="absolute bottom-2 left-2 w-3 h-3">
+            <div className="absolute bottom-0 left-0 w-full h-px bg-[#D4D0C8]" />
+            <div className="absolute bottom-0 left-0 w-px h-full bg-[#D4D0C8]" />
+          </div>
+          <div className="absolute bottom-2 right-2 w-3 h-3">
+            <div className="absolute bottom-0 right-0 w-full h-px bg-[#D4D0C8]" />
+            <div className="absolute bottom-0 right-0 w-px h-full bg-[#D4D0C8]" />
           </div>
 
-          {/* Brand */}
-          <p className="text-[10px] font-extrabold tracking-[0.22em] uppercase text-[#1A1A1A]">
-            WORDS INCARNATE
-          </p>
-          <p className="mt-0.5 text-[8px] font-bold tracking-[0.18em] uppercase text-[#9B1B3A]">
-            MY CORE VALUES
-          </p>
+          {/* Inner frame */}
+          <div className="border border-[#1C1C1C]/60 px-5 py-6">
+            {/* Subtle hatch band at top */}
+            <div
+              className="absolute top-3 left-3 right-3 h-[5px] opacity-[0.04]"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, #B0ACA4 0px, #B0ACA4 0.5px, transparent 0.5px, transparent 4px)",
+              }}
+            />
 
-          {/* Rule with diamond */}
-          <div className="relative mt-3 mb-4 flex items-center justify-center">
-            <div className="h-px flex-1 bg-[#1A1A1A]/60" />
-            <div className="mx-2 h-2 w-2 rotate-45 bg-[#9B1B3A]" />
-            <div className="h-px flex-1 bg-[#1A1A1A]/60" />
-          </div>
-
-          {/* Values */}
-          <div className="space-y-2.5">
-            {values.map((value, i) => (
-              <div key={`${value}-${i}`} className="text-center">
-                <p className="text-[7px] font-mono text-[#C8C4BE] tracking-wider">
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <p className="text-[12px] font-semibold tracking-[0.14em] uppercase text-[#1A1A1A] mt-px">
-                  {value}
-                </p>
+            {/* Flame icon — matches nav */}
+            <div className="flex justify-center mb-3">
+              <div className="relative">
+                {/* Construction circle behind flame */}
+                <div className="absolute inset-0 -m-2 rounded-full border border-[#E8E5DF]" />
+                <Flame className="h-5 w-5 text-[#9B1B3A]" strokeWidth={1.8} />
               </div>
-            ))}
+            </div>
+
+            {/* Brand */}
+            <p
+              className="text-center font-semibold uppercase text-[#1C1C1C]"
+              style={{ fontSize: "10px", letterSpacing: "0.28em" }}
+            >
+              Words Incarnate
+            </p>
+            <p
+              className="text-center font-semibold uppercase text-[#9B1B3A] mt-0.5"
+              style={{ fontSize: "7px", letterSpacing: "0.22em" }}
+            >
+              My Core Values
+            </p>
+
+            {/* Separator with diamond */}
+            <div className="flex items-center gap-1.5 my-3 px-2">
+              <div className="flex-1 h-px bg-[#1C1C1C]/50" />
+              <div className="h-[5px] w-[5px] rotate-45 bg-[#9B1B3A]" />
+              <div className="flex-1 h-px bg-[#1C1C1C]/50" />
+            </div>
+
+            {/* Values */}
+            <div className="space-y-2 py-1">
+              {values.map((value, i) => (
+                <div key={`${value}-${i}`} className="text-center">
+                  <p
+                    className="font-mono text-[#D4D0C8]"
+                    style={{ fontSize: "6px", letterSpacing: "0.15em" }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
+                  <p
+                    className="font-semibold uppercase text-[#1C1C1C] -mt-px"
+                    style={{ fontSize: "12px", letterSpacing: "0.16em" }}
+                  >
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom separator */}
+            <div className="h-px bg-[#1C1C1C]/30 mt-3 mb-2 mx-2" />
+
+            {/* Footer */}
+            <p
+              className="text-center font-mono uppercase text-[#B0ACA4]"
+              style={{ fontSize: "6px", letterSpacing: "0.2em" }}
+            >
+              wordsincarnate.com
+            </p>
+
+            {/* Subtle hatch band at bottom */}
+            <div
+              className="absolute bottom-3 left-3 right-3 h-[5px] opacity-[0.03]"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, #B0ACA4 0px, #B0ACA4 0.5px, transparent 0.5px, transparent 4px)",
+              }}
+            />
           </div>
-
-          {/* Bottom rule */}
-          <div className="mt-4 h-px bg-[#1A1A1A]/30" />
-
-          {/* Footer */}
-          <p className="mt-2 text-[7px] font-mono tracking-[0.15em] text-[#9E9A93] uppercase">
-            wordsincarnate.com
-          </p>
-
-          {/* Cross-hatch band bottom */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-3 opacity-[0.05]"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px), repeating-linear-gradient(-45deg, transparent, transparent 2px, #9E9A93 2px, #9E9A93 2.5px)",
-            }}
-          />
         </div>
-
-        {/* Construction corner marks */}
-        <div className="absolute top-1 left-1 h-3 w-3 border-l border-t border-[#C8C4BE]" />
-        <div className="absolute top-1 right-1 h-3 w-3 border-r border-t border-[#C8C4BE]" />
-        <div className="absolute bottom-1 left-1 h-3 w-3 border-l border-b border-[#C8C4BE]" />
-        <div className="absolute bottom-1 right-1 h-3 w-3 border-r border-b border-[#C8C4BE]" />
       </div>
 
       {/* Action buttons */}
