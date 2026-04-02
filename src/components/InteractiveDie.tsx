@@ -30,12 +30,12 @@ function createFaceTexture(text: string, variant: "light" | "dark"): THREE.Canva
   const isLight = variant === "light";
 
   // Clean flat fill
-  ctx.fillStyle = isLight ? "#FAFAF8" : "#1A1A1A";
+  ctx.fillStyle = isLight ? "#FAFAF8" : "#000000";
   ctx.fillRect(0, 0, res, res);
 
   // Text — large, bold, crisp
   const upperText = text.toUpperCase();
-  ctx.fillStyle = isLight ? "#1A1A1A" : "#F0EDE8";
+  ctx.fillStyle = isLight ? "#000000" : "#F0EDE8";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
@@ -137,7 +137,7 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       cleanup();
       const container = mountRef.current;
       const isLight = variant === "light";
-      const edgeColor = isLight ? 0x1a1a1a : 0xe0dcd8;
+      const edgeColor = isLight ? 0x000000 : 0xe0dcd8;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
@@ -161,7 +161,7 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       );
 
       const boxSize = 1.45;
-      const geo = new THREE.BoxGeometry(boxSize, boxSize, boxSize, 1, 1, 1);
+      const geo = new THREE.BoxGeometry(boxSize, boxSize, boxSize, 8, 8, 8);
 
       // Rounded corners via vertex manipulation
       const rr = 0.14;
