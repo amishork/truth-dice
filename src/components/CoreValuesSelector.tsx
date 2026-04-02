@@ -31,21 +31,11 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const rankedValues = useMemo(
-    () => aggregateValuesAcrossSessions(sessions),
-    [sessions]
-  );
+  const rankedValues = useMemo(() => aggregateValuesAcrossSessions(sessions), [sessions]);
+  const preSuggested = useMemo(() => new Set(rankedValues.slice(0, 6).map((v) => v.value)), [rankedValues]);
 
-  const preSuggested = useMemo(
-    () => new Set(rankedValues.slice(0, 6).map((v) => v.value)),
-    [rankedValues]
-  );
+  useEffect(() => { onSelectionChange?.(selectedValues, isLocked && !isEditing); }, [selectedValues, isLocked, isEditing]);
 
-  useEffect(() => {
-    onSelectionChange?.(selectedValues, isLocked && !isEditing);
-  }, [selectedValues, isLocked, isEditing]);
-
-  // Load saved core values
   useEffect(() => {
     if (!userId) { setLoading(false); return; }
     getCoreValues(userId).then((saved) => {
@@ -58,7 +48,7 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
     });
   }, [userId]);
 
-  // Auto-lock on first 6 selection (not editing)
+  // Auto-lock on first 6 selection
   useEffect(() => {
     if (selectedValues.length === 6 && !isLocked && !isEditing) {
       const timer = setTimeout(async () => {
@@ -82,12 +72,8 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
   }, []);
 
   const handleEdit = () => { setIsLocked(false); setIsEditing(true); };
-
   const handleSave = async () => {
-    if (selectedValues.length !== 6) {
-      toast.error("Please select exactly 6 values.");
-      return;
-    }
+    if (selectedValues.length !== 6) { toast.error("Please select exactly 6 values."); return; }
     setIsLocked(true);
     setIsEditing(false);
     onCoreValuesConfirmed?.(selectedValues);
@@ -97,7 +83,6 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
       else toast.success("Core values updated!");
     }
   };
-
   const handleCancelEdit = () => {
     if (userId) {
       getCoreValues(userId).then((saved) => {
@@ -108,22 +93,22 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
     }
   };
 
-  // Teaser
+  // Teaser — shown when < 3 areas
   if (completedAreas.length < MIN_AREAS) {
     return (
       <div className="mt-4">
-        <div className="sketch-card p-5 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Lock className="h-3.5 w-3.5 text-muted-foreground/40" />
-            <h3 className="text-xs font-semibold text-foreground">Your Core Values</h3>
+        <div className="sketch-card p-4 flex items-center gap-4">
+          <Lock className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground">Your Core Values</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              Complete {MIN_AREAS - completedAreas.length} more{" "}
+              {MIN_AREAS - completedAreas.length === 1 ? "area" : "areas"} of life to unlock your Core Values.
+            </p>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
-            Complete {MIN_AREAS - completedAreas.length} more{" "}
-            {MIN_AREAS - completedAreas.length === 1 ? "area" : "areas"} to unlock.
-          </p>
-          <div className="mt-3 flex justify-center gap-1">
+          <div className="flex gap-1 shrink-0">
             {Array.from({ length: MIN_AREAS }).map((_, i) => (
-              <div key={i} className={`h-1 w-6 rounded-full ${i < completedAreas.length ? "bg-primary" : "bg-border"}`} />
+              <div key={i} className={`h-1.5 w-5 rounded-full ${i < completedAreas.length ? "bg-primary" : "bg-border"}`} />
             ))}
           </div>
         </div>
@@ -131,106 +116,105 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
     );
   }
 
-  if (loading) return <Skeleton className="h-28 w-full rounded-md mt-4" />;
+  if (loading) return <Skeleton className="h-16 w-full rounded-md mt-4" />;
 
-  const midpoint = Math.ceil(rankedValues.length / 2);
-  const col1 = rankedValues.slice(0, midpoint);
-  const col2 = rankedValues.slice(midpoint);
   const isSelecting = !isLocked || isEditing;
 
+  // Split values into 3 columns for horizontal layout
+  const third = Math.ceil(rankedValues.length / 3);
+  const cols = [
+    rankedValues.slice(0, third),
+    rankedValues.slice(third, third * 2),
+    rankedValues.slice(third * 2),
+  ];
+
   return (
-    <div className="mt-2 space-y-3">
-      {/* Header */}
+    <div className="mt-4 space-y-3">
+      {/* Header row */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-foreground">
-          {isSelecting ? "Select Your Core 6" : "Your Core Values"}
-        </h3>
-        {isLocked && !isEditing && (
-          <Button variant="ghost" size="sm" onClick={handleEdit} className="gap-1 text-[10px] h-6 px-2">
-            <Pencil className="h-2.5 w-2.5" /> Edit
-          </Button>
-        )}
-        {isEditing && (
-          <div className="flex gap-1">
-            <Button variant="ghost" size="sm" onClick={handleCancelEdit} className="text-[10px] h-6 px-2">
-              Cancel
+        <div>
+          <p className="text-xs font-semibold text-foreground">
+            {isSelecting ? "Your Core Values" : "Your Core Values"}
+          </p>
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            {isSelecting
+              ? "Select the 6 core values that you want to make incarnate across all areas of your life."
+              : "Locked in — these drive your dice rolls."}
+          </p>
+        </div>
+        <div className="flex gap-1 shrink-0">
+          {isLocked && !isEditing && (
+            <Button variant="ghost" size="sm" onClick={handleEdit} className="gap-1 text-[10px] h-7 px-2.5">
+              <Pencil className="h-3 w-3" /> Edit
             </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={selectedValues.length !== 6}
-              className="gap-1 text-[10px] h-6 px-2"
-            >
-              <Save className="h-2.5 w-2.5" /> Save
-            </Button>
-          </div>
-        )}
+          )}
+          {isEditing && (
+            <>
+              <Button variant="ghost" size="sm" onClick={handleCancelEdit} className="text-[10px] h-7 px-2.5">
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSave} disabled={selectedValues.length !== 6} className="gap-1 text-[10px] h-7 px-2.5">
+                <Save className="h-3 w-3" /> Save
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Values list — when selecting or editing */}
+      {/* Selecting / editing — 3-column grid */}
       {isSelecting && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="grid grid-cols-2 gap-1"
-        >
-          {[col1, col2].map((col, colIdx) => (
-            <div key={colIdx} className="space-y-0.5">
-              {col.map(({ value, areaCount }) => {
-                const isSelected = selectedValues.includes(value);
-                const isSuggested = preSuggested.has(value) && !isSelected;
-                const isDisabled = selectedValues.length >= 6 && !isSelected;
-
-                return (
-                  <button
-                    key={value}
-                    onClick={() => !isDisabled && toggleValue(value)}
-                    onMouseEnter={() => onHighlightValue?.(value)}
-                    onMouseLeave={() => onHighlightValue?.(null)}
-                    disabled={isDisabled}
-                    className={`
-                      flex items-center gap-1.5 w-full rounded px-2 py-1 text-left transition-all
-                      ${isSelected
-                        ? "bg-primary text-primary-foreground"
-                        : isSuggested
-                        ? "bg-primary/8 ring-1 ring-primary/20 text-foreground"
-                        : "bg-muted/40 text-foreground hover:bg-muted/60"
-                      }
-                      ${isDisabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}
-                    `}
-                  >
-                    <span className="flex-1 truncate text-[10px] font-medium">{value}</span>
-                    <span className={`
-                      flex h-3.5 min-w-3.5 items-center justify-center rounded text-[8px] font-bold px-0.5
-                      ${isSelected ? "bg-primary-foreground/20 text-primary-foreground" : "bg-foreground/8 text-muted-foreground"}
-                    `}>
-                      {areaCount}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
-          <p className="col-span-2 text-center text-[9px] text-muted-foreground pt-1">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <div className="grid grid-cols-3 gap-1.5">
+            {cols.map((col, colIdx) => (
+              <div key={colIdx} className="space-y-0.5">
+                {col.map(({ value, areaCount }) => {
+                  const isSelected = selectedValues.includes(value);
+                  const isSuggested = preSuggested.has(value) && !isSelected;
+                  const isDisabled = selectedValues.length >= 6 && !isSelected;
+                  return (
+                    <button
+                      key={value}
+                      onClick={() => !isDisabled && toggleValue(value)}
+                      onMouseEnter={() => onHighlightValue?.(value)}
+                      onMouseLeave={() => onHighlightValue?.(null)}
+                      disabled={isDisabled}
+                      className={`
+                        flex items-center gap-1.5 w-full rounded px-2 py-1 text-left transition-all
+                        ${isSelected ? "bg-primary text-primary-foreground"
+                          : isSuggested ? "bg-primary/8 ring-1 ring-primary/20 text-foreground"
+                          : "bg-muted/40 text-foreground hover:bg-muted/60"}
+                        ${isDisabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}
+                      `}
+                    >
+                      <span className="flex-1 truncate text-[10px] font-medium">{value}</span>
+                      <span className={`
+                        flex h-3.5 min-w-3.5 items-center justify-center rounded text-[8px] font-bold px-0.5
+                        ${isSelected ? "bg-primary-foreground/20 text-primary-foreground" : "bg-foreground/8 text-muted-foreground"}
+                      `}>{areaCount}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-[9px] text-muted-foreground pt-2">
             {selectedValues.length} of 6 selected
           </p>
         </motion.div>
       )}
 
-      {/* Locked state — vertical list */}
+      {/* Locked state — horizontal row of 6 values */}
       {isLocked && !isEditing && (
-        <div className="space-y-1">
+        <div className="grid grid-cols-6 gap-1.5">
           {selectedValues.map((v, i) => (
             <div
               key={v}
-              className="flex items-center gap-2 px-2 py-1 rounded bg-muted/30"
+              className="flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded bg-muted/30 cursor-default"
               onMouseEnter={() => onHighlightValue?.(v)}
               onMouseLeave={() => onHighlightValue?.(null)}
             >
-              <span className="text-[8px] font-mono text-muted-foreground w-3">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="text-[10px] font-semibold text-foreground">{v}</span>
+              <span className="text-[7px] font-mono text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-[9px] sm:text-[10px] font-semibold text-foreground text-center leading-tight">{v}</span>
             </div>
           ))}
         </div>

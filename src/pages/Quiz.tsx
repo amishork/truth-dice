@@ -615,55 +615,34 @@ const Quiz = () => {
                 </Button>
               </div>
 
-              {/* Chord Diagram + Values List side by side */}
+              {/* ─── Core Values Selector (horizontal, full width) ─── */}
+              {isAuthenticated && user && (
+                <CoreValuesSelector
+                  sessions={userSessions}
+                  userId={user.id}
+                  completedAreas={completedAreas}
+                  onHighlightValue={setHighlightedValue}
+                  onCoreValuesConfirmed={setConfirmedCoreValues}
+                  onSelectionChange={(_vals, locked) => {
+                    setCoreLocked(locked);
+                  }}
+                />
+              )}
+
+              {/* ─── Chord Diagram (centered) ─── */}
               <div className="hub-diagram-area">
-                <div className="flex gap-4 items-start">
-                  {/* Chord diagram — left */}
-                  <div className="flex-1 min-w-0">
-                    <Suspense fallback={
-                      <div className="flex flex-col items-center gap-3 py-8">
-                        <Skeleton className="h-64 w-64 rounded-full" />
-                        <Skeleton className="h-4 w-32" />
-                      </div>
-                    }>
-                      <ValuesChordDiagram
-                        sessions={userSessions}
-                        activeSessionId={selectedSessionId}
-                        externalHighlight={highlightedValue}
-                      />
-                    </Suspense>
+                <Suspense fallback={
+                  <div className="flex flex-col items-center gap-3 py-8">
+                    <Skeleton className="h-64 w-64 rounded-full" />
+                    <Skeleton className="h-4 w-32" />
                   </div>
-
-                  {/* Core Values Selector — right of diagram (only when 3+ areas) */}
-                  {completedAreas.length >= 3 && isAuthenticated && user && (
-                    <div className="w-[200px] flex-shrink-0">
-                      <CoreValuesSelector
-                        sessions={userSessions}
-                        userId={user.id}
-                        completedAreas={completedAreas}
-                        onHighlightValue={setHighlightedValue}
-                        onCoreValuesConfirmed={setConfirmedCoreValues}
-                        onSelectionChange={(_vals, locked) => {
-                          setCoreLocked(locked);
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Core Values teaser — below diagram when < 3 areas */}
-                {completedAreas.length < 3 && completedAreas.length >= 1 && isAuthenticated && user && (
-                  <CoreValuesSelector
+                }>
+                  <ValuesChordDiagram
                     sessions={userSessions}
-                    userId={user.id}
-                    completedAreas={completedAreas}
-                    onHighlightValue={setHighlightedValue}
-                    onCoreValuesConfirmed={setConfirmedCoreValues}
-                    onSelectionChange={(_vals, locked) => {
-                      setCoreLocked(locked);
-                    }}
+                    activeSessionId={selectedSessionId}
+                    externalHighlight={highlightedValue}
                   />
-                )}
+                </Suspense>
               </div>
 
               {/* Share & Save — below diagram */}
