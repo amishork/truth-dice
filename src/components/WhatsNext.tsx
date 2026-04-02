@@ -1,14 +1,27 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, User, Users, GraduationCap, ChevronRight } from "lucide-react";
+import { ArrowRight, User, Users, GraduationCap, Dices, ChevronRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { SHOPIFY_STORE_PERMANENT_DOMAIN } from "@/lib/shopify";
 
 interface WhatsNextProps {
   coreValues?: string[];
 }
 
 const paths = [
+  {
+    id: "dice",
+    icon: Dices,
+    label: "A Custom Game — To Share Your Values",
+    desc: "Your 6 core values, engraved on real dice.",
+    offering: "Custom Conversation Dice",
+    detail: "Your values become a physical game. Two handcrafted dice — one with your core values, one with conversation contexts — turn any gathering into a moment of real connection.",
+    cta: "Shop Now",
+    href: `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}`,
+    external: true,
+    param: "",
+  },
   {
     id: "personal",
     icon: User,
@@ -18,6 +31,7 @@ const paths = [
     detail: "A live, 1-on-1 formation session where you move from naming your values to building a concrete plan for living them.",
     cta: "Apply Now",
     href: "/contact",
+    external: false,
     param: "personal",
   },
   {
@@ -29,6 +43,7 @@ const paths = [
     detail: "Three workshops over six weeks. Your family discovers shared values, creates a family mission, and builds rituals that stick.",
     cta: "Apply Now",
     href: "/contact",
+    external: false,
     param: "family",
   },
   {
@@ -40,6 +55,7 @@ const paths = [
     detail: "Faculty workshops, student programs, and strategic consulting to align your institution's lived culture with its stated mission.",
     cta: "Request a Proposal",
     href: "/contact",
+    external: false,
     param: "school",
   },
 ];
@@ -110,10 +126,20 @@ const WhatsNext = ({ coreValues }: WhatsNextProps) => {
               <Button
                 size="sm"
                 className="mt-4 w-full group"
-                onClick={() => navigate(`${activePath.href}?interest=${activePath.param}`)}
+                onClick={() => {
+                  if (activePath.external) {
+                    window.open(activePath.href, "_blank");
+                  } else {
+                    navigate(`${activePath.href}?interest=${activePath.param}`);
+                  }
+                }}
               >
                 {activePath.cta}
-                <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                {activePath.external ? (
+                  <ExternalLink className="h-3.5 w-3.5 ml-1" />
+                ) : (
+                  <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                )}
               </Button>
             </div>
           </motion.div>

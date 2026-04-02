@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Pencil } from "lucide-react";
+import { motion } from "framer-motion";
+import { Lock, Pencil, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -29,7 +29,6 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const [isLocked, setIsLocked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const rankedValues = useMemo(
@@ -42,7 +41,6 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
     [rankedValues]
   );
 
-  // Notify parent of selection changes
   useEffect(() => {
     onSelectionChange?.(selectedValues, isLocked && !isEditing);
   }, [selectedValues, isLocked, isEditing]);
@@ -60,19 +58,17 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
     });
   }, [userId]);
 
-  // Confirmation animation on 6th selection
+  // Auto-lock on first 6 selection (not editing)
   useEffect(() => {
     if (selectedValues.length === 6 && !isLocked && !isEditing) {
-      setShowConfirmation(true);
       const timer = setTimeout(async () => {
-        setShowConfirmation(false);
         setIsLocked(true);
         onCoreValuesConfirmed?.(selectedValues);
         if (userId) {
           const { error } = await saveCoreValues(userId, selectedValues);
           if (error) toast.error("Couldn't save your core values. Try again.");
         }
-      }, 1200);
+      }, 800);
       return () => clearTimeout(timer);
     }
   }, [selectedValues, isLocked, isEditing, userId]);
@@ -86,6 +82,21 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
   }, []);
 
   const handleEdit = () => { setIsLocked(false); setIsEditing(true); };
+
+  const handleSave = async () => {
+    if (selectedValues.length !== 6) {
+      toast.error("Please select exactly 6 values.");
+      return;
+    }
+    setIsLocked(true);
+    setIsEditing(false);
+    onCoreValuesConfirmed?.(selectedValues);
+    if (userId) {
+      const { error } = await saveCoreValues(userId, selectedValues);
+      if (error) toast.error("Couldn't save your core values. Try again.");
+      else toast.success("Core values updated!");
+    }
+  };
 
   const handleCancelEdit = () => {
     if (userId) {
@@ -132,7 +143,7 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-semibold text-foreground">
-          {isSelecting ? "Select Your Core 6" : "Core Values Locked"}
+          {isSelecting ? "Select Your Core 6" : "Your Core Values"}
         </h3>
         {isLocked && !isEditing && (
           <Button variant="ghost" size="sm" onClick={handleEdit} className="gap-1 text-[10px] h-6 px-2">
@@ -140,13 +151,23 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
           </Button>
         )}
         {isEditing && (
-          <Button variant="ghost" size="sm" onClick={handleCancelEdit} className="text-[10px] h-6 px-2">
-            Cancel
-          </Button>
+          <div className="flex gap-1">
+            <Button variant="ghost" size="sm" onClick={handleCancelEdit} className="text-[10px] h-6 px-2">
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={selectedValues.length !== 6}
+              className="gap-1 text-[10px] h-6 px-2"
+            >
+              <Save className="h-2.5 w-2.5" /> Save
+            </Button>
+          </div>
         )}
       </div>
 
-      {/* Values list — only when selecting */}
+      {/* Values list — when selecting or editing */}
       {isSelecting && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -196,13 +217,21 @@ const CoreValuesSelector: React.FC<CoreValuesSelectorProps> = ({
         </motion.div>
       )}
 
-      {/* Locked summary when not editing */}
+      {/* Locked state — vertical list */}
       {isLocked && !isEditing && (
-        <div className="flex flex-wrap gap-1">
-          {selectedValues.map((v) => (
-            <span key={v} className="text-[9px] font-medium bg-primary/10 text-primary rounded px-1.5 py-0.5">
-              {v}
-            </span>
+        <div className="space-y-1">
+          {selectedValues.map((v, i) => (
+            <div
+              key={v}
+              className="flex items-center gap-2 px-2 py-1 rounded bg-muted/30"
+              onMouseEnter={() => onHighlightValue?.(v)}
+              onMouseLeave={() => onHighlightValue?.(null)}
+            >
+              <span className="text-[8px] font-mono text-muted-foreground w-3">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="text-[10px] font-semibold text-foreground">{v}</span>
+            </div>
           ))}
         </div>
       )}

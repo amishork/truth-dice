@@ -10,7 +10,6 @@ import { ValueCard } from "@/components/ValueCard";
 import { ValuePair } from "@/components/ValuePair";
 import CommitmentEscalation from "@/components/CommitmentEscalation";
 import WhatsNext from "@/components/WhatsNext";
-import DiceProductPopup from "@/components/DiceProductPopup";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
 import EmailMyResults from "@/components/EmailMyResults";
@@ -69,7 +68,6 @@ const Quiz = () => {
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [highlightedValue, setHighlightedValue] = useState<string | null>(null);
   const [confirmedCoreValues, setConfirmedCoreValues] = useState<string[] | null>(null);
-  const [coreSlots, setCoreSlots] = useState<string[]>([]);
   const [coreLocked, setCoreLocked] = useState(false);
   const valueDieRef = useRef<DieHandle>(null);
   const contextDieRef = useRef<DieHandle>(null);
@@ -432,9 +430,6 @@ const Quiz = () => {
       {stage === "dice" && (
         <div className="min-h-screen bg-background">
           <Navigation />
-          {confirmedCoreValues && confirmedCoreValues.length === 6 && (
-            <DiceProductPopup coreValues={confirmedCoreValues} />
-          )}
 
           <div className="hub-page">
             {/* ─── Col 1: Discoveries sidebar ─── */}
@@ -571,30 +566,8 @@ const Quiz = () => {
               )}
             </aside>
 
-            {/* ─── Col 2: Slots → Dice → Diagram → Share → Journey ─── */}
+            {/* ─── Col 2: Dice → Diagram → Share → Journey ─── */}
             <div className="hub-center">
-
-              {/* ─── Confirmed Core 6 Slots (large, top of column) ─── */}
-              {coreLocked && confirmedCoreValues && confirmedCoreValues.length === 6 && (
-                <div className="mb-5">
-                  <p className="label-technical text-center mb-2">Your Core Values</p>
-                  <div className="grid grid-cols-6 gap-2">
-                    {confirmedCoreValues.map((value, i) => (
-                      <motion.div
-                        key={`slot-${i}-${value}`}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: i * 0.06, type: "spring", stiffness: 300 }}
-                        className="aspect-square rounded-lg border border-primary/30 bg-primary/5 flex items-center justify-center p-1.5"
-                      >
-                        <span className="text-[9px] sm:text-[10px] font-bold text-foreground text-center leading-tight break-words uppercase">
-                          {value}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* ─── Dice Area ─── */}
               <div className="hub-dice-area">
@@ -670,8 +643,7 @@ const Quiz = () => {
                         completedAreas={completedAreas}
                         onHighlightValue={setHighlightedValue}
                         onCoreValuesConfirmed={setConfirmedCoreValues}
-                        onSelectionChange={(vals, locked) => {
-                          setCoreSlots(vals);
+                        onSelectionChange={(_vals, locked) => {
                           setCoreLocked(locked);
                         }}
                       />
@@ -687,8 +659,7 @@ const Quiz = () => {
                     completedAreas={completedAreas}
                     onHighlightValue={setHighlightedValue}
                     onCoreValuesConfirmed={setConfirmedCoreValues}
-                    onSelectionChange={(vals, locked) => {
-                      setCoreSlots(vals);
+                    onSelectionChange={(_vals, locked) => {
                       setCoreLocked(locked);
                     }}
                   />
