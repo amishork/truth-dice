@@ -200,10 +200,12 @@ const Quiz = () => {
     const diceValues = confirmedCoreValues ?? activeValues;
     if (diceValues.length === 0) return;
     setIsRolling(true);
+    setDice1Result("");
+    setDice2Result("");
     trackDiceRolled();
 
-    const valueIdx = Math.floor(Math.random() * diceValues.length);
-    const contextIdx = Math.floor(Math.random() * DICE_CONTEXTS.length);
+    const valueIdx = Math.floor(Math.random() * Math.min(diceValues.length, 6));
+    const contextIdx = Math.floor(Math.random() * Math.min(DICE_CONTEXTS.length, 6));
     const valueResult = diceValues[valueIdx];
     const contextResult = DICE_CONTEXTS[contextIdx];
 

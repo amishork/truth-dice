@@ -12,48 +12,144 @@ interface InteractiveDieProps {
   onRollComplete?: (label: string) => void;
 }
 
+// Each rotation makes material[i] face the camera at (0,0,5)
+// Three.js BoxGeometry material order: +X, -X, +Y, -Y, +Z, -Z
 const FACE_ROTATIONS: THREE.Euler[] = [
-  new THREE.Euler(0, Math.PI / 2, 0),
-  new THREE.Euler(0, -Math.PI / 2, 0),
-  new THREE.Euler(-Math.PI / 2, 0, 0),
-  new THREE.Euler(Math.PI / 2, 0, 0),
-  new THREE.Euler(0, 0, 0),
-  new THREE.Euler(0, Math.PI, 0),
+  new THREE.Euler(0, Math.PI / 2, 0),   // mat 0 (+X) faces camera
+  new THREE.Euler(0, -Math.PI / 2, 0),  // mat 1 (-X) faces camera
+  new THREE.Euler(-Math.PI / 2, 0, 0),  // mat 2 (+Y) faces camera
+  new THREE.Euler(Math.PI / 2, 0, 0),   // mat 3 (-Y) faces camera
+  new THREE.Euler(0, 0, 0),             // mat 4 (+Z) faces camera
+  new THREE.Euler(0, Math.PI, 0),       // mat 5 (-Z) faces camera
 ];
 
 function createFaceTexture(text: string, variant: "light" | "dark"): THREE.CanvasTexture {
-  const res = 1024;
+  const res = 2048;
   const canvas = document.createElement("canvas");
   canvas.width = res;
   canvas.height = res;
   const ctx = canvas.getContext("2d")!;
   const isLight = variant === "light";
 
-  // Clean flat fill
-  ctx.fillStyle = isLight ? "#FAFAF8" : "#000000";
+  const bg = isLight ? "#FAF9F6" : "#000000";
+  const fg = isLight ? "#000000" : "#EDEBE7";
+  const pencil = isLight ? "#D8D4CC" : "#2A2A2A";
+  const hatch = isLight ? "#C8C4BC" : "#1E1E1E";
+  const red = "#9B1B3A";
+
+  // ─── Layer 0: Paper ────────────────────────────────────────────────
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, res, res);
 
-  // Text — large, bold, crisp
+  // ─── Layer 1: Construction geometry (pencil) ───────────────────────
+  ctx.strokeStyle = pencil;
+  ctx.lineWidth = res * 0.0015;
+  ctx.globalAlpha = 0.35;
+
+  // Center crosshair
+  ctx.beginPath();
+  ctx.moveTo(res * 0.3, res / 2);
+  ctx.lineTo(res * 0.7, res / 2);
+  ctx.moveTo(res / 2, res * 0.3);
+  ctx.lineTo(res / 2, res * 0.7);
+  ctx.stroke();
+
+  // Corner registration marks
+  const m = res * 0.08;
+  const cLen = res * 0.05;
+  [[m, m], [res - m, m], [m, res - m], [res - m, res - m]].forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.moveTo(x - cLen * (x < res / 2 ? -1 : 1), y);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x, y - cLen * (y < res / 2 ? -1 : 1));
+    ctx.stroke();
+  });
+
+  ctx.globalAlpha = 1;
+
+  // ─── Layer 3: Cross-hatching along edges ───────────────────────────
+  ctx.strokeStyle = hatch;
+  ctx.lineWidth = res * 0.001;
+  ctx.globalAlpha = isLight ? 0.06 : 0.08;
+
+  const hatchInset = res * 0.03;
+  const hatchDepth = res * 0.09;
+  const step = res * 0.008;
+
+  // Top edge hatching
+  for (let x = hatchInset; x < res - hatchInset; x += step) {
+    ctx.beginPath();
+    ctx.moveTo(x, hatchInset);
+    ctx.lineTo(x + hatchDepth * 0.6, hatchInset + hatchDepth);
+    ctx.stroke();
+  }
+  // Bottom edge hatching
+  for (let x = hatchInset; x < res - hatchInset; x += step) {
+    ctx.beginPath();
+    ctx.moveTo(x, res - hatchInset);
+    ctx.lineTo(x - hatchDepth * 0.6, res - hatchInset - hatchDepth);
+    ctx.stroke();
+  }
+  // Left edge hatching
+  for (let y = hatchInset; y < res - hatchInset; y += step) {
+    ctx.beginPath();
+    ctx.moveTo(hatchInset, y);
+    ctx.lineTo(hatchInset + hatchDepth, y + hatchDepth * 0.6);
+    ctx.stroke();
+  }
+  // Right edge hatching
+  for (let y = hatchInset; y < res - hatchInset; y += step) {
+    ctx.beginPath();
+    ctx.moveTo(res - hatchInset, y);
+    ctx.lineTo(res - hatchInset - hatchDepth, y - hatchDepth * 0.6);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+
+  // ─── Layer 2: Commitment border (pen) ──────────────────────────────
+  const borderInset = res * 0.055;
+  const cornerR = res * 0.045;
+  ctx.strokeStyle = fg;
+  ctx.lineWidth = res * 0.003;
+  ctx.globalAlpha = isLight ? 0.12 : 0.1;
+  ctx.beginPath();
+  ctx.roundRect(borderInset, borderInset, res - borderInset * 2, res - borderInset * 2, cornerR);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // ─── Layer 4: Red accent — small diamond at bottom center ──────────
+  ctx.fillStyle = red;
+  ctx.globalAlpha = 0.6;
+  const dSize = res * 0.008;
+  ctx.save();
+  ctx.translate(res / 2, res - borderInset - res * 0.04);
+  ctx.rotate(Math.PI / 4);
+  ctx.fillRect(-dSize, -dSize, dSize * 2, dSize * 2);
+  ctx.restore();
+  ctx.globalAlpha = 1;
+
+  // ─── Layer 2: Text (commitment — bold, clear) ─────────────────────
   const upperText = text.toUpperCase();
-  ctx.fillStyle = isLight ? "#000000" : "#F0EDE8";
+  ctx.fillStyle = fg;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  let fontSize = res * 0.18;
-  const maxWidth = res * 0.72;
+  let fontSize = res * 0.17;
+  const maxWidth = res * 0.68;
   ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
-  let m = ctx.measureText(upperText);
-  while (m.width > maxWidth && fontSize > res * 0.07) {
-    fontSize -= res * 0.006;
+  let mt = ctx.measureText(upperText);
+  while (mt.width > maxWidth && fontSize > res * 0.07) {
+    fontSize -= res * 0.005;
     ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
-    m = ctx.measureText(upperText);
+    mt = ctx.measureText(upperText);
   }
 
-  if (m.width > maxWidth) {
+  if (mt.width > maxWidth) {
     const words = upperText.split(" ");
     if (words.length >= 2) {
       const mid = Math.ceil(words.length / 2);
-      fontSize = res * 0.13;
+      fontSize = res * 0.12;
       ctx.font = `800 ${fontSize}px -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif`;
       const lineH = fontSize * 1.3;
       ctx.fillText(words.slice(0, mid).join(" "), res / 2, res / 2 - lineH / 2);
@@ -66,7 +162,7 @@ function createFaceTexture(text: string, variant: "light" | "dark"): THREE.Canva
   }
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = 8;
+  texture.anisotropy = 16;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.generateMipmaps = true;
@@ -137,7 +233,8 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       cleanup();
       const container = mountRef.current;
       const isLight = variant === "light";
-      const edgeColor = isLight ? 0x000000 : 0xe0dcd8;
+      // Edge line color: pen black on light die, warm gray on dark die
+      const edgeColor = isLight ? 0x000000 : 0xc8c4bc;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
@@ -149,23 +246,19 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       renderer.setClearColor(0x000000, 0);
       container.appendChild(renderer.domElement);
 
-      // ─── Build die ───────────────────────────────────────────────────
       const labels = [...faceLabels];
       while (labels.length < 6) labels.push("");
 
-      // Face materials — flat, no lighting (MeshBasicMaterial)
+      // Flat materials — no lighting, textures render exactly as drawn
       const materials = labels.map((label) =>
-        new THREE.MeshBasicMaterial({
-          map: createFaceTexture(label, variant),
-        })
+        new THREE.MeshBasicMaterial({ map: createFaceTexture(label, variant) })
       );
 
       const boxSize = 1.45;
       const geo = new THREE.BoxGeometry(boxSize, boxSize, boxSize, 8, 8, 8);
 
-      // Rounded corners via vertex manipulation
-      const rr = 0.14;
-      const half = boxSize / 2;
+      // Round corners
+      const half = boxSize / 2, rr = 0.14;
       const pos = geo.attributes.position;
       const v = new THREE.Vector3();
       for (let i = 0; i < pos.count; i++) {
@@ -182,17 +275,16 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
 
       const dieMesh = new THREE.Mesh(geo, materials);
 
-      // ─── Edge lines — the sketch/wireframe look ────────────────────
-      const edgesGeo = new THREE.EdgesGeometry(geo, 15); // threshold angle for visible edges
+      // Edge lines — commitment lines (pen strokes on the form)
+      const edgesGeo = new THREE.EdgesGeometry(geo, 12);
       const edgesMat = new THREE.LineBasicMaterial({
         color: edgeColor,
         linewidth: 1,
         transparent: true,
-        opacity: 0.7,
+        opacity: isLight ? 0.5 : 0.35,
       });
       const edgeLines = new THREE.LineSegments(edgesGeo, edgesMat);
 
-      // Group die mesh + edge lines
       const group = new THREE.Group();
       group.add(dieMesh);
       group.add(edgeLines);
@@ -219,7 +311,6 @@ const InteractiveDie = forwardRef<DieHandle, InteractiveDieProps>(
       };
       animate();
 
-      // Interaction
       const getPos = (e: MouseEvent | TouchEvent) =>
         "touches" in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
       const onDown = (e: MouseEvent | TouchEvent) => {
