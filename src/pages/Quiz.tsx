@@ -13,7 +13,6 @@ import WhatsNext from "@/components/WhatsNext";
 import DiceProductPopup from "@/components/DiceProductPopup";
 import TheSorting from "@/components/TheSorting";
 import GratitudeMoment from "@/components/GratitudeMoment";
-import ShareableValuesCard from "@/components/ShareableValuesCard";
 import EmailMyResults from "@/components/EmailMyResults";
 import QuizMilestone from "@/components/QuizMilestone";
 import PhaseBanner from "@/components/PhaseBanner";
@@ -32,6 +31,7 @@ import type { QuizSession } from "@/lib/quizSessions";
 
 const ValuesChordDiagram = lazy(() => import("@/components/ValuesChordDiagram"));
 const ValuesChat = lazy(() => import("@/components/ValuesChat").then(mod => ({ default: mod.ValuesChat })));
+const ShareableValuesCard = lazy(() => import("@/components/ShareableValuesCard"));
 
 const Quiz = () => {
   const { user, loading: authLoading, isAuthenticated, gender } = useAuth();
@@ -580,7 +580,9 @@ const Quiz = () => {
               {/* Share & Save — below diagram */}
               {activeValues.length >= 6 && (
                 <div className="hub-dice-area mt-4 space-y-5">
-                  <ShareableValuesCard values={activeValues} />
+                  <Suspense fallback={<Skeleton className="h-64 w-full rounded-md" />}>
+                    <ShareableValuesCard values={activeValues} />
+                  </Suspense>
                   {!isAuthenticated && (
                     <EmailMyResults values={activeValues} areaLabel={areaLabel} />
                   )}

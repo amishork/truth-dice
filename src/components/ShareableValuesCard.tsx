@@ -4,222 +4,31 @@ import { Download, Share2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { trackResultsShared } from "@/lib/analytics";
+import html2canvas from "html2canvas";
 
 interface ShareableValuesCardProps {
   values: string[];
 }
 
-// ─── Style Constitution Palette ───────────────────────────────────────────────
-const C = {
-  white: "#FFFFFF",
-  paper: "#FAFAF8",      // Warm white paper
-  pencil: "#D4D0C8",     // Layer 1
-  pencilFaint: "#E8E5DF",
-  pen: "#1C1C1C",        // Layer 2
-  hatch: "#B0ACA4",      // Layer 3
-  red: "#9B1B3A",        // Layer 4
-};
-
-// Lucide Flame path at 24x24 viewBox
-const FLAME_PATH = "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z";
-
 const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const posterRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateImage = async (): Promise<HTMLCanvasElement> => {
-    const canvas = document.createElement("canvas");
-    const scale = 3; // High DPI
-    const w = 600;
-    const h = 800;
-    canvas.width = w * scale;
-    canvas.height = h * scale;
-    const ctx = canvas.getContext("2d")!;
-    ctx.scale(scale, scale);
-
-    // ─── Paper ─────────────────────────────────────────────────────────
-    ctx.fillStyle = C.paper;
-    ctx.fillRect(0, 0, w, h);
-
-    // ─── Layer 1: Construction (pencil) — minimal, purposeful ─────────
-    ctx.strokeStyle = C.pencilFaint;
-    ctx.lineWidth = 0.4;
-
-    // Single vertical center axis — faint, extends past frame
-    ctx.beginPath();
-    ctx.moveTo(w / 2, 24);
-    ctx.lineTo(w / 2, h - 24);
-    ctx.stroke();
-
-    // Two horizontal construction lines framing the header zone
-    for (const y of [115, 190]) {
-      ctx.beginPath();
-      ctx.moveTo(50, y);
-      ctx.lineTo(w - 50, y);
-      ctx.stroke();
-    }
-
-    // Construction circle — single, centered on flame
-    ctx.strokeStyle = C.pencil;
-    ctx.lineWidth = 0.35;
-    ctx.beginPath();
-    ctx.arc(w / 2, 82, 32, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Corner registration marks — precise L-shapes
-    ctx.strokeStyle = C.pencil;
-    ctx.lineWidth = 0.5;
-    const reg = 42;
-    const regLen = 14;
-    for (const [x, y, dx, dy] of [
-      [reg, reg, 1, 1], [w - reg, reg, -1, 1],
-      [reg, h - reg, 1, -1], [w - reg, h - reg, -1, -1],
-    ] as [number, number, number, number][]) {
-      ctx.beginPath();
-      ctx.moveTo(x + regLen * dx, y);
-      ctx.lineTo(x, y);
-      ctx.lineTo(x, y + regLen * dy);
-      ctx.stroke();
-    }
-
-    // ─── Layer 2: Commitment (pen) — clean, confident ──────────────────
-    // Outer frame
-    ctx.strokeStyle = C.pen;
-    ctx.lineWidth = 0.8;
-    ctx.strokeRect(48, 48, w - 96, h - 96);
-
-    // Flame icon — using Lucide path, centered
-    ctx.save();
-    ctx.translate(w / 2 - 14, 62);
-    ctx.scale(1.15, 1.15);
-    ctx.fillStyle = C.red;
-    const flamePath = new Path2D(FLAME_PATH);
-    ctx.fill(flamePath);
-    ctx.restore();
-
-    // Brand name — tracked uppercase
-    ctx.fillStyle = C.pen;
-    ctx.font = "700 11.5px 'Inter', 'Helvetica Neue', system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("W O R D S   I N C A R N A T E", w / 2, 128);
-
-    // Subtitle
-    ctx.fillStyle = C.red;
-    ctx.font = "600 8px 'Inter', 'Helvetica Neue', system-ui, sans-serif";
-    ctx.fillText("M Y   C O R E   V A L U E S", w / 2, 146);
-
-    // Header separator — thin line, small red diamond
-    const sepY = 172;
-    ctx.strokeStyle = C.pen;
-    ctx.lineWidth = 0.6;
-    ctx.beginPath();
-    ctx.moveTo(90, sepY);
-    ctx.lineTo(w / 2 - 8, sepY);
-    ctx.moveTo(w / 2 + 8, sepY);
-    ctx.lineTo(w - 90, sepY);
-    ctx.stroke();
-
-    ctx.fillStyle = C.red;
-    ctx.save();
-    ctx.translate(w / 2, sepY);
-    ctx.rotate(Math.PI / 4);
-    ctx.fillRect(-3.5, -3.5, 7, 7);
-    ctx.restore();
-
-    // ─── Values list ───────────────────────────────────────────────────
-    const listTop = 218;
-    const spacing = 76;
-
-    values.forEach((value, i) => {
-      const y = listTop + i * spacing;
-
-      // Number — small, monospace, pencil gray
-      ctx.fillStyle = C.pencil;
-      ctx.font = "400 8px 'Courier New', 'SF Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.fillText(String(i + 1).padStart(2, "0"), w / 2, y);
-
-      // Value name — strong, tracked
-      ctx.fillStyle = C.pen;
-      ctx.font = "600 18px 'Inter', 'Helvetica Neue', system-ui, sans-serif";
-      // Add letter spacing by manually spacing
-      const text = value.toUpperCase();
-      const measured = ctx.measureText(text).width;
-      if (measured < w - 200) {
-        // Draw with letter spacing
-        const chars = text.split("");
-        const letterSpacing = 2.5;
-        const totalWidth = measured + (chars.length - 1) * letterSpacing;
-        let cx = w / 2 - totalWidth / 2;
-        ctx.textAlign = "left";
-        for (const char of chars) {
-          ctx.fillText(char, cx, y + 22);
-          cx += ctx.measureText(char).width + letterSpacing;
-        }
-        ctx.textAlign = "center";
-      } else {
-        ctx.fillText(text, w / 2, y + 22);
-      }
-
-      // Subtle separator between values
-      if (i < values.length - 1) {
-        ctx.strokeStyle = C.pencilFaint;
-        ctx.lineWidth = 0.3;
-        ctx.beginPath();
-        ctx.moveTo(w / 2 - 60, y + 52);
-        ctx.lineTo(w / 2 + 60, y + 52);
-        ctx.stroke();
-      }
+  const capture = async (): Promise<HTMLCanvasElement | null> => {
+    if (!posterRef.current) return null;
+    return html2canvas(posterRef.current, {
+      scale: 3,
+      backgroundColor: null,
+      useCORS: true,
+      logging: false,
     });
-
-    // ─── Layer 3: Hatching — subtle top/bottom bands inside frame ──────
-    ctx.globalAlpha = 0.06;
-    ctx.strokeStyle = C.hatch;
-    ctx.lineWidth = 0.5;
-    // Top band (inside frame, thin strip)
-    for (let x = 50; x < w - 50; x += 5) {
-      ctx.beginPath();
-      ctx.moveTo(x, 50);
-      ctx.lineTo(x + 6, 56);
-      ctx.stroke();
-    }
-    // Bottom band
-    for (let x = 50; x < w - 50; x += 5) {
-      ctx.beginPath();
-      ctx.moveTo(x, h - 56);
-      ctx.lineTo(x + 6, h - 50);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
-    // ─── Footer ────────────────────────────────────────────────────────
-    // Bottom separator
-    ctx.strokeStyle = C.pen;
-    ctx.lineWidth = 0.4;
-    ctx.beginPath();
-    ctx.moveTo(90, h - 100);
-    ctx.lineTo(w - 90, h - 100);
-    ctx.stroke();
-
-    ctx.fillStyle = C.hatch;
-    ctx.font = "500 7.5px 'Courier New', 'SF Mono', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("W O R D S I N C A R N A T E . C O M", w / 2, h - 76);
-
-    const date = new Date()
-      .toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
-      .toUpperCase();
-    ctx.fillStyle = C.pencil;
-    ctx.font = "400 6.5px 'Courier New', 'SF Mono', monospace";
-    ctx.fillText(date, w / 2, h - 62);
-
-    return canvas;
   };
 
   const handleDownload = async () => {
     setIsGenerating(true);
     try {
-      const canvas = await generateImage();
+      const canvas = await capture();
+      if (!canvas) throw new Error("Capture failed");
       const link = document.createElement("a");
       link.download = "my-core-values-words-incarnate.png";
       link.href = canvas.toDataURL("image/png");
@@ -235,7 +44,8 @@ const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => 
   const handleShare = async () => {
     setIsGenerating(true);
     try {
-      const canvas = await generateImage();
+      const canvas = await capture();
+      if (!canvas) throw new Error("Capture failed");
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         if (navigator.share) {
@@ -269,116 +79,301 @@ const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => 
     >
       <p className="label-technical">Share your values</p>
 
-      {/* ─── Preview card ─── */}
+      {/* ═══ THE POSTER — this exact element is captured as the PNG ═══ */}
       <div
-        ref={cardRef}
-        className="relative bg-[#FAFAF8] rounded-md overflow-hidden"
+        ref={posterRef}
         style={{
-          boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)",
+          width: 480,
+          padding: 28,
+          fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+          background: "#FAFAF8",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Outer padding with corner marks */}
-        <div className="relative p-3">
-          {/* Corner registration marks */}
-          <div className="absolute top-2 left-2 w-3 h-3">
-            <div className="absolute top-0 left-0 w-full h-px bg-[#D4D0C8]" />
-            <div className="absolute top-0 left-0 w-px h-full bg-[#D4D0C8]" />
-          </div>
-          <div className="absolute top-2 right-2 w-3 h-3">
-            <div className="absolute top-0 right-0 w-full h-px bg-[#D4D0C8]" />
-            <div className="absolute top-0 right-0 w-px h-full bg-[#D4D0C8]" />
-          </div>
-          <div className="absolute bottom-2 left-2 w-3 h-3">
-            <div className="absolute bottom-0 left-0 w-full h-px bg-[#D4D0C8]" />
-            <div className="absolute bottom-0 left-0 w-px h-full bg-[#D4D0C8]" />
-          </div>
-          <div className="absolute bottom-2 right-2 w-3 h-3">
-            <div className="absolute bottom-0 right-0 w-full h-px bg-[#D4D0C8]" />
-            <div className="absolute bottom-0 right-0 w-px h-full bg-[#D4D0C8]" />
-          </div>
+        {/* ── Layer 1: Construction geometry (pencil) ── */}
+        {/* Vertical center axis */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: 0,
+            bottom: 0,
+            width: 1,
+            background: "linear-gradient(to bottom, transparent 8px, #E2DFD8 28px, #E2DFD8 calc(100% - 28px), transparent calc(100% - 8px))",
+            opacity: 0.5,
+          }}
+        />
+        {/* Horizontal construction lines */}
+        {[92, 148].map((y) => (
+          <div
+            key={y}
+            style={{
+              position: "absolute",
+              top: y,
+              left: 20,
+              right: 20,
+              height: 1,
+              background: "#E2DFD8",
+              opacity: 0.45,
+            }}
+          />
+        ))}
 
-          {/* Inner frame */}
-          <div className="border border-[#1C1C1C]/60 px-5 py-6">
-            {/* Subtle hatch band at top */}
+        {/* Corner registration marks */}
+        {([
+          { top: 12, left: 12 },
+          { top: 12, right: 12 },
+          { bottom: 12, left: 12 },
+          { bottom: 12, right: 12 },
+        ] as React.CSSProperties[]).map((pos, i) => (
+          <div key={i} style={{ position: "absolute", ...pos, width: 14, height: 14 }}>
             <div
-              className="absolute top-3 left-3 right-3 h-[5px] opacity-[0.04]"
               style={{
-                backgroundImage:
-                  "repeating-linear-gradient(45deg, #B0ACA4 0px, #B0ACA4 0.5px, transparent 0.5px, transparent 4px)",
+                position: "absolute",
+                top: 0,
+                left: pos.right !== undefined ? undefined : 0,
+                right: pos.right !== undefined ? 0 : undefined,
+                width: "100%",
+                height: 1,
+                background: "#CBC7BF",
               }}
             />
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: pos.right !== undefined ? undefined : 0,
+                right: pos.right !== undefined ? 0 : undefined,
+                width: 1,
+                height: "100%",
+                background: "#CBC7BF",
+              }}
+            />
+          </div>
+        ))}
 
-            {/* Flame icon — matches nav */}
-            <div className="flex justify-center mb-3">
-              <div className="relative">
-                {/* Construction circle behind flame */}
-                <div className="absolute inset-0 -m-2 rounded-full border border-[#E8E5DF]" />
-                <Flame className="h-5 w-5 text-[#9B1B3A]" strokeWidth={1.8} />
-              </div>
+        {/* ── Layer 2 + 4: The committed design ── */}
+        <div
+          style={{
+            border: "1px solid rgba(28,28,28,0.55)",
+            padding: "32px 28px 24px",
+            position: "relative",
+          }}
+        >
+          {/* Layer 3: Hatch band — top edge inside frame */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              opacity: 0.035,
+              backgroundImage:
+                "repeating-linear-gradient(45deg, #908C84 0px, #908C84 0.6px, transparent 0.6px, transparent 4px)",
+            }}
+          />
+
+          {/* Flame icon */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
+            <div style={{ position: "relative" }}>
+              {/* Construction circle */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: -10,
+                  borderRadius: "50%",
+                  border: "0.6px solid #DDD9D2",
+                }}
+              />
+              <Flame
+                size={22}
+                color="#9B1B3A"
+                strokeWidth={1.8}
+                style={{ display: "block" }}
+              />
             </div>
+          </div>
 
-            {/* Brand */}
-            <p
-              className="text-center font-semibold uppercase text-[#1C1C1C]"
-              style={{ fontSize: "10px", letterSpacing: "0.28em" }}
-            >
-              Words Incarnate
-            </p>
-            <p
-              className="text-center font-semibold uppercase text-[#9B1B3A] mt-0.5"
-              style={{ fontSize: "7px", letterSpacing: "0.22em" }}
-            >
-              My Core Values
-            </p>
+          {/* Brand name */}
+          <div
+            style={{
+              textAlign: "center",
+              fontSize: 11.5,
+              fontWeight: 700,
+              letterSpacing: "0.32em",
+              textTransform: "uppercase" as const,
+              color: "#1C1C1C",
+              lineHeight: 1,
+            }}
+          >
+            Words Incarnate
+          </div>
 
-            {/* Separator with diamond */}
-            <div className="flex items-center gap-1.5 my-3 px-2">
-              <div className="flex-1 h-px bg-[#1C1C1C]/50" />
-              <div className="h-[5px] w-[5px] rotate-45 bg-[#9B1B3A]" />
-              <div className="flex-1 h-px bg-[#1C1C1C]/50" />
-            </div>
+          {/* Subtitle */}
+          <div
+            style={{
+              textAlign: "center",
+              fontSize: 8,
+              fontWeight: 600,
+              letterSpacing: "0.28em",
+              textTransform: "uppercase" as const,
+              color: "#9B1B3A",
+              marginTop: 5,
+              lineHeight: 1,
+            }}
+          >
+            My Core Values
+          </div>
 
-            {/* Values */}
-            <div className="space-y-2 py-1">
-              {values.map((value, i) => (
-                <div key={`${value}-${i}`} className="text-center">
-                  <p
-                    className="font-mono text-[#D4D0C8]"
-                    style={{ fontSize: "6px", letterSpacing: "0.15em" }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </p>
-                  <p
-                    className="font-semibold uppercase text-[#1C1C1C] -mt-px"
-                    style={{ fontSize: "12px", letterSpacing: "0.16em" }}
-                  >
-                    {value}
-                  </p>
+          {/* Separator with diamond */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              margin: "18px 12px 20px",
+            }}
+          >
+            <div style={{ flex: 1, height: 1, background: "rgba(28,28,28,0.45)" }} />
+            <div
+              style={{
+                width: 7,
+                height: 7,
+                background: "#9B1B3A",
+                transform: "rotate(45deg)",
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1, height: 1, background: "rgba(28,28,28,0.45)" }} />
+          </div>
+
+          {/* ── Values list ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {values.map((value, i) => (
+              <div key={`${value}-${i}`} style={{ textAlign: "center" }}>
+                {/* Number */}
+                <div
+                  style={{
+                    fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+                    fontSize: 7.5,
+                    fontWeight: 400,
+                    letterSpacing: "0.2em",
+                    color: "#CBC7BF",
+                    lineHeight: 1,
+                    marginBottom: 4,
+                  }}
+                >
+                  {String(i + 1).padStart(2, "0")}
                 </div>
-              ))}
-            </div>
-
-            {/* Bottom separator */}
-            <div className="h-px bg-[#1C1C1C]/30 mt-3 mb-2 mx-2" />
-
-            {/* Footer */}
-            <p
-              className="text-center font-mono uppercase text-[#B0ACA4]"
-              style={{ fontSize: "6px", letterSpacing: "0.2em" }}
-            >
-              wordsincarnate.com
-            </p>
-
-            {/* Subtle hatch band at bottom */}
-            <div
-              className="absolute bottom-3 left-3 right-3 h-[5px] opacity-[0.03]"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(45deg, #B0ACA4 0px, #B0ACA4 0.5px, transparent 0.5px, transparent 4px)",
-              }}
-            />
+                {/* Value name */}
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase" as const,
+                    color: "#1C1C1C",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {value}
+                </div>
+                {/* Pencil separator between values */}
+                {i < values.length - 1 && (
+                  <div
+                    style={{
+                      width: 100,
+                      height: 1,
+                      background: "#E8E5DF",
+                      margin: "14px auto 0",
+                    }}
+                  />
+                )}
+              </div>
+            ))}
           </div>
+
+          {/* Bottom separator */}
+          <div
+            style={{
+              height: 1,
+              background: "rgba(28,28,28,0.25)",
+              margin: "24px 12px 14px",
+            }}
+          />
+
+          {/* Footer */}
+          <div
+            style={{
+              textAlign: "center",
+              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+              fontSize: 7,
+              fontWeight: 500,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase" as const,
+              color: "#B0ACA4",
+              lineHeight: 1,
+            }}
+          >
+            wordsincarnate.com
+          </div>
+          <div
+            style={{
+              textAlign: "center",
+              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+              fontSize: 6,
+              fontWeight: 400,
+              letterSpacing: "0.15em",
+              color: "#D4D0C8",
+              marginTop: 5,
+              lineHeight: 1,
+            }}
+          >
+            {new Date()
+              .toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+              .toUpperCase()}
+          </div>
+
+          {/* Layer 3: Hatch band — bottom edge */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              opacity: 0.025,
+              backgroundImage:
+                "repeating-linear-gradient(45deg, #908C84 0px, #908C84 0.6px, transparent 0.6px, transparent 4px)",
+            }}
+          />
         </div>
+
+        {/* Red accent dots — flanking first and last values */}
+        <div
+          style={{
+            position: "absolute",
+            left: 38,
+            top: 232,
+            width: 4,
+            height: 4,
+            borderRadius: "50%",
+            background: "#9B1B3A",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            right: 38,
+            bottom: 106,
+            width: 4,
+            height: 4,
+            borderRadius: "50%",
+            background: "#9B1B3A",
+          }}
+        />
       </div>
 
       {/* Action buttons */}
@@ -391,7 +386,7 @@ const ShareableValuesCard: React.FC<ShareableValuesCardProps> = ({ values }) => 
           className="flex-1 gap-2"
         >
           <Download className="h-3.5 w-3.5" />
-          Download
+          {isGenerating ? "Generating..." : "Download"}
         </Button>
         <Button
           size="sm"
