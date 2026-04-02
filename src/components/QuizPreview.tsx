@@ -64,37 +64,31 @@ const MiniChordDiagram = () => {
   );
 };
 
-/** Mini values card — matches the ShareableValuesCard visual */
+/** Mini preview — represents the shareable values reveal page */
 const MiniValuesCard = () => (
   <div
-    className="relative bg-[#FAFAF8] rounded-md overflow-hidden"
-    style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.03)" }}
+    className="relative rounded-md overflow-hidden"
+    style={{
+      background: "linear-gradient(170deg, #0C0A0D, #1A0F16, #0A080C)",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.1)",
+      padding: "16px 12px",
+    }}
   >
-    <div className="relative p-1.5">
-      {/* Corner marks */}
-      <div className="absolute top-1 left-1 w-2 h-2 border-l border-t border-[#D4D0C8]" />
-      <div className="absolute top-1 right-1 w-2 h-2 border-r border-t border-[#D4D0C8]" />
-      <div className="absolute bottom-1 left-1 w-2 h-2 border-l border-b border-[#D4D0C8]" />
-      <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-[#D4D0C8]" />
-
-      <div className="border border-[#1C1C1C]/50 px-3 py-3 text-center">
-        <Flame className="mx-auto h-3.5 w-3.5 text-[#9B1B3A] mb-1.5" strokeWidth={1.8} />
-        <p style={{ fontSize: "7px", letterSpacing: "0.25em" }} className="font-semibold uppercase text-[#1C1C1C]">Words Incarnate</p>
-        <p style={{ fontSize: "5.5px", letterSpacing: "0.2em" }} className="font-semibold uppercase text-[#9B1B3A] mt-px">My Core Values</p>
-        <div className="flex items-center gap-1 my-2 px-1">
-          <div className="flex-1 h-px bg-[#1C1C1C]/40" />
-          <div className="h-1 w-1 rotate-45 bg-[#9B1B3A]" />
-          <div className="flex-1 h-px bg-[#1C1C1C]/40" />
-        </div>
-        <div className="space-y-1">
-          {SAMPLE_VALUES.map((value) => (
-            <p key={value} style={{ fontSize: "9px", letterSpacing: "0.12em" }} className="font-semibold uppercase text-[#1C1C1C]">{value}</p>
-          ))}
-        </div>
-        <div className="h-px bg-[#1C1C1C]/20 mt-2 mb-1 mx-1" />
-        <p style={{ fontSize: "5px", letterSpacing: "0.18em" }} className="font-mono uppercase text-[#B0ACA4]">wordsincarnate.com</p>
+    {/* Flame glow */}
+    <div className="flex justify-center mb-2">
+      <div className="relative">
+        <div className="absolute inset-0 -m-2 rounded-full" style={{ background: "radial-gradient(circle, rgba(155,27,58,0.2) 0%, transparent 70%)" }} />
+        <Flame className="h-3.5 w-3.5 text-[#C85046]" strokeWidth={1.4} style={{ filter: "drop-shadow(0 0 4px rgba(155,27,58,0.4))" }} />
       </div>
     </div>
+    <p style={{ fontSize: "6px", letterSpacing: "0.35em" }} className="text-center uppercase text-white/30 mb-2 font-serif">My Values</p>
+    <div className="space-y-1.5">
+      {SAMPLE_VALUES.map((value) => (
+        <p key={value} style={{ fontSize: "10px", letterSpacing: "0.02em" }} className="text-center italic text-white/85 font-serif">{value}</p>
+      ))}
+    </div>
+    <div className="h-px bg-white/8 mt-3 mb-1.5 mx-2" />
+    <p style={{ fontSize: "5px", letterSpacing: "0.25em" }} className="text-center uppercase text-white/20 font-serif">Words Incarnate</p>
   </div>
 );
 
@@ -131,7 +125,7 @@ const QuizPreview = () => {
             </p>
           </motion.div>
 
-          {/* Shareable Card */}
+          {/* Shareable Reveal */}
           <motion.div
             className="text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -142,9 +136,9 @@ const QuizPreview = () => {
             <div className="max-w-[200px] mx-auto">
               <MiniValuesCard />
             </div>
-            <p className="mt-4 text-sm font-semibold text-foreground">Shareable Card</p>
+            <p className="mt-4 text-sm font-semibold text-foreground">Shareable Page</p>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Download a branded values card to share with family, friends, or your team.
+              Share a cinematic reveal of your values with family, friends, or your team.
             </p>
           </motion.div>
 
