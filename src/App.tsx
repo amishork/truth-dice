@@ -22,6 +22,7 @@ const Services = lazy(() => import("./pages/Services"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Schools = lazy(() => import("./pages/Schools"));
 const WallOfLove = lazy(() => import("./pages/WallOfLove"));
+const ShareExperience = lazy(() => import("./pages/ShareExperience"));
 const FreeWorkshop = lazy(() => import("./pages/FreeWorkshop"));
 const ValuesReveal = lazy(() => import("./pages/ValuesReveal"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -47,6 +48,7 @@ const AnimatedRoutes = () => {
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/schools" element={<PageTransition><Schools /></PageTransition>} />
           <Route path="/testimonials" element={<PageTransition><WallOfLove /></PageTransition>} />
+          <Route path="/testimonials/share" element={<PageTransition><ShareExperience /></PageTransition>} />
           <Route path="/workshop" element={<PageTransition><FreeWorkshop /></PageTransition>} />
           <Route path="/v" element={<ValuesReveal />} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
