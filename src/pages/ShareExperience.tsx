@@ -525,17 +525,11 @@ const ShareExperience = () => {
                         Preview
                       </p>
                       <div className="rounded-lg border border-border bg-card p-5">
-                        <div className="flex gap-0.5 mb-3">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              className={`h-4 w-4 ${
-                                s <= form.rating
-                                  ? "fill-primary text-primary"
-                                  : "fill-none text-muted-foreground/30"
-                              }`}
-                            />
-                          ))}
+                        <div className="mb-3">
+                          <StarRating
+                            value={form.rating}
+                            onChange={(v) => update("rating", v)}
+                          />
                         </div>
                         <p className="text-sm text-foreground leading-relaxed italic">
                           "{form.testimonialDraft.trim()}"
