@@ -241,6 +241,38 @@ serve(async (req) => {
           `
         );
       }
+    } else if (type === "testimonial") {
+      // Notify owner about new testimonial submission for review
+      const starsHtml = "★".repeat(data.rating || 5) + "☆".repeat(5 - (data.rating || 5));
+
+      await sendEmail(
+        RESEND_API_KEY,
+        OWNER_EMAIL,
+        `New Testimonial Submitted: ${data.name} (${data.audience})`,
+        `
+        <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #333;">
+          <h2 style="color: #9B1B3A; margin-bottom: 4px;">New Testimonial for Review</h2>
+          <p style="color: #888; margin-top: 0;">Submitted via wordsincarnate.com/testimonials/share</p>
+
+          <table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 14px; margin: 16px 0;">
+            <tr><td style="padding: 8px 12px; border: 1px solid #e5e5e5; font-weight: 600; width: 120px;">Name</td><td style="padding: 8px 12px; border: 1px solid #e5e5e5;">${data.name}</td></tr>
+            <tr><td style="padding: 8px 12px; border: 1px solid #e5e5e5; font-weight: 600;">Role</td><td style="padding: 8px 12px; border: 1px solid #e5e5e5;">${data.role}</td></tr>
+            <tr><td style="padding: 8px 12px; border: 1px solid #e5e5e5; font-weight: 600;">Audience</td><td style="padding: 8px 12px; border: 1px solid #e5e5e5;">${data.audience}</td></tr>
+            <tr><td style="padding: 8px 12px; border: 1px solid #e5e5e5; font-weight: 600;">Rating</td><td style="padding: 8px 12px; border: 1px solid #e5e5e5; color: #9B1B3A; font-size: 18px;">${starsHtml}</td></tr>
+            <tr><td style="padding: 8px 12px; border: 1px solid #e5e5e5; font-weight: 600;">Email</td><td style="padding: 8px 12px; border: 1px solid #e5e5e5;">${data.email}</td></tr>
+          </table>
+
+          <div style="background: #f9f7f5; border-left: 3px solid #9B1B3A; padding: 16px 20px; margin: 20px 0; font-style: italic; line-height: 1.6;">
+            "${data.testimonial}"
+          </div>
+
+          <p style="font-size: 13px; color: #666;">To approve: Supabase Dashboard → Table Editor → <strong>testimonials</strong> → find this row → change <code>status</code> from <code>pending</code> to <code>approved</code>.</p>
+          <p style="margin-top: 16px;">
+            <a href="https://supabase.com/dashboard/project/phfvfesypzoxatueijdt/editor" style="display: inline-block; background-color: #9B1B3A; color: #fff; padding: 10px 24px; text-decoration: none; border-radius: 4px; font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;">Open Supabase Dashboard</a>
+          </p>
+        </div>
+        `
+      );
     } else {
       throw new Error(`Unknown notification type: ${type}`);
     }
