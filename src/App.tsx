@@ -28,6 +28,7 @@ const ValuesReveal = lazy(() => import("./pages/ValuesReveal"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
+const Admin = lazy(() => import("./pages/Admin"));
 
 const PageLoader = () => (
   <div className="min-h-screen bg-background">
@@ -68,6 +69,7 @@ const AnimatedRoutes = () => {
           <Route path="/v" element={<ValuesReveal />} />
           <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
