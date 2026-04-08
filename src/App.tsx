@@ -71,8 +71,8 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <AnimatedRoutes />
+              <CookieConsent />
             </BrowserRouter>
-            <CookieConsent />
             <Analytics />
           </AuthProvider>
         </ErrorBoundary>

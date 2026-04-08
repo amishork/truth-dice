@@ -167,10 +167,9 @@ interface ValuesChatProps {
   rolledValue: string;
   rolledContext: string;
   coreValues?: string[];
-  onTriggerProductPopup?: () => void;
 }
 
-export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, coreValues, onTriggerProductPopup }) => {
+export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledContext, coreValues }) => {
   const [apiMessages, setApiMessages] = useState<Msg[]>([]);
   const [displayMessages, setDisplayMessages] = useState<DisplayMsg[]>([]);
   const [input, setInput] = useState('');
@@ -179,7 +178,6 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
   const [progress, setProgress] = useState<ProgressState>({ step: 0, phase: 'reflect' });
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const popupTriggeredRef = useRef(false);
   const bookingSavedRef = useRef(false);
   const lastQuestionRef = useRef<string | null>(null);
 
@@ -380,11 +378,6 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
               return [...prev, { role: 'assistant' as const, content: assistantSoFar }];
             });
             scrollToBottom();
-
-            if (!popupTriggeredRef.current && assistantSoFar.includes('At Words Incarnate, everything we create')) {
-              popupTriggeredRef.current = true;
-              onTriggerProductPopup?.();
-            }
 
             const latestParsed = parseAssistantMessage(assistantSoFar);
             if (latestParsed.question) {

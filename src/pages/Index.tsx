@@ -89,6 +89,7 @@ const Index = () => {
               loop
               muted
               playsInline
+              preload="metadata"
               poster={heroPoster}
               className="h-full w-full object-cover"
             >

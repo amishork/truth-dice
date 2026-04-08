@@ -347,6 +347,7 @@ const Quiz = () => {
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Discover Your Core Values | Free Assessment" description="Discover your 6 core values in a guided assessment. Free, no account required. Understand what drives you and how to live with greater intention." path="/quiz" />
 
       <AuthModal
         open={showAuthModal}
@@ -816,7 +817,7 @@ const Quiz = () => {
                     <Skeleton className="h-10 w-full rounded-md" />
                   </div>
                 }>
-                  <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} onTriggerProductPopup={() => setShowDicePopup(true)} />
+                  <ValuesChat rolledValue={dice1Result} rolledContext={dice2Result} coreValues={activeValues} />
                 </Suspense>
               </div>
             </div>
