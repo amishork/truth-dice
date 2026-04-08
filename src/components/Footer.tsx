@@ -74,6 +74,10 @@ const Footer = () => {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Words Incarnate. All rights reserved.
           </p>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <NavLink to="/privacy" className="transition-colors hover:text-foreground">Privacy Policy</NavLink>
+            <NavLink to="/terms" className="transition-colors hover:text-foreground">Terms of Service</NavLink>
+          </div>
           <p className="text-xs text-muted-foreground">
             Honor · Observe · Live · Declare
           </p>

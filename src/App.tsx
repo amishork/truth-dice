@@ -26,6 +26,8 @@ const ShareExperience = lazy(() => import("./pages/ShareExperience"));
 const FreeWorkshop = lazy(() => import("./pages/FreeWorkshop"));
 const ValuesReveal = lazy(() => import("./pages/ValuesReveal"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center bg-background">
@@ -51,6 +53,8 @@ const AnimatedRoutes = () => {
           <Route path="/testimonials/share" element={<PageTransition><ShareExperience /></PageTransition>} />
           <Route path="/workshop" element={<PageTransition><FreeWorkshop /></PageTransition>} />
           <Route path="/v" element={<ValuesReveal />} />
+          <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+          <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>

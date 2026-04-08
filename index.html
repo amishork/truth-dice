@@ -29,12 +29,77 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "Words Incarnate",
-      "description": "Values formation, strategy, and experience design for families, schools, and organizations.",
-      "url": "https://wordsincarnate.com",
-      "serviceType": ["Culture Consulting", "Values Discovery", "Formation", "Strategy"],
-      "areaServed": "US"
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://wordsincarnate.com/#organization",
+          "name": "Words Incarnate",
+          "legalName": "Providentia Limited LLC",
+          "url": "https://wordsincarnate.com",
+          "logo": "https://wordsincarnate.com/favicon-32x32.png",
+          "description": "Values formation, strategy, and experience design for families, schools, and organizations.",
+          "telephone": "+1-682-233-3559",
+          "email": "alex@wordsincarnate.com",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Fort Worth",
+            "addressRegion": "TX",
+            "addressCountry": "US"
+          },
+          "areaServed": [
+            {
+              "@type": "City",
+              "name": "Fort Worth",
+              "sameAs": "https://en.wikipedia.org/wiki/Fort_Worth,_Texas"
+            },
+            {
+              "@type": "State",
+              "name": "Texas"
+            },
+            {
+              "@type": "Country",
+              "name": "United States"
+            }
+          ]
+        },
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://wordsincarnate.com/#service",
+          "name": "Words Incarnate",
+          "url": "https://wordsincarnate.com",
+          "telephone": "+1-682-233-3559",
+          "email": "alex@wordsincarnate.com",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Fort Worth",
+            "addressRegion": "TX",
+            "addressCountry": "US"
+          },
+          "serviceType": ["Values Formation", "Culture Consulting", "Values Discovery", "Workshop Facilitation", "Leadership Development"],
+          "areaServed": "US",
+          "parentOrganization": { "@id": "https://wordsincarnate.com/#organization" }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://wordsincarnate.com/#website",
+          "name": "Words Incarnate",
+          "url": "https://wordsincarnate.com",
+          "publisher": { "@id": "https://wordsincarnate.com/#organization" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://wordsincarnate.com/#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://wordsincarnate.com" },
+            { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://wordsincarnate.com/services" },
+            { "@type": "ListItem", "position": 3, "name": "Values Discovery", "item": "https://wordsincarnate.com/quiz" },
+            { "@type": "ListItem", "position": 4, "name": "About", "item": "https://wordsincarnate.com/about" },
+            { "@type": "ListItem", "position": 5, "name": "For Schools", "item": "https://wordsincarnate.com/schools" },
+            { "@type": "ListItem", "position": 6, "name": "Testimonials", "item": "https://wordsincarnate.com/testimonials" },
+            { "@type": "ListItem", "position": 7, "name": "Contact", "item": "https://wordsincarnate.com/contact" }
+          ]
+        }
+      ]
     }
     </script>
 
