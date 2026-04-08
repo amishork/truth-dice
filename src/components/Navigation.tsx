@@ -64,15 +64,13 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
 
         {quizMode ? (
           <div className="flex items-center gap-2">
-            {isAuthenticated && (
-              <button
-                onClick={toggleTheme}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Toggle dark mode"
-              >
-                {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-              </button>
-            )}
+            <button
+              onClick={toggleTheme}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </button>
             <Button variant="ghost" size="sm" asChild>
               <a href="/">Exit Quiz</a>
             </Button>
@@ -96,16 +94,13 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
             <div className="flex items-center gap-2">
               {cartItemCount > 0 && <CartDrawer />}
 
-              {/* Dark mode toggle — only when authenticated */}
-              {isAuthenticated && (
-                <button
-                  onClick={toggleTheme}
-                  className="hidden md:flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Toggle dark mode"
-                >
-                  {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-                </button>
-              )}
+              <button
+                onClick={toggleTheme}
+                className="hidden md:flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+              </button>
 
               {/* Auth UI */}
               {isAuthenticated ? (
@@ -173,6 +168,13 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                           </div>
                         ))}
                         <div className="h-px w-full bg-border" />
+                        <button
+                          onClick={toggleTheme}
+                          className="flex items-center gap-2 text-left text-base font-medium text-muted-foreground"
+                        >
+                          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                          {isDark ? "Light Mode" : "Dark Mode"}
+                        </button>
                         {isAuthenticated ? (
                           <>
                             <button
@@ -180,13 +182,6 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                               className="text-left text-base font-medium text-muted-foreground"
                             >
                               My Values
-                            </button>
-                            <button
-                              onClick={toggleTheme}
-                              className="flex items-center gap-2 text-left text-base font-medium text-muted-foreground"
-                            >
-                              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                              {isDark ? "Light Mode" : "Dark Mode"}
                             </button>
                             <button
                               onClick={() => { setMobileOpen(false); signOut(); }}

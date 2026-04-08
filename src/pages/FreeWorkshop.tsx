@@ -201,7 +201,7 @@ const FreeWorkshop = () => {
                 Can't wait? Start now.
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Take the free values assessment — 5 minutes to discover the 6 values
+                Take the free values assessment — 10 minutes to discover the 6 values
                 that are already shaping your decisions.
               </p>
               <Button size="lg" className="mt-8" onClick={() => navigate("/quiz")}>

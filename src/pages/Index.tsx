@@ -79,7 +79,7 @@ const Index = () => {
 
       <main id="main" className="pt-16">
         {/* ─── HERO ─── */}
-        <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
+        <section id="hero" className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
           <motion.div
             className="absolute inset-0 will-change-transform"
             style={{ y: videoY }}
@@ -125,7 +125,7 @@ const Index = () => {
               </MagneticButton>
             </div>
 
-            <p className="mt-3 text-xs text-muted-foreground">~5 minutes · guided assessment · 6-value takeaway</p>
+            <p className="mt-3 text-xs text-muted-foreground">~10 minutes · guided assessment · 6-value takeaway</p>
           </motion.div>
 
           {/* Talk to an Adviser — floating bottom-right of hero */}

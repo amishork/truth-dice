@@ -13,8 +13,11 @@ const ExitIntentPopup = ({ onStartQuiz }: ExitIntentPopupProps) => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Don't show if already shown this session
     if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+    // Suppress on pages where user is actively engaged
+    const path = window.location.pathname;
+    if (["/quiz", "/contact", "/testimonials/share"].includes(path)) return;
 
     const triggerPopup = () => {
       if (sessionStorage.getItem(STORAGE_KEY)) return;
@@ -30,20 +33,37 @@ const ExitIntentPopup = ({ onStartQuiz }: ExitIntentPopupProps) => {
       }
     };
 
-    // Delay attaching desktop listener so it doesn't fire immediately
     const mouseTimer = setTimeout(() => {
       document.addEventListener("mouseout", mouseHandler);
     }, 5000);
 
-    // Mobile fallback: show after 45s if still on page and no CTA clicked
-    const mobileTimer = setTimeout(() => {
-      triggerPopup();
-      document.removeEventListener("mouseout", mouseHandler);
-    }, 45000);
+    // Mobile: idle-based trigger — fires after 30s of no interaction
+    let idleTimer: ReturnType<typeof setTimeout>;
+    const resetIdle = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        triggerPopup();
+        cleanup();
+      }, 30000);
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("scroll", resetIdle);
+      window.removeEventListener("touchstart", resetIdle);
+    };
+
+    // Start idle tracking after 10s on page
+    const idleStartTimer = setTimeout(() => {
+      window.addEventListener("scroll", resetIdle, { passive: true });
+      window.addEventListener("touchstart", resetIdle, { passive: true });
+      resetIdle();
+    }, 10000);
 
     return () => {
       clearTimeout(mouseTimer);
-      clearTimeout(mobileTimer);
+      clearTimeout(idleStartTimer);
+      clearTimeout(idleTimer);
+      cleanup();
       document.removeEventListener("mouseout", mouseHandler);
     };
   }, []);
@@ -77,7 +97,7 @@ const ExitIntentPopup = ({ onStartQuiz }: ExitIntentPopupProps) => {
             <div className="text-center">
               <p className="label-technical mb-3">Before you go</p>
               <h3 className="text-xl font-semibold text-foreground">
-                Discover your core values in 5 minutes
+                Discover your core values in 10 minutes
               </h3>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                 Our free assessment helps you name the 6 values that matter most — so you can build a life that embodies them.

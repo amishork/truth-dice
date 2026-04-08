@@ -288,7 +288,7 @@ const QuizPreview = () => {
           <Button size="lg" onClick={() => navigate("/quiz")} className="wi-cta">
             Start Free Assessment <ChevronRight />
           </Button>
-          <p className="mt-2 text-xs text-muted-foreground">~5 minutes · no account required</p>
+          <p className="mt-2 text-xs text-muted-foreground">~10 minutes · no account required</p>
         </motion.div>
       </div>
     </section>

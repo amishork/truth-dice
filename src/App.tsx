@@ -30,8 +30,21 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 
 const PageLoader = () => (
-  <div className="flex min-h-screen items-center justify-center bg-background">
-    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+  <div className="min-h-screen bg-background">
+    <div className="h-16 border-b border-border" />
+    <div className="mx-auto max-w-3xl px-6 pt-12 space-y-6">
+      <div className="h-8 w-2/3 animate-pulse rounded bg-muted" />
+      <div className="space-y-3">
+        <div className="h-4 w-full animate-pulse rounded bg-muted" />
+        <div className="h-4 w-5/6 animate-pulse rounded bg-muted" />
+        <div className="h-4 w-4/6 animate-pulse rounded bg-muted" />
+      </div>
+      <div className="h-48 w-full animate-pulse rounded-lg bg-muted" />
+      <div className="space-y-3">
+        <div className="h-4 w-full animate-pulse rounded bg-muted" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+      </div>
+    </div>
   </div>
 );
 
