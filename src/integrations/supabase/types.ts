@@ -10,13 +10,73 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
+      chat_bookings: {
+        Row: {
+          contact_info: string | null
+          contact_method: string | null
+          context_explored: string | null
+          core_values: string[] | null
+          created_at: string
+          customer_type: string | null
+          desired_outcome: string | null
+          id: string
+          insight: string | null
+          intention: string | null
+          name: string | null
+          offering: string | null
+          raw_summary: Json | null
+          support_type: string | null
+          timing: string | null
+          user_id: string | null
+          value_explored: string | null
+        }
+        Insert: {
+          contact_info?: string | null
+          contact_method?: string | null
+          context_explored?: string | null
+          core_values?: string[] | null
+          created_at?: string
+          customer_type?: string | null
+          desired_outcome?: string | null
+          id?: string
+          insight?: string | null
+          intention?: string | null
+          name?: string | null
+          offering?: string | null
+          raw_summary?: Json | null
+          support_type?: string | null
+          timing?: string | null
+          user_id?: string | null
+          value_explored?: string | null
+        }
+        Update: {
+          contact_info?: string | null
+          contact_method?: string | null
+          context_explored?: string | null
+          core_values?: string[] | null
+          created_at?: string
+          customer_type?: string | null
+          desired_outcome?: string | null
+          id?: string
+          insight?: string | null
+          intention?: string | null
+          name?: string | null
+          offering?: string | null
+          raw_summary?: Json | null
+          support_type?: string | null
+          timing?: string | null
+          user_id?: string | null
+          value_explored?: string | null
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
-          created_at: string
+          created_at: string | null
           email: string
           id: string
           message: string
@@ -26,7 +86,7 @@ export type Database = {
           service_interest: string | null
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           email: string
           id?: string
           message: string
@@ -36,7 +96,7 @@ export type Database = {
           service_interest?: string | null
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           email?: string
           id?: string
           message?: string
@@ -47,27 +107,132 @@ export type Database = {
         }
         Relationships: []
       }
-      email_captures: {
+      core_values: {
         Row: {
           created_at: string
-          email: string
           id: string
-          name: string | null
-          source: string
+          updated_at: string
+          user_id: string
+          values: string[]
         }
         Insert: {
           created_at?: string
-          email: string
           id?: string
-          name?: string | null
-          source?: string
+          updated_at?: string
+          user_id: string
+          values?: string[]
         }
         Update: {
           created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          values?: string[]
+        }
+        Relationships: []
+      }
+      email_captures: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string | null
+          source: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          name?: string | null
+          source?: string | null
+        }
+        Update: {
+          created_at?: string | null
           email?: string
           id?: string
           name?: string | null
-          source?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
+      quiz_sessions: {
+        Row: {
+          all_winners: Json | null
+          area_of_life: string
+          created_at: string | null
+          duration_seconds: number | null
+          final_six_values: Json
+          id: string
+          selection_counts: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          all_winners?: Json | null
+          area_of_life: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          final_six_values?: Json
+          id?: string
+          selection_counts?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          all_winners?: Json | null
+          area_of_life?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          final_six_values?: Json
+          id?: string
+          selection_counts?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          audience: string
+          challenge: string | null
+          created_at: string | null
+          email: string | null
+          experience: string | null
+          id: string
+          impact: string | null
+          name: string
+          photo_url: string | null
+          rating: number | null
+          role: string
+          status: string
+          testimonial_draft: string
+        }
+        Insert: {
+          audience?: string
+          challenge?: string | null
+          created_at?: string | null
+          email?: string | null
+          experience?: string | null
+          id?: string
+          impact?: string | null
+          name: string
+          photo_url?: string | null
+          rating?: number | null
+          role: string
+          status?: string
+          testimonial_draft: string
+        }
+        Update: {
+          audience?: string
+          challenge?: string | null
+          created_at?: string | null
+          email?: string | null
+          experience?: string | null
+          id?: string
+          impact?: string | null
+          name?: string
+          photo_url?: string | null
+          rating?: number | null
+          role?: string
+          status?: string
+          testimonial_draft?: string
         }
         Relationships: []
       }
@@ -76,7 +241,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_avg_quiz_duration: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

@@ -207,7 +207,7 @@ const ShareExperience = () => {
     setError("");
 
     try {
-      const { error: dbError } = await supabase.from("testimonials" as any).insert({
+      const { error: dbError } = await supabase.from("testimonials").insert({
         name: form.name.trim(),
         role: form.role.trim(),
         email: form.email.trim() || null,
@@ -218,13 +218,13 @@ const ShareExperience = () => {
         impact: form.impact.trim() || null,
         testimonial_draft: form.testimonialDraft.trim(),
         status: "pending",
-      } as any);
+      });
 
       if (dbError) throw dbError;
 
       // Fire notification to Alex
       try {
-        await sendNotification("testimonial" as any, {
+        await sendNotification("testimonial", {
           name: form.name,
           role: form.role,
           audience: form.audience,

@@ -746,7 +746,7 @@ const Quiz = () => {
                             { id: "demo-1", user_id: null, area_of_life: "personal", final_six_values: ["Love", "Wisdom", "Courage", "Integrity", "Faith", "Purpose"], all_winners: [], selection_counts: {}, created_at: "" },
                             { id: "demo-2", user_id: null, area_of_life: "leader", final_six_values: ["Integrity", "Courage", "Vision", "Wisdom", "Service", "Discipline"], all_winners: [], selection_counts: {}, created_at: "" },
                             { id: "demo-3", user_id: null, area_of_life: "work", final_six_values: ["Purpose", "Discipline", "Integrity", "Growth", "Excellence", "Courage"], all_winners: [], selection_counts: {}, created_at: "" },
-                          ] as any}
+                          ] as Array<{ id: string; user_id: string | null; area_of_life: string; final_six_values: string[]; all_winners: string[]; selection_counts: Record<string, number>; created_at: string }>}
                           activeSessionId={null}
                         />
                       </Suspense>

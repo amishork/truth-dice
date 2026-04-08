@@ -1,6 +1,6 @@
 const NOTIFICATION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`;
 
-export async function sendNotification(type: "contact" | "newsletter" | "lead_magnet", data: Record<string, unknown>) {
+export async function sendNotification(type: "contact" | "newsletter" | "lead_magnet" | "booking" | "testimonial", data: Record<string, unknown>) {
   try {
     await fetch(NOTIFICATION_URL, {
       method: "POST",

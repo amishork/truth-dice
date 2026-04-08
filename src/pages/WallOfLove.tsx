@@ -35,7 +35,7 @@ const WallOfLove = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       const { data, error } = await supabase
-        .from("testimonials" as any)
+        .from("testimonials")
         .select("id, name, role, audience, testimonial_draft, rating, created_at")
         .eq("status", "approved")
         .order("created_at", { ascending: false });
