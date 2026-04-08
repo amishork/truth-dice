@@ -1,7 +1,16 @@
+import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
+  useEffect(() => {
+    // Tell search engines not to index 404 pages
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow";
+    document.head.appendChild(meta);
+    return () => { document.head.removeChild(meta); };
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
