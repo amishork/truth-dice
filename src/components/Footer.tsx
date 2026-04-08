@@ -60,8 +60,8 @@ const Footer = () => {
             </p>
             <NewsletterSignup />
             <div className="mt-6 flex flex-col gap-2.5 text-sm text-muted-foreground">
-              <a href="mailto:hello@wordsincarnate.com" className="transition-colors hover:text-foreground">
-                hello@wordsincarnate.com
+              <a href="mailto:alex@wordsincarnate.com" className="transition-colors hover:text-foreground">
+                alex@wordsincarnate.com
               </a>
               <NavLink to="/contact" className="text-primary transition-colors hover:text-primary/80">
                 Request a Proposal →
