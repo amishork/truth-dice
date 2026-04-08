@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ChevronRight, Loader2, CheckCircle2, Download } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -31,12 +31,9 @@ const Index = () => {
   const navigate = useNavigate();
   const [showLeadMagnet, setShowLeadMagnet] = useState(false);
 
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const { scrollY } = useScroll();
+  const videoY = useTransform(scrollY, [0, 1000], [0, 300]);
+  const overlayY = useTransform(scrollY, [0, 1000], [0, 100]);
 
   const startQuiz = () => navigate("/quiz");
 
@@ -83,9 +80,9 @@ const Index = () => {
       <main id="main" className="pt-16">
         {/* ─── HERO ─── */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6">
-          <div
+          <motion.div
             className="absolute inset-0 will-change-transform"
-            style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+            style={{ y: videoY }}
           >
             <video
               autoPlay
@@ -97,10 +94,10 @@ const Index = () => {
             >
               <source src="/hero-video.mp4" type="video/mp4" />
             </video>
-          </div>
-          <div
+          </motion.div>
+          <motion.div
             className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background/90 backdrop-blur-[3px]"
-            style={{ transform: `translateY(${scrollY * 0.1}px)` }}
+            style={{ y: overlayY }}
           />
 
           <motion.div
