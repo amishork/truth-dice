@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Send, Sparkles, Download } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { SimpleMarkdown } from '@/lib/simpleMarkdown';
 import { trackChatEngaged, trackBookingSubmitted } from '@/lib/analytics';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
@@ -555,9 +555,9 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
                 <div className="chat-msg-assistant-wrap">
                   <div className="chat-msg-assistant">
                     <div className="prose-sketch max-w-none text-sm leading-relaxed">
-                      <ReactMarkdown>
+                      <SimpleMarkdown>
                         {parsed ? parsed.body : stripProgressMarker(msg.content)}
-                      </ReactMarkdown>
+                      </SimpleMarkdown>
                     </div>
                   </div>
                 </div>

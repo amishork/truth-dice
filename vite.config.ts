@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'framer': ['framer-motion'],
-          'recharts': ['recharts'],
           'sentry': ['@sentry/react'],
           'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
           'radix': [
