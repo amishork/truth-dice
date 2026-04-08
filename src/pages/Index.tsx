@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Loader2, CheckCircle2, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
-import HeroEmailCapture from "@/components/HeroEmailCapture";
 import HomeProgramCards from "@/components/HomeProgramCards";
+import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
+import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
 import QuizPreview from "@/components/QuizPreview";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
@@ -37,6 +39,25 @@ const Index = () => {
   }, []);
 
   const startQuiz = () => navigate("/quiz");
+
+  const [footerEmail, setFooterEmail] = useState("");
+  const [footerLoading, setFooterLoading] = useState(false);
+  const [footerSubmitted, setFooterSubmitted] = useState(false);
+  const [footerHoneypot, setFooterHoneypot] = useState("");
+
+  const handleFooterEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!footerEmail.trim() || footerHoneypot) return;
+    setFooterLoading(true);
+    await supabase.from("email_captures").upsert(
+      { email: footerEmail.trim(), source: "footer_cta" },
+      { onConflict: "email" }
+    );
+    setFooterLoading(false);
+    setFooterSubmitted(true);
+    trackEmailCaptured("footer_cta");
+    sendNotification("newsletter", { email: footerEmail.trim() });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,11 +128,6 @@ const Index = () => {
             </div>
 
             <p className="mt-3 text-xs text-muted-foreground">~5 minutes · guided assessment · 6-value takeaway</p>
-
-            {/* Email capture */}
-            <div className="mt-10">
-              <HeroEmailCapture />
-            </div>
           </motion.div>
 
           {/* Talk to an Adviser — floating bottom-right of hero */}
@@ -191,15 +207,61 @@ const Index = () => {
         >
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">
-              Ready to discover what drives you?
+              Not ready for the assessment yet?
             </h2>
             <p className="mt-3 text-primary-foreground/80">
-              Start with our free assessment — or apply to go deeper.
+              Get our free dinner guide — seven nights of guided family conversation.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button size="lg" variant="secondary" onClick={startQuiz} className="wi-cta">
-                Free Values Assessment <ChevronRight />
-              </Button>
+
+            <div className="mt-8 mx-auto max-w-md">
+              {footerSubmitted ? (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex items-center gap-2 text-primary-foreground">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span className="text-sm">You're in — here's your free guide:</span>
+                  </div>
+                  <a
+                    href="/seven-conversations-that-matter.pdf"
+                    download
+                    onClick={() => trackLeadMagnetDownloaded()}
+                    className="inline-flex items-center gap-1.5 rounded-md bg-primary-foreground/15 px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary-foreground/25 transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Seven Conversations That Matter (PDF)
+                  </a>
+                </div>
+              ) : (
+                <form onSubmit={handleFooterEmail} className="flex gap-2">
+                  <input
+                    type="text"
+                    name="company"
+                    value={footerHoneypot}
+                    onChange={(e) => setFooterHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+                    aria-hidden="true"
+                  />
+                  <input
+                    type="email"
+                    required
+                    placeholder="your@email.com"
+                    value={footerEmail}
+                    onChange={(e) => setFooterEmail(e.target.value)}
+                    className="h-10 flex-1 rounded-md border border-primary-foreground/20 bg-primary-foreground/10 px-3 text-sm text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary-foreground/30"
+                  />
+                  <Button type="submit" size="sm" variant="secondary" disabled={footerLoading} className="h-10 px-5 whitespace-nowrap">
+                    {footerLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Get Free Guide"}
+                  </Button>
+                </form>
+              )}
+
+              <p className="mt-3 text-[11px] text-primary-foreground/60">
+                Seven nights of guided family conversation — plus formation insights and workshop invitations.
+              </p>
+            </div>
+
+            <div className="mt-8">
               <Button
                 size="lg"
                 variant="outline"

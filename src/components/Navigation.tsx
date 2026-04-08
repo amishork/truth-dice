@@ -37,6 +37,7 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
 
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
@@ -146,7 +147,7 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
               )}
 
               <div className="md:hidden">
-                <Sheet>
+                <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" aria-label="Open menu">
                       <Menu />
@@ -161,20 +162,21 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                       <div className="h-px w-full bg-border" />
                       <nav className="flex flex-col gap-4">
                         {navItems.map((item) => (
-                          <NavLink
-                            key={item.to}
-                            to={item.to}
-                            className="text-base font-medium text-muted-foreground"
-                            activeClassName="text-foreground"
-                          >
-                            {item.label}
-                          </NavLink>
+                          <div key={item.to} onClick={() => setMobileOpen(false)}>
+                            <NavLink
+                              to={item.to}
+                              className="text-base font-medium text-muted-foreground"
+                              activeClassName="text-foreground"
+                            >
+                              {item.label}
+                            </NavLink>
+                          </div>
                         ))}
                         <div className="h-px w-full bg-border" />
                         {isAuthenticated ? (
                           <>
                             <button
-                              onClick={() => navigate("/quiz")}
+                              onClick={() => { setMobileOpen(false); navigate("/quiz"); }}
                               className="text-left text-base font-medium text-muted-foreground"
                             >
                               My Values
@@ -187,7 +189,7 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                               {isDark ? "Light Mode" : "Dark Mode"}
                             </button>
                             <button
-                              onClick={() => signOut()}
+                              onClick={() => { setMobileOpen(false); signOut(); }}
                               className="text-left text-base font-medium text-muted-foreground"
                             >
                               Sign Out
@@ -196,13 +198,13 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
                         ) : (
                           <>
                             <button
-                              onClick={() => setShowAuthModal(true)}
+                              onClick={() => { setMobileOpen(false); setShowAuthModal(true); }}
                               className="text-left text-base font-medium text-muted-foreground"
                             >
                               Sign In
                             </button>
                             <Button
-                              onClick={() => navigate("/quiz")}
+                              onClick={() => { setMobileOpen(false); navigate("/quiz"); }}
                               className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                             >
                               Free Values Assessment

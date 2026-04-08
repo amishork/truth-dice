@@ -16,22 +16,35 @@ const ExitIntentPopup = ({ onStartQuiz }: ExitIntentPopupProps) => {
     // Don't show if already shown this session
     if (sessionStorage.getItem(STORAGE_KEY)) return;
 
-    const handler = (e: MouseEvent) => {
+    const triggerPopup = () => {
+      if (sessionStorage.getItem(STORAGE_KEY)) return;
+      setShow(true);
+      sessionStorage.setItem(STORAGE_KEY, "1");
+    };
+
+    // Desktop: mouseout near top of viewport
+    const mouseHandler = (e: MouseEvent) => {
       if (e.clientY <= 5) {
-        setShow(true);
-        sessionStorage.setItem(STORAGE_KEY, "1");
-        document.removeEventListener("mouseout", handler);
+        triggerPopup();
+        document.removeEventListener("mouseout", mouseHandler);
       }
     };
 
-    // Delay attaching so it doesn't fire immediately
-    const timer = setTimeout(() => {
-      document.addEventListener("mouseout", handler);
+    // Delay attaching desktop listener so it doesn't fire immediately
+    const mouseTimer = setTimeout(() => {
+      document.addEventListener("mouseout", mouseHandler);
     }, 5000);
 
+    // Mobile fallback: show after 45s if still on page and no CTA clicked
+    const mobileTimer = setTimeout(() => {
+      triggerPopup();
+      document.removeEventListener("mouseout", mouseHandler);
+    }, 45000);
+
     return () => {
-      clearTimeout(timer);
-      document.removeEventListener("mouseout", handler);
+      clearTimeout(mouseTimer);
+      clearTimeout(mobileTimer);
+      document.removeEventListener("mouseout", mouseHandler);
     };
   }, []);
 
