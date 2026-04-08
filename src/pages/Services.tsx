@@ -57,7 +57,7 @@ const Services = () => {
       <PageMeta title="Services" description="Values discovery workshops, family formation, school culture advisory, and organizational strategy. Tailored formation experiences for every context." path="/services" />
       <Navigation />
       
-      <main className="pt-16">
+      <main id="main" className="pt-16">
         <div className="container mx-auto px-4 py-20">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}

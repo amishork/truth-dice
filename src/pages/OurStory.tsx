@@ -150,7 +150,7 @@ const OurStory = () => {
         style={{ width: progressWidth }}
       />
 
-      <main>
+      <main id="main">
         {/* Chapter 1: The Question */}
         <Chapter index={0} chapterLabel={CHAPTERS[0].label} total={CHAPTERS.length}>
           <h1 className="text-4xl sm:text-5xl font-semibold text-foreground leading-tight">

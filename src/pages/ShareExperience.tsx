@@ -253,7 +253,7 @@ const ShareExperience = () => {
           path="/testimonials/share"
         />
         <Navigation />
-        <main className="container mx-auto flex min-h-[70vh] items-center justify-center px-4 pt-24 pb-20">
+        <main id="main" className="container mx-auto flex min-h-[70vh] items-center justify-center px-4 pt-24 pb-20">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}

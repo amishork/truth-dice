@@ -346,7 +346,7 @@ const Quiz = () => {
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-background">
+    <div id="main" className="min-h-screen bg-background">
       <PageMeta title="Discover Your Core Values | Free Assessment" description="Discover your 6 core values in a guided assessment. Free, no account required. Understand what drives you and how to live with greater intention." path="/quiz" />
 
       <AuthModal

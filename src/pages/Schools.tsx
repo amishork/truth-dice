@@ -62,7 +62,7 @@ const Schools = () => {
       />
       <Navigation />
 
-      <main className="pt-16">
+      <main id="main" className="pt-16">
         {/* ─── HERO ─── */}
         <section className="bg-card py-24">
           <div className="container mx-auto px-4">

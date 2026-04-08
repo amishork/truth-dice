@@ -19,7 +19,7 @@ const Contact = () => {
       <PageMeta title="Contact" description="Ready to make your values incarnate? Get in touch with Words Incarnate to explore formation experiences for your family, school, or organization." path="/contact" />
       <Navigation />
 
-      <main className="container mx-auto px-4 pt-24 pb-20">
+      <main id="main" className="container mx-auto px-4 pt-24 pb-20">
         <div className="mx-auto max-w-5xl">
           <div className="grid gap-12 lg:grid-cols-5">
             {/* Left info panel */}

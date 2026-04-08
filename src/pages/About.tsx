@@ -17,7 +17,7 @@ const About = () => {
       <PageMeta title="About" description="Learn about Words Incarnate — values formation, strategy, and experience design for families, schools, and organizations." path="/about" />
       <Navigation />
 
-      <main className="container mx-auto px-4 pt-24 pb-20">
+      <main id="main" className="container mx-auto px-4 pt-24 pb-20">
         <div className="mx-auto max-w-3xl">
           <motion.h1 {...fadeUp} className="text-4xl sm:text-5xl font-semibold text-foreground">
             About Words Incarnate

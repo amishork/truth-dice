@@ -16,7 +16,7 @@ const Privacy = () => {
         path="/privacy"
       />
       <Navigation />
-      <main className="min-h-screen pt-24 pb-20">
+      <main id="main" className="min-h-screen pt-24 pb-20">
         <div className="container mx-auto px-4 max-w-3xl">
           <h1 className="text-3xl sm:text-4xl font-semibold text-foreground mb-2">
             Privacy Policy

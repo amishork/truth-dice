@@ -63,12 +63,6 @@ const Index = () => {
         description="Discover your core values and build cultures of connection, delight, and belonging. Start your free values assessment today."
         path="/"
       />
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-foreground focus:ring-2 focus:ring-ring"
-      >
-        Skip to Main Content
-      </a>
 
       <Navigation />
       <ExitIntentPopup onStartQuiz={startQuiz} />
