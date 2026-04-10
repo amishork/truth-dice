@@ -93,7 +93,29 @@ serve(async (req) => {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
 
-    const { type, data } = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+
+    const { type, data: rawData } = body;
+    const data = rawData as Record<string, unknown>;
+
+    const VALID_TYPES = ["contact", "newsletter", "lead_magnet", "booking", "testimonial"];
+    if (typeof type !== "string" || !VALID_TYPES.includes(type)) {
+      return new Response(JSON.stringify({ error: "Invalid or missing notification type" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    if (typeof data !== "object" || data === null) {
+      return new Response(JSON.stringify({ error: "data must be an object" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
 
     if (type === "contact") {
       // Notify you about new contact form submission

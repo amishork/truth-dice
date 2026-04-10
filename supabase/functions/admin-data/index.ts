@@ -23,12 +23,55 @@ function json(data: unknown, status: number, headers: Record<string, string>) {
   });
 }
 
+// ─── Rate Limiter ─────────────────────────────────────────────────────────────
+const RATE_LIMIT = 30; // requests per window
+const RATE_WINDOW_MS = 60_000; // 1 minute
+const rateLimitMap = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < RATE_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT) return true;
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+  if (rateLimitMap.size > 500) {
+    for (const [key, val] of rateLimitMap) {
+      if (val.every((t) => now - t > RATE_WINDOW_MS)) rateLimitMap.delete(key);
+    }
+  }
+  return false;
+}
+
+function getClientIp(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
 Deno.serve(async (req) => {
   const cors = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
+  const clientIp = getClientIp(req);
+  if (isRateLimited(clientIp)) {
+    return json({ error: "Too many requests." }, 429, { ...cors, "Retry-After": "60" });
+  }
+
   try {
-    const { password, action, params } = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid JSON body" }, 400, cors);
+    }
+
+    const { password, action, params } = body;
+
+    if (typeof password !== "string" || typeof action !== "string") {
+      return json({ error: "Invalid request format" }, 400, cors);
+    }
 
     const adminPassword = Deno.env.get("ADMIN_PASSWORD");
     if (!password || password !== adminPassword) {

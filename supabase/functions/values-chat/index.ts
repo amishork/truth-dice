@@ -558,14 +558,68 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, rolledValue, rolledContext, coreValues } = await req.json();
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+
+    const { messages, rolledValue, rolledContext, coreValues } = body;
+
+    // Input validation
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return new Response(JSON.stringify({ error: "messages must be a non-empty array" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    if (typeof rolledValue !== "string" || rolledValue.length > 200) {
+      return new Response(JSON.stringify({ error: "rolledValue must be a string under 200 chars" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    if (typeof rolledContext !== "string" || rolledContext.length > 200) {
+      return new Response(JSON.stringify({ error: "rolledContext must be a string under 200 chars" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    if (!Array.isArray(coreValues)) {
+      return new Response(JSON.stringify({ error: "coreValues must be an array" }), {
+        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    for (const msg of messages) {
+      if (
+        typeof msg !== "object" || msg === null ||
+        typeof (msg as Record<string, unknown>).role !== "string" ||
+        typeof (msg as Record<string, unknown>).content !== "string"
+      ) {
+        return new Response(JSON.stringify({ error: "Each message must have string role and content" }), {
+          status: 400, headers: { ...cors, "Content-Type": "application/json" },
+        });
+      }
+      if (((msg as Record<string, unknown>).content as string).length > 4000) {
+        return new Response(JSON.stringify({ error: "Message content exceeds 4000 character limit" }), {
+          status: 400, headers: { ...cors, "Content-Type": "application/json" },
+        });
+      }
+    }
+    // Hard message cap: no legitimate booking conversation needs more than 30 exchanges
+    if (messages.length > 30) {
+      return new Response(
+        JSON.stringify({ error: "Conversation limit reached. Please start a new session or book directly at wordsincarnate.com/contact" }),
+        { status: 429, headers: { ...cors, "Content-Type": "application/json" } }
+      );
+    }
 
     // Try Anthropic first, fall back to OpenAI-compatible endpoint
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
     const systemPrompt = buildSystemPrompt(rolledValue || "[value]", rolledContext || "[context]", coreValues || []);
-    const cappedMessages = capMessages(messages);
+    const cappedMessages = capMessages(messages as Array<{ role: string; content: string }>);
 
     let response: Response;
 
