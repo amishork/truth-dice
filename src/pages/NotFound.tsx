@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Flame } from "lucide-react";
 
 const NotFound = () => {
   useEffect(() => {
-    // Tell search engines not to index 404 pages
     const meta = document.createElement("meta");
     meta.name = "robots";
     meta.content = "noindex, nofollow";
@@ -14,18 +15,30 @@ const NotFound = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main id="main" className="container mx-auto px-4 pt-24 pb-20">
+      <main id="main" className="container mx-auto px-4 pt-32 pb-20">
         <div className="mx-auto max-w-xl text-center">
-          <p className="label-technical">Error</p>
-          <h1 className="mt-3 text-5xl font-semibold text-foreground">404</h1>
-          <p className="mt-4 text-muted-foreground">This page isn’t available.</p>
-          <div className="mt-8 flex justify-center">
-            <Button asChild>
-              <a href="/">Go to Homepage</a>
+          <Flame className="mx-auto h-10 w-10 text-primary mb-6" />
+          <h1 className="text-6xl font-bold text-foreground tracking-tight">404</h1>
+          <p className="mt-4 text-lg text-muted-foreground">
+            This page doesn't exist — but your values do.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-3">
+            <Button asChild size="lg">
+              <a href="/">Back to Home</a>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <a href="/quiz">Discover Your Values</a>
             </Button>
           </div>
+          <p className="mt-12 text-sm text-muted-foreground">
+            Looking for something specific? Try{" "}
+            <a href="/about" className="text-primary underline hover:text-primary/80">About</a>,{" "}
+            <a href="/schools" className="text-primary underline hover:text-primary/80">Schools</a>, or{" "}
+            <a href="/testimonials" className="text-primary underline hover:text-primary/80">Testimonials</a>.
+          </p>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

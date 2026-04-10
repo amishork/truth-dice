@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -60,6 +61,7 @@ const Schools = () => {
         description="Values formation consulting for Catholic schools. Faculty workshops, student programming, and institutional culture transformation."
         path="/schools"
       />
+      <JsonLd data={webPageSchema("For Schools | Words Incarnate", "Values formation consulting for Catholic schools. Faculty workshops, student programming, and institutional culture transformation.", "/schools")} />
       <Navigation />
 
       <main id="main" className="pt-16">

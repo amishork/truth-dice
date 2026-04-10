@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +55,7 @@ const FreeWorkshop = () => {
         description="Experience the work before you commit. Join a free live values formation workshop — open to families, educators, and leaders."
         path="/workshop"
       />
+      <JsonLd data={webPageSchema("Free Workshop | Words Incarnate", "Experience the work before you commit. Join a free live values formation workshop — open to families, educators, and leaders.", "/workshop")} />
       <Navigation />
 
       <main id="main" className="pt-16">

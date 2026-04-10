@@ -18,6 +18,7 @@ import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
 import QuizPreview from "@/components/QuizPreview";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { organizationSchema, localBusinessSchema } from "@/components/JsonLd";
 import heroPoster from "@/assets/hero-poster.webp";
 
 const fadeInUp = {
@@ -63,6 +64,8 @@ const Index = () => {
         description="Discover your core values and build cultures of connection, delight, and belonging. Start your free values assessment today."
         path="/"
       />
+      <JsonLd data={organizationSchema} />
+      <JsonLd data={localBusinessSchema} />
 
       <Navigation />
       <ExitIntentPopup onStartQuiz={startQuiz} />

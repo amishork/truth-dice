@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, Star } from "lucide-react";
@@ -61,6 +62,7 @@ const WallOfLove = () => {
         description="What families, schools, and organizations are saying about Words Incarnate."
         path="/testimonials"
       />
+      <JsonLd data={webPageSchema("Wall of Love | Words Incarnate", "What families, schools, and organizations are saying about Words Incarnate.", "/testimonials")} />
       <Navigation />
 
       <main id="main" className="container mx-auto px-4 pt-24 pb-20">

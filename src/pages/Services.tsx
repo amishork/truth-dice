@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import PricingCards from "@/components/PricingCards";
 import FAQ from "@/components/FAQ";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, GraduationCap, Building } from "lucide-react";
 
@@ -55,6 +56,7 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-background">
       <PageMeta title="Services" description="Values discovery workshops, family formation, school culture advisory, and organizational strategy. Tailored formation experiences for every context." path="/services" />
+      <JsonLd data={webPageSchema("Services", "Values discovery workshops, family formation, school culture advisory, and organizational strategy. Tailored formation experiences for every context.", "/services")} />
       <Navigation />
       
       <main id="main" className="pt-16">

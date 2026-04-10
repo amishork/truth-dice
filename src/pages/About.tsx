@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import FounderBio from "@/components/FounderBio";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 
 const fadeUp = {
@@ -15,6 +16,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-background">
       <PageMeta title="About" description="Learn about Words Incarnate — values formation, strategy, and experience design for families, schools, and organizations." path="/about" />
+      <JsonLd data={webPageSchema("About", "Learn about Words Incarnate — values formation, strategy, and experience design for families, schools, and organizations.", "/about")} />
       <Navigation />
 
       <main id="main" className="container mx-auto px-4 pt-24 pb-20">
