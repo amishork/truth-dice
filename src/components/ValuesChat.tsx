@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Send, Sparkles, Download } from 'lucide-react';
 import { SimpleMarkdown } from '@/lib/simpleMarkdown';
-import { trackChatEngaged, trackBookingSubmitted } from '@/lib/analytics';
+import { trackChatEngaged, trackBookingSubmitted, trackChatOpened, trackBookingInitiated } from '@/lib/analytics';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -187,6 +187,8 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
     [displayMessages]
   );
 
+  useEffect(() => { trackChatOpened(); }, []);
+
   useEffect(() => {
     if (rolledValue && rolledContext && !hasStarted) {
       setHasStarted(true);
@@ -301,7 +303,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
         }),
       });
 
-      trackBookingSubmitted();
+      trackBookingSubmitted(bookingData.customer_type ?? undefined, bookingData.offering ?? undefined, bookingData.intention ?? undefined);
     } catch (e) {
       console.error('Failed to save booking:', e);
     }
@@ -387,6 +389,7 @@ export const ValuesChat: React.FC<ValuesChatProps> = ({ rolledValue, rolledConte
             // Update progress from LLM marker (primary)
             const marker = extractProgressMarker(assistantSoFar);
             if (marker) {
+              if (marker.phase === "book" && progress.phase !== "book") trackBookingInitiated();
               setProgress(marker);
             }
           }

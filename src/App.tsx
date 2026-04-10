@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -17,7 +17,6 @@ const queryClient = new QueryClient();
 const Index = lazy(() => import("./pages/Index"));
 const Quiz = lazy(() => import("./pages/Quiz"));
 const About = lazy(() => import("./pages/About"));
-const OurStory = lazy(() => import("./pages/OurStory"));
 const Services = lazy(() => import("./pages/Services"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Schools = lazy(() => import("./pages/Schools"));
@@ -59,7 +58,7 @@ const AnimatedRoutes = () => {
           <Route path="/" element={<PageTransition><Index /></PageTransition>} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-          <Route path="/our-story" element={<PageTransition><OurStory /></PageTransition>} />
+          <Route path="/our-story" element={<Navigate to="/about" replace />} />
           <Route path="/services" element={<PageTransition><Services /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/schools" element={<PageTransition><Schools /></PageTransition>} />

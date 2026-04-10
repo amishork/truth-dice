@@ -1,15 +1,14 @@
 import { track } from "@vercel/analytics";
+import posthog from "posthog-js";
 
 /**
  * Words Incarnate Funnel Analytics
+ * Dual-fires to Vercel Analytics (existing) and PostHog (funnel analysis).
  *
- * Key funnel stages tracked:
+ * Key funnel stages:
  *   quiz_started → area_selected → section1_complete → section2_complete →
  *   section3_complete → final_selection_complete → quiz_saved →
  *   results_viewed → dice_rolled → chat_engaged → booking_submitted
- *
- * Lead capture events:
- *   email_captured, contact_submitted, lead_magnet_downloaded
  */
 
 export function trackEvent(
@@ -19,7 +18,12 @@ export function trackEvent(
   try {
     track(event, properties);
   } catch {
-    // Analytics should never break the app
+    // Vercel Analytics should never break the app
+  }
+  try {
+    posthog.capture(event, properties);
+  } catch {
+    // PostHog should never break the app
   }
 }
 
@@ -87,8 +91,12 @@ export function trackChatEngaged() {
   trackEvent("chat_engaged");
 }
 
-export function trackBookingSubmitted() {
-  trackEvent("booking_submitted");
+export function trackBookingSubmitted(customerType?: string, offering?: string, intention?: string) {
+  trackEvent("booking_submitted", {
+    ...(customerType ? { customer_type: customerType } : {}),
+    ...(offering ? { offering } : {}),
+    ...(intention ? { intention } : {}),
+  });
 }
 
 export function trackResultsShared(method: "download" | "email") {
@@ -109,4 +117,22 @@ export function trackContactSubmitted(serviceInterest?: string) {
 
 export function trackLeadMagnetDownloaded() {
   trackEvent("lead_magnet_downloaded");
+}
+
+// ─── Chat & Booking ───────────────────────────────────────────────────────────
+
+export function trackChatOpened() {
+  trackEvent("chat_opened");
+}
+
+export function trackChatMessageSent(messageIndex: number, phase: string) {
+  trackEvent("chat_message_sent", { message_index: messageIndex, phase });
+}
+
+export function trackBookingInitiated() {
+  trackEvent("booking_initiated");
+}
+
+export function trackWorkshopCtaClicked(location: string) {
+  trackEvent("workshop_cta_clicked", { location });
 }
