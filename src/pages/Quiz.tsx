@@ -33,6 +33,7 @@ const ValuesChordDiagram = lazy(() => import("@/components/ValuesChordDiagram"))
 const ValuesChat = lazy(() => import("@/components/ValuesChat").then(mod => ({ default: mod.ValuesChat })));
 const InteractiveDie = lazy(() => import("@/components/InteractiveDie"));
 import ShareValues from "@/components/ShareValues";
+import ValuesPosterDownload from "@/components/ValuesPosterDownload";
 import type { DieHandle } from "@/components/InteractiveDie";
 
 const Quiz = () => {
@@ -52,6 +53,8 @@ const Quiz = () => {
     handleGratitudeComplete, buildSection3Pairs, buildRunoffPairs,
     getResumableState, saveQuizStateToStorage, resetQuiz,
   } = quiz;
+
+  const [showResumePrompt, setShowResumePrompt] = useState<boolean>(hasResumable);
 
   // ─── Dashboard state (sessions, dice, UI) ───────────────────────────────────
   const [completedAreas, setCompletedAreas] = useState<string[]>([]);
@@ -258,7 +261,19 @@ const Quiz = () => {
     return (
       <div className="mx-auto w-full max-w-3xl px-6 pt-24 pb-2">
         <div className="mb-6 flex items-center justify-between gap-3">
-          <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/")}>Exit Quiz</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/")}>Exit Quiz</Button>
+            {isAuthenticated && userSessions.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary hover:text-primary/80 text-[11px]"
+                onClick={() => setStage("dice")}
+              >
+                ← My Results
+              </Button>
+            )}
+          </div>
           <span className="text-[10px] font-mono text-muted-foreground tracking-wider uppercase">
             {QUIZ_SECTIONS[activeIdx]?.label} — {current} of {Math.max(total, 1)}
           </span>
@@ -354,6 +369,33 @@ const Quiz = () => {
         onClose={handleGuestContinue}
         onContinueAsGuest={handleGuestContinue}
       />
+
+      {showResumePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm px-6">
+          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-xl text-center space-y-5">
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">Quiz in Progress</p>
+            <h2 className="font-serif text-2xl text-foreground">You left off here.</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              You have an unfinished values assessment. Pick up where you left off, or start fresh from the beginning.
+            </p>
+            <div className="flex flex-col gap-3 pt-2">
+              <button
+                onClick={() => setShowResumePrompt(false)}
+                className="w-full rounded-lg bg-foreground text-background px-6 py-3 text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                Resume where I left off
+              </button>
+              <button
+                onClick={() => { resetQuiz(); setShowResumePrompt(false); setStage("area-of-life"); }}
+                className="w-full rounded-lg border border-border px-6 py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Start fresh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {stage === "area-of-life" && (
         <div className="min-h-screen bg-background">
@@ -791,6 +833,7 @@ const Quiz = () => {
                   {!isAuthenticated && (
                     <EmailMyResults values={activeValues} areaLabel={areaLabel} />
                   )}
+                  <ValuesPosterDownload coreValues={activeValues} areaLabel={areaLabel || undefined} />
                 </div>
               )}
 
