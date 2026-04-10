@@ -17,20 +17,11 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'framer': ['framer-motion'],
-          'sentry': ['@sentry/react'],
-          'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
-          'radix': [
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-label',
-            '@radix-ui/react-select',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-slot',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-tooltip',
-          ],
+        manualChunks(id) {
+          if (id.includes('framer-motion')) return 'framer';
+          if (id.includes('@sentry')) return 'sentry';
+          if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) return 'forms';
+          if (id.includes('@radix-ui')) return 'radix';
         },
       },
     },

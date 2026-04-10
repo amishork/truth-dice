@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, lazy, Suspense } from "react";
 import { NavLink } from "@/components/NavLink";
+
+const AuthModal = lazy(() => import("./AuthModal"));
 import { Flame, Menu, Moon, Sun } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { CartDrawer } from "./CartDrawer";
-import AuthModal from "./AuthModal";
+
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,20 +48,22 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
     >
       Skip to Main Content
     </a>
-    <AuthModal
-      open={showAuthModal}
-      onClose={() => setShowAuthModal(false)}
-      onContinueAsGuest={() => setShowAuthModal(false)}
-    />
-    <motion.nav
+    {showAuthModal && (
+      <Suspense fallback={null}>
+        <AuthModal
+          open={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onContinueAsGuest={() => setShowAuthModal(false)}
+        />
+      </Suspense>
+    )}
+    <nav
       className={`fixed top-0 left-0 right-0 z-50 border-b border-border backdrop-blur-sm transition-all duration-500 ${
         quizMode
           ? "bg-background/60 opacity-70 hover:opacity-100"
           : "bg-background/95"
       }`}
-      initial={{ y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      style={{ animation: "fadeSlideDown 0.4s ease-out forwards" }}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <NavLink to="/" className="flex items-center gap-3">
@@ -221,7 +224,7 @@ const Navigation: React.FC<NavigationProps> = ({ quizMode = false }) => {
           </>
         )}
       </div>
-    </motion.nav>
+    </nav>
     </>
   );
 };
