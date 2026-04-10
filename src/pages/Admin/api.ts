@@ -153,6 +153,52 @@ export interface LeadActivity {
   created_at: string;
 }
 
+export interface EngagementRecord {
+  id: string;
+  lead_id: string | null;
+  client_name: string;
+  organization: string | null;
+  engagement_type: string;
+  tier: "I" | "II" | "III" | null;
+  segment: "individual" | "family" | "school" | "organization";
+  contract_value: number;
+  amount_invoiced: number;
+  amount_received: number;
+  status: "active" | "completed" | "paused" | "cancelled";
+  start_date: string | null;
+  end_date: string | null;
+  sessions_total: number;
+  sessions_completed: number;
+  deliverables: unknown[];
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EngagementSession {
+  id: string;
+  engagement_id: string;
+  session_date: string | null;
+  session_notes: string | null;
+  hold_stage: "honor" | "observe" | "live" | "declare" | null;
+  created_at: string;
+}
+
+export const HOLD_STAGES = ["honor", "observe", "live", "declare"] as const;
+
+export interface RevenueSummary {
+  totalRevenue: number;
+  totalInvoiced: number;
+  totalContract: number;
+  outstanding: number;
+  bySegment: Record<string, number>;
+  byMonth: Record<string, number>;
+  byStatus: Record<string, number>;
+  avgBySegment: Record<string, number>;
+  pipelineCount: number;
+  engagementCount: number;
+}
+
 // ─── Helpers ───
 
 export function timeAgo(dateStr: string): string {

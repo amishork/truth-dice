@@ -5,6 +5,8 @@ import CommandCenter from "./CommandCenter";
 import Testimonials from "./Testimonials";
 import DataView from "./DataView";
 import Pipeline from "./Pipeline";
+import Engagements from "./Engagements";
+import Revenue from "./Revenue";
 import "./admin.css";
 
 // ─── Icons (inline SVG to avoid lucide bundle in admin) ───
@@ -337,21 +339,9 @@ const Admin = () => {
       case "pipeline":
         return <Pipeline password={password} />;
       case "engagements":
-        return (
-          <PlaceholderView
-            title="Engagements"
-            description="Active client engagement tracking, session logging, HOLD stage progression, and session preparation views. Coming in Phase 3."
-            icon="briefcase"
-          />
-        );
+        return <Engagements password={password} />;
       case "revenue":
-        return (
-          <PlaceholderView
-            title="Revenue"
-            description="Revenue dashboard with monthly trends, segment breakdown, pipeline value, and revenue calculator. Coming in Phase 3."
-            icon="dollar"
-          />
-        );
+        return <Revenue password={password} />;
       case "content-config":
         return (
           <PlaceholderView
