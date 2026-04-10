@@ -833,7 +833,7 @@ const Quiz = () => {
                   {!isAuthenticated && (
                     <EmailMyResults values={activeValues} areaLabel={areaLabel} />
                   )}
-                  <ValuesPosterDownload coreValues={activeValues} areaLabel={areaLabel || undefined} />
+                  <ValuesPosterDownload coreValues={activeValues} areaLabel={areaLabel || undefined} sessions={userSessions} />
                 </div>
               )}
 

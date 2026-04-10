@@ -1,6 +1,8 @@
 import React, { useRef, useState, useMemo } from "react";
 import { CORE_VALUES } from "@/data/values";
 import { trackResultsShared } from "@/lib/analytics";
+import ValuesChordDiagramPrint from "./ValuesChordDiagramPrint";
+import type { QuizSession } from "@/lib/quizSessions";
 
 // ─── Brand tokens ─────────────────────────────────────────────────────────────
 const CRIMSON = "#9B1B3A";
@@ -142,9 +144,10 @@ function PosterChordDiagram({ coreValues }: { coreValues: string[] }) {
 interface ValuesPosterDownloadProps {
   coreValues: string[];
   areaLabel?: string;
+  sessions?: QuizSession[];
 }
 
-export default function ValuesPosterDownload({ coreValues, areaLabel }: ValuesPosterDownloadProps) {
+export default function ValuesPosterDownload({ coreValues, areaLabel, sessions }: ValuesPosterDownloadProps) {
   const posterRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -253,7 +256,11 @@ export default function ValuesPosterDownload({ coreValues, areaLabel }: ValuesPo
           alignItems: "center",
           justifyContent: "center",
         }}>
-          <PosterChordDiagram coreValues={coreValues} />
+          {sessions && sessions.length > 0 ? (
+            <ValuesChordDiagramPrint sessions={sessions} coreValues={coreValues} />
+          ) : (
+            <PosterChordDiagram coreValues={coreValues} />
+          )}
         </div>
 
         {/* Bottom rule + branding */}
