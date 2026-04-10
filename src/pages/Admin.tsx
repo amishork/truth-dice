@@ -15,7 +15,7 @@ type Tab = "overview" | "emails" | "quizzes" | "bookings" | "contacts" | "testim
 async function api(password: string, action: string, params?: Record<string, unknown>) {
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: ANON_KEY },
+    headers: { "Content-Type": "application/json", apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
     body: JSON.stringify({ password, action, params }),
   });
   const data = await res.json();
