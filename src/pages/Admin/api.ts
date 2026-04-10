@@ -111,6 +111,50 @@ export interface TestimonialRecord {
 
 // ─── Helpers ───
 
+export const PIPELINE_STAGES = [
+  { id: "anonymous", label: "Anonymous", color: "#6B6560" },
+  { id: "captured", label: "Captured", color: "#5B7B8C" },
+  { id: "engaged", label: "Engaged", color: "#7B8C5B" },
+  { id: "booking_requested", label: "Booking Requested", color: "#C4943D" },
+  { id: "contacted", label: "Contacted", color: "#8C7B5B" },
+  { id: "in_conversation", label: "In Conversation", color: "#D4A574" },
+  { id: "proposal_sent", label: "Proposal Sent", color: "#D4A574" },
+  { id: "won", label: "Won", color: "#5B8C5A" },
+  { id: "lost", label: "Lost", color: "#C45B5B" },
+  { id: "nurture", label: "Nurture", color: "#8C5B7B" },
+] as const;
+
+export type PipelineStage = typeof PIPELINE_STAGES[number]["id"];
+
+export interface LeadRecord {
+  id: string;
+  email: string | null;
+  name: string | null;
+  phone: string | null;
+  customer_type: "individual" | "family" | "school" | "organization";
+  pipeline_stage: PipelineStage;
+  lead_score: number;
+  source: string | null;
+  tags: string[];
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  last_activity_at: string;
+  follow_up_date: string | null;
+  follow_up_note: string | null;
+  lost_reason: string | null;
+}
+
+export interface LeadActivity {
+  id: string;
+  lead_id: string;
+  activity_type: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+// ─── Helpers ───
+
 export function timeAgo(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();

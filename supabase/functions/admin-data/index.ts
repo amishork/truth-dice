@@ -211,12 +211,172 @@ Deno.serve(async (req) => {
 
       case "export_csv": {
         const table = params?.table;
-        const allowed = ["quiz_sessions", "email_captures", "chat_bookings", "contact_submissions"];
+        const allowed = ["quiz_sessions", "email_captures", "chat_bookings", "contact_submissions", "leads"];
         if (!allowed.includes(table)) {
           return json({ error: "Invalid table" }, 400, cors);
         }
         const { data } = await db.from(table).select("*").order("created_at", { ascending: false });
         return json({ data }, 200, cors);
+      }
+
+      // ─── Lead Management ─────────────────────────────────────────────────
+
+      case "leads": {
+        const stage = params?.stage as string | undefined;
+        const limit = (params?.limit as number) || 100;
+        const offset = (params?.offset as number) || 0;
+        let query = db.from("leads").select("*", { count: "exact" });
+        if (stage) query = query.eq("pipeline_stage", stage);
+        query = query.order("last_activity_at", { ascending: false }).range(offset, offset + limit - 1);
+        const { data, count, error } = await query;
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ data, count }, 200, cors);
+      }
+
+      case "leads_by_stage": {
+        const { data, error } = await db
+          .from("leads")
+          .select("*")
+          .order("lead_score", { ascending: false });
+        if (error) return json({ error: error.message }, 500, cors);
+
+        const stages = [
+          "anonymous", "captured", "engaged", "booking_requested",
+          "contacted", "in_conversation", "proposal_sent", "won", "lost", "nurture"
+        ];
+        const grouped: Record<string, unknown[]> = {};
+        for (const s of stages) grouped[s] = [];
+        for (const lead of data || []) {
+          const s = lead.pipeline_stage || "captured";
+          if (grouped[s]) grouped[s].push(lead);
+          else grouped["captured"].push(lead);
+        }
+        return json({ stages: grouped }, 200, cors);
+      }
+
+      case "lead_detail": {
+        const leadId = params?.id as string;
+        if (!leadId) return json({ error: "Missing lead id" }, 400, cors);
+
+        const [leadRes, activitiesRes] = await Promise.all([
+          db.from("leads").select("*").eq("id", leadId).single(),
+          db.from("lead_activities").select("*").eq("lead_id", leadId).order("created_at", { ascending: false }),
+        ]);
+        if (leadRes.error) return json({ error: leadRes.error.message }, 404, cors);
+        return json({ lead: leadRes.data, activities: activitiesRes.data || [] }, 200, cors);
+      }
+
+      case "create_lead": {
+        const { email, name, phone, customer_type, pipeline_stage, source, tags, notes } = params || {};
+        const insertData: Record<string, unknown> = {};
+        if (email) insertData.email = (email as string).toLowerCase();
+        if (name) insertData.name = name;
+        if (phone) insertData.phone = phone;
+        if (customer_type) insertData.customer_type = customer_type;
+        if (pipeline_stage) insertData.pipeline_stage = pipeline_stage;
+        if (source) insertData.source = source;
+        if (tags) insertData.tags = tags;
+        if (notes) insertData.notes = notes;
+        insertData.lead_score = 0;
+
+        const { data, error } = await db.from("leads").insert(insertData).select().single();
+        if (error) return json({ error: error.message }, 400, cors);
+        return json({ lead: data }, 201, cors);
+      }
+
+      case "update_lead": {
+        const leadId = params?.id as string;
+        if (!leadId) return json({ error: "Missing lead id" }, 400, cors);
+
+        const updates: Record<string, unknown> = {};
+        const allowed_fields = [
+          "name", "email", "phone", "customer_type", "source",
+          "tags", "notes", "follow_up_date", "follow_up_note", "lost_reason", "lead_score"
+        ];
+        for (const f of allowed_fields) {
+          if (params?.[f] !== undefined) {
+            updates[f] = f === "email" && params[f] ? (params[f] as string).toLowerCase() : params[f];
+          }
+        }
+
+        if (Object.keys(updates).length === 0) return json({ error: "No fields to update" }, 400, cors);
+
+        const { data, error } = await db.from("leads").update(updates).eq("id", leadId).select().single();
+        if (error) return json({ error: error.message }, 400, cors);
+        return json({ lead: data }, 200, cors);
+      }
+
+      case "update_lead_stage": {
+        const leadId = params?.id as string;
+        const newStage = params?.stage as string;
+        const lostReason = params?.lost_reason as string | undefined;
+        if (!leadId || !newStage) return json({ error: "Missing id or stage" }, 400, cors);
+
+        const validStages = [
+          "anonymous", "captured", "engaged", "booking_requested",
+          "contacted", "in_conversation", "proposal_sent", "won", "lost", "nurture"
+        ];
+        if (!validStages.includes(newStage)) return json({ error: "Invalid stage" }, 400, cors);
+
+        // Get current stage for activity log
+        const { data: current } = await db.from("leads").select("pipeline_stage").eq("id", leadId).single();
+        const oldStage = current?.pipeline_stage || "unknown";
+
+        const updateData: Record<string, unknown> = {
+          pipeline_stage: newStage,
+          last_activity_at: new Date().toISOString(),
+        };
+        if (newStage === "lost" && lostReason) updateData.lost_reason = lostReason;
+
+        const { data, error } = await db.from("leads").update(updateData).eq("id", leadId).select().single();
+        if (error) return json({ error: error.message }, 400, cors);
+
+        // Log the stage change
+        await db.from("lead_activities").insert({
+          lead_id: leadId,
+          activity_type: "stage_changed",
+          metadata: { from: oldStage, to: newStage, lost_reason: lostReason || null },
+        });
+
+        return json({ lead: data }, 200, cors);
+      }
+
+      case "add_lead_note": {
+        const leadId = params?.id as string;
+        const note = params?.note as string;
+        if (!leadId || !note) return json({ error: "Missing id or note" }, 400, cors);
+
+        // Append to notes field
+        const { data: current } = await db.from("leads").select("notes").eq("id", leadId).single();
+        const timestamp = new Date().toLocaleString("en-US", {
+          month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit"
+        });
+        const newNotes = current?.notes
+          ? `${current.notes}\n\n[${timestamp}] ${note}`
+          : `[${timestamp}] ${note}`;
+
+        const { error } = await db.from("leads").update({
+          notes: newNotes,
+          last_activity_at: new Date().toISOString(),
+        }).eq("id", leadId);
+        if (error) return json({ error: error.message }, 500, cors);
+
+        // Log activity
+        await db.from("lead_activities").insert({
+          lead_id: leadId,
+          activity_type: "note_added",
+          metadata: { note },
+        });
+
+        return json({ success: true }, 200, cors);
+      }
+
+      case "delete_lead": {
+        const leadId = params?.id as string;
+        if (!leadId) return json({ error: "Missing lead id" }, 400, cors);
+        const { error } = await db.from("leads").delete().eq("id", leadId);
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ success: true }, 200, cors);
       }
 
       default:

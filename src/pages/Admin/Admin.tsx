@@ -4,6 +4,7 @@ import { api, SESSION_KEY, type AdminView, type OverviewData, type BookingRecord
 import CommandCenter from "./CommandCenter";
 import Testimonials from "./Testimonials";
 import DataView from "./DataView";
+import Pipeline from "./Pipeline";
 import "./admin.css";
 
 // ─── Icons (inline SVG to avoid lucide bundle in admin) ───
@@ -334,13 +335,7 @@ const Admin = () => {
           />
         );
       case "pipeline":
-        return (
-          <PlaceholderView
-            title="Pipeline"
-            description="Lead pipeline board with Kanban view, list view, and unified contact profiles. Coming in Phase 2."
-            icon="pipeline"
-          />
-        );
+        return <Pipeline password={password} />;
       case "engagements":
         return (
           <PlaceholderView
