@@ -81,6 +81,31 @@ const FreeWorkshop = () => {
           </div>
         </section>
 
+        {/* ─── SCARCITY / NEXT SESSION ─── */}
+        <section className="py-6">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-3xl rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-2">
+                Next Live Session
+              </p>
+              <p className="text-2xl font-semibold text-foreground">
+                May 16, 2026
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Limited to 20 participants per session to keep conversation personal.
+              </p>
+              <div className="mt-4">
+                <Button
+                  size="lg"
+                  onClick={() => document.getElementById("workshop-signup")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                  Reserve Your Spot
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ─── WHAT TO EXPECT ─── */}
         <section className="py-20">
           <div className="container mx-auto px-4">
@@ -130,7 +155,7 @@ const FreeWorkshop = () => {
         </section>
 
         {/* ─── SIGNUP ─── */}
-        <section className="bg-card py-20">
+        <section id="workshop-signup" className="bg-card py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-md text-center">
               <h2 className="text-3xl font-semibold text-foreground">
