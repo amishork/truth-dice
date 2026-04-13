@@ -28,7 +28,8 @@ const FreeWorkshop = () => {
   const [honeypot, setHoneypot] = useState("");
 
   // Fetch workshop config from dashboard_config
-  const [workshopDate, setWorkshopDate] = useState("May 16, 2026");
+  const [workshopDate, setWorkshopDate] = useState<string | null>(null);
+  const [workshopScheduled, setWorkshopScheduled] = useState(false);
   const [workshopCapacity, setWorkshopCapacity] = useState(20);
 
   useEffect(() => {
@@ -41,8 +42,9 @@ const FreeWorkshop = () => {
           for (const row of data) {
             if (row.key === "workshop_date" && row.value) {
               const d = new Date(String(row.value));
-              if (!isNaN(d.getTime())) {
+              if (!isNaN(d.getTime()) && d > new Date()) {
                 setWorkshopDate(d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }));
+                setWorkshopScheduled(true);
               }
             }
             if (row.key === "workshop_capacity" && row.value) {
@@ -108,6 +110,7 @@ const FreeWorkshop = () => {
         </section>
 
         {/* ─── SCARCITY / NEXT SESSION ─── */}
+        {workshopScheduled && (
         <section className="py-6">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-3xl rounded-xl border border-primary/20 bg-primary/5 p-6 text-center">
@@ -131,6 +134,7 @@ const FreeWorkshop = () => {
             </div>
           </div>
         </section>
+        )}
 
         {/* ─── WHAT TO EXPECT ─── */}
         <section className="py-20">
@@ -185,10 +189,14 @@ const FreeWorkshop = () => {
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-md text-center">
               <h2 className="text-3xl font-semibold text-foreground">
-                Get notified when the next workshop is scheduled.
+                {workshopScheduled
+                  ? `Register for ${workshopDate}`
+                  : "Get notified when the next workshop is scheduled."}
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Workshops are scheduled periodically. Drop your email and you'll be the first to know.
+                {workshopScheduled
+                  ? `Limited to ${workshopCapacity} participants. Drop your info below to reserve your spot.`
+                  : "Workshops are scheduled periodically. Drop your email and you'll be the first to know."}
               </p>
 
               {!submitted ? (
@@ -222,7 +230,7 @@ const FreeWorkshop = () => {
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <>
-                        Notify Me
+                        {workshopScheduled ? "Reserve My Spot" : "Notify Me"}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
@@ -236,9 +244,13 @@ const FreeWorkshop = () => {
                   className="mt-8 rounded-xl border border-border bg-background p-8"
                 >
                   <CheckCircle2 className="mx-auto h-10 w-10 text-primary" />
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">You're on the list.</h3>
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">
+                    {workshopScheduled ? "You're registered." : "You're on the list."}
+                  </h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    We'll email you as soon as the next workshop is scheduled.
+                    {workshopScheduled
+                      ? `We'll send you the details for the ${workshopDate} session.`
+                      : "We'll email you as soon as the next workshop is scheduled."}
                   </p>
                 </motion.div>
               )}

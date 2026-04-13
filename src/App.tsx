@@ -10,6 +10,8 @@ import CookieConsent from "./components/CookieConsent";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "@/contexts/AuthContext";
 
+import MobilePhoneCTA from "./components/MobilePhoneCTA";
+
 const queryClient = new QueryClient();
 
 // Code-split all routes
@@ -56,6 +58,7 @@ const PageLoader = () => (
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const hidePhoneCTA = ["/quiz", "/admin", "/v"].some((p) => location.pathname.startsWith(p));
 
   return (
     <Suspense fallback={<PageLoader />}>
@@ -83,6 +86,7 @@ const AnimatedRoutes = () => {
           <Route path="/dice" element={<PageTransition><Dice /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
+        {!hidePhoneCTA && <MobilePhoneCTA />}
     </Suspense>
   );
 };
