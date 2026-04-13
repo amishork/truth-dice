@@ -9,6 +9,7 @@ import Engagements from "./Engagements";
 import Revenue from "./Revenue";
 import Analytics from "./Analytics";
 import ContentConfig from "./ContentConfig";
+import System from "./System";
 import "./admin.css";
 
 // ─── Icons (inline SVG to avoid lucide bundle in admin) ───
@@ -192,20 +193,6 @@ function Sidebar({
   );
 }
 
-// ─── Placeholder View ───
-
-function PlaceholderView({ title, description, icon }: { title: string; description: string; icon: string }) {
-  return (
-    <div className="ac-placeholder">
-      <div className="ac-placeholder-icon">
-        <Icon d={ICONS[icon as keyof typeof ICONS]} />
-      </div>
-      <div className="ac-placeholder-title">{title}</div>
-      <div className="ac-placeholder-desc">{description}</div>
-    </div>
-  );
-}
-
 // ─── Main Admin Shell ───
 
 const Admin = () => {
@@ -341,13 +328,7 @@ const Admin = () => {
       case "content-config":
         return <ContentConfig password={password} />;
       case "system":
-        return (
-          <PlaceholderView
-            title="System"
-            description="Data health dashboard, export center, edge function monitoring, and bulk operations. Coming in Phase 5."
-            icon="tool"
-          />
-        );
+        return <System password={password} />;
       default:
         return null;
     }
