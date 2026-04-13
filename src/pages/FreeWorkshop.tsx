@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -26,6 +26,32 @@ const FreeWorkshop = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
+
+  // Fetch workshop config from dashboard_config
+  const [workshopDate, setWorkshopDate] = useState("May 16, 2026");
+  const [workshopCapacity, setWorkshopCapacity] = useState(20);
+
+  useEffect(() => {
+    supabase
+      .from("dashboard_config")
+      .select("key, value")
+      .in("key", ["workshop_date", "workshop_capacity"])
+      .then(({ data }) => {
+        if (data) {
+          for (const row of data) {
+            if (row.key === "workshop_date" && row.value) {
+              const d = new Date(String(row.value));
+              if (!isNaN(d.getTime())) {
+                setWorkshopDate(d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }));
+              }
+            }
+            if (row.key === "workshop_capacity" && row.value) {
+              setWorkshopCapacity(Number(row.value) || 20);
+            }
+          }
+        }
+      });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,10 +115,10 @@ const FreeWorkshop = () => {
                 Next Live Session
               </p>
               <p className="text-2xl font-semibold text-foreground">
-                May 16, 2026
+                {workshopDate}
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
-                Limited to 20 participants per session to keep conversation personal.
+                Limited to {workshopCapacity} participants per session to keep conversation personal.
               </p>
               <div className="mt-4">
                 <Button
