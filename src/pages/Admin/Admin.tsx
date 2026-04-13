@@ -7,6 +7,8 @@ import DataView from "./DataView";
 import Pipeline from "./Pipeline";
 import Engagements from "./Engagements";
 import Revenue from "./Revenue";
+import Analytics from "./Analytics";
+import ContentConfig from "./ContentConfig";
 import "./admin.css";
 
 // ─── Icons (inline SVG to avoid lucide bundle in admin) ───
@@ -329,13 +331,7 @@ const Admin = () => {
       case "leads-lists":
         return <DataView password={password} defaultTab="emails" />;
       case "analytics":
-        return (
-          <PlaceholderView
-            title="Analytics"
-            description="Funnel visualization, quiz intelligence, chat analytics, and source attribution. Coming in Phase 4."
-            icon="chart"
-          />
-        );
+        return <Analytics password={password} />;
       case "pipeline":
         return <Pipeline password={password} />;
       case "engagements":
@@ -343,13 +339,7 @@ const Admin = () => {
       case "revenue":
         return <Revenue password={password} />;
       case "content-config":
-        return (
-          <PlaceholderView
-            title="Content & Config"
-            description="Blog management, workshop date configuration, homepage toggles, and communication templates. Coming in Phase 4."
-            icon="settings"
-          />
-        );
+        return <ContentConfig password={password} />;
       case "system":
         return (
           <PlaceholderView

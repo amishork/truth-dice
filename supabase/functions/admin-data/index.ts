@@ -594,6 +594,228 @@ Deno.serve(async (req) => {
         }, 200, cors);
       }
 
+      // ─── Analytics ────────────────────────────────────────────────────────
+
+      case "funnel_data": {
+        const periodDays = (params?.days as number) || 30;
+        const since = new Date(Date.now() - periodDays * 86400000).toISOString();
+
+        const [quizAll, quizPeriod, chatAll, chatPeriod, emailAll, emailPeriod, contactAll, contactPeriod, leadWon] = await Promise.all([
+          db.from("quiz_sessions").select("*", { count: "exact", head: true }),
+          db.from("quiz_sessions").select("*", { count: "exact", head: true }).gte("created_at", since),
+          db.from("chat_bookings").select("*", { count: "exact", head: true }),
+          db.from("chat_bookings").select("*", { count: "exact", head: true }).gte("created_at", since),
+          db.from("email_captures").select("*", { count: "exact", head: true }),
+          db.from("email_captures").select("*", { count: "exact", head: true }).gte("created_at", since),
+          db.from("contact_submissions").select("*", { count: "exact", head: true }),
+          db.from("contact_submissions").select("*", { count: "exact", head: true }).gte("created_at", since),
+          db.from("leads").select("*", { count: "exact", head: true }).eq("pipeline_stage", "won"),
+        ]);
+
+        return json({
+          allTime: {
+            quizCompletions: quizAll.count || 0,
+            emailCaptures: emailAll.count || 0,
+            chatBookings: chatAll.count || 0,
+            contactForms: contactAll.count || 0,
+            won: leadWon.count || 0,
+          },
+          period: {
+            quizCompletions: quizPeriod.count || 0,
+            emailCaptures: emailPeriod.count || 0,
+            chatBookings: chatPeriod.count || 0,
+            contactForms: contactPeriod.count || 0,
+          },
+          days: periodDays,
+        }, 200, cors);
+      }
+
+      case "quiz_analytics": {
+        // All quiz sessions with details
+        const { data: sessions } = await db
+          .from("quiz_sessions")
+          .select("area_of_life, final_six_values, duration_seconds, created_at, user_id")
+          .order("created_at", { ascending: false });
+
+        const all = sessions || [];
+        const withDuration = all.filter(s => s.duration_seconds && s.duration_seconds > 0);
+
+        // Area of life counts
+        const areaCounts: Record<string, number> = {};
+        for (const s of all) {
+          areaCounts[s.area_of_life] = (areaCounts[s.area_of_life] || 0) + 1;
+        }
+
+        // Value frequency
+        const valueCounts: Record<string, number> = {};
+        for (const s of all) {
+          if (Array.isArray(s.final_six_values)) {
+            for (const v of s.final_six_values) {
+              valueCounts[v] = (valueCounts[v] || 0) + 1;
+            }
+          }
+        }
+
+        // Values by area
+        const valuesByArea: Record<string, Record<string, number>> = {};
+        for (const s of all) {
+          if (!valuesByArea[s.area_of_life]) valuesByArea[s.area_of_life] = {};
+          if (Array.isArray(s.final_six_values)) {
+            for (const v of s.final_six_values) {
+              valuesByArea[s.area_of_life][v] = (valuesByArea[s.area_of_life][v] || 0) + 1;
+            }
+          }
+        }
+
+        // Duration distribution (buckets: 0-2m, 2-4m, 4-6m, 6-8m, 8-10m, 10+m)
+        const durationBuckets = [0, 0, 0, 0, 0, 0];
+        for (const s of withDuration) {
+          const mins = s.duration_seconds / 60;
+          if (mins < 2) durationBuckets[0]++;
+          else if (mins < 4) durationBuckets[1]++;
+          else if (mins < 6) durationBuckets[2]++;
+          else if (mins < 8) durationBuckets[3]++;
+          else if (mins < 10) durationBuckets[4]++;
+          else durationBuckets[5]++;
+        }
+
+        // Daily counts for trend (last 90 days)
+        const ninetyDaysAgo = Date.now() - 90 * 86400000;
+        const dailyCounts: Record<string, number> = {};
+        for (const s of all) {
+          const d = new Date(s.created_at);
+          if (d.getTime() >= ninetyDaysAgo) {
+            const key = d.toISOString().slice(0, 10);
+            dailyCounts[key] = (dailyCounts[key] || 0) + 1;
+          }
+        }
+
+        // Repeat users
+        const userIds = all.filter(s => s.user_id).map(s => s.user_id);
+        const userCounts: Record<string, number> = {};
+        for (const uid of userIds) {
+          userCounts[uid] = (userCounts[uid] || 0) + 1;
+        }
+        const repeatUsers = Object.values(userCounts).filter(c => c > 1).length;
+
+        // Co-occurrence (top value pairs)
+        const pairCounts: Record<string, number> = {};
+        for (const s of all) {
+          if (Array.isArray(s.final_six_values)) {
+            const vals = s.final_six_values.sort();
+            for (let i = 0; i < vals.length; i++) {
+              for (let j = i + 1; j < vals.length; j++) {
+                const pair = `${vals[i]}|${vals[j]}`;
+                pairCounts[pair] = (pairCounts[pair] || 0) + 1;
+              }
+            }
+          }
+        }
+        const topPairs = Object.entries(pairCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 15)
+          .map(([pair, count]) => ({ values: pair.split("|"), count }));
+
+        return json({
+          total: all.length,
+          avgDuration: withDuration.length > 0
+            ? Math.round(withDuration.reduce((s, q) => s + q.duration_seconds, 0) / withDuration.length)
+            : 0,
+          areaCounts,
+          valueCounts,
+          valuesByArea,
+          durationBuckets,
+          dailyCounts,
+          repeatUsers,
+          totalUsers: Object.keys(userCounts).length,
+          topPairs,
+        }, 200, cors);
+      }
+
+      case "chat_analytics": {
+        const { data: bookings } = await db
+          .from("chat_bookings")
+          .select("customer_type, offering, timing, created_at")
+          .order("created_at", { ascending: false });
+
+        const all = bookings || [];
+
+        // By customer type
+        const byType: Record<string, number> = {};
+        for (const b of all) {
+          byType[b.customer_type || "unknown"] = (byType[b.customer_type || "unknown"] || 0) + 1;
+        }
+
+        // By offering
+        const byOffering: Record<string, number> = {};
+        for (const b of all) {
+          byOffering[b.offering || "unknown"] = (byOffering[b.offering || "unknown"] || 0) + 1;
+        }
+
+        // By timing
+        const byTiming: Record<string, number> = {};
+        for (const b of all) {
+          byTiming[b.timing || "unknown"] = (byTiming[b.timing || "unknown"] || 0) + 1;
+        }
+
+        return json({
+          total: all.length,
+          byType,
+          byOffering,
+          byTiming,
+        }, 200, cors);
+      }
+
+      case "source_analytics": {
+        const { data: emails } = await db.from("email_captures").select("source, created_at");
+        const { data: leads } = await db.from("leads").select("source, pipeline_stage");
+
+        const emailsBySource: Record<string, number> = {};
+        for (const e of emails || []) {
+          emailsBySource[e.source || "unknown"] = (emailsBySource[e.source || "unknown"] || 0) + 1;
+        }
+
+        // Conversion by source (leads that reached booking_requested or beyond)
+        const convertedStages = ["booking_requested", "contacted", "in_conversation", "proposal_sent", "won"];
+        const conversionBySource: Record<string, { total: number; converted: number }> = {};
+        for (const l of leads || []) {
+          const src = l.source || "unknown";
+          if (!conversionBySource[src]) conversionBySource[src] = { total: 0, converted: 0 };
+          conversionBySource[src].total++;
+          if (convertedStages.includes(l.pipeline_stage)) conversionBySource[src].converted++;
+        }
+
+        return json({
+          emailsBySource,
+          conversionBySource,
+        }, 200, cors);
+      }
+
+      // ─── Configuration ────────────────────────────────────────────────────
+
+      case "get_config": {
+        const { data } = await db.from("dashboard_config").select("*");
+        const config: Record<string, unknown> = {};
+        for (const row of data || []) {
+          config[row.key] = row.value;
+        }
+        return json({ config }, 200, cors);
+      }
+
+      case "set_config": {
+        const key = params?.key as string;
+        const value = params?.value;
+        if (!key || value === undefined) return json({ error: "Missing key or value" }, 400, cors);
+
+        const { error } = await db.from("dashboard_config").upsert({
+          key,
+          value: JSON.parse(JSON.stringify(value)),
+          updated_at: new Date().toISOString(),
+        });
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ success: true }, 200, cors);
+      }
+
       default:
         return json({ error: "Unknown action" }, 400, cors);
     }
