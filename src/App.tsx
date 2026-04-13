@@ -24,6 +24,7 @@ const HoldGuide = lazy(() => import("./pages/HoldGuide"));
 const Families = lazy(() => import("./pages/Families"));
 const Organizations = lazy(() => import("./pages/Organizations"));
 const CaseStudies = lazy(() => import("./pages/CaseStudies"));
+const Resources = lazy(() => import("./pages/Resources"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Schools = lazy(() => import("./pages/Schools"));
 const WallOfLove = lazy(() => import("./pages/WallOfLove"));
@@ -74,6 +75,7 @@ const AnimatedRoutes = () => {
           <Route path="/families" element={<PageTransition><Families /></PageTransition>} />
           <Route path="/organizations" element={<PageTransition><Organizations /></PageTransition>} />
           <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
+          <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/schools" element={<PageTransition><Schools /></PageTransition>} />
           <Route path="/testimonials" element={<PageTransition><WallOfLove /></PageTransition>} />

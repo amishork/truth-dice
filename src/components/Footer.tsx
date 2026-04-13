@@ -48,6 +48,7 @@ const Footer = () => {
               <NavLink to="/families" className="text-sm text-muted-foreground transition-colors hover:text-foreground">For Families</NavLink>
               <NavLink to="/organizations" className="text-sm text-muted-foreground transition-colors hover:text-foreground">For Organizations</NavLink>
               <NavLink to="/case-studies" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Case Studies</NavLink>
+              <NavLink to="/resources" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Resources</NavLink>
               <NavLink to="/quiz" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Values Assessment</NavLink>
             </nav>
           </div>
