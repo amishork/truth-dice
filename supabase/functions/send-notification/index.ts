@@ -246,6 +246,57 @@ serve(async (req) => {
         `
       );
 
+      // ─── Create/update lead in pipeline ───
+      try {
+        const sbUrl = Deno.env.get("SUPABASE_URL");
+        const sbKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        if (sbUrl && sbKey) {
+          const isEmail = data.contact_method?.toLowerCase() === "email";
+          const contactEmail = isEmail ? data.contact_info : null;
+          const contactPhone = !isEmail ? data.contact_info : null;
+
+          const notes = [
+            data.intention ? `Intention: ${data.intention}` : "",
+            data.offering ? `Interested in: ${data.offering}` : "",
+            data.timing ? `Timing preference: ${data.timing}` : "",
+            data.desired_outcome ? `Desired outcome: ${data.desired_outcome}` : "",
+            data.value_explored ? `Value explored: ${data.value_explored}` : "",
+            data.core_values?.length ? `Core values: ${data.core_values.join(", ")}` : "",
+          ].filter(Boolean).join("\n");
+
+          const leadPayload = {
+            name: data.name || null,
+            email: contactEmail,
+            phone: contactPhone,
+            customer_type: data.customer_type || null,
+            pipeline_stage: "new",
+            source: "values_chat",
+            lead_score: 70,
+            notes,
+            last_activity_at: new Date().toISOString(),
+          };
+
+          // Upsert by email if available, otherwise just insert
+          const upsertUrl = contactEmail
+            ? `${sbUrl}/rest/v1/leads?on_conflict=email`
+            : `${sbUrl}/rest/v1/leads`;
+
+          await fetch(upsertUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: sbKey,
+              Authorization: `Bearer ${sbKey}`,
+              Prefer: contactEmail ? "resolution=merge-duplicates,return=minimal" : "return=minimal",
+            },
+            body: JSON.stringify(leadPayload),
+          });
+        }
+      } catch (leadErr) {
+        console.error("Failed to create lead from booking:", leadErr);
+        // Non-fatal: booking notification already sent
+      }
+
       // Send confirmation to customer if we have their email and domain is verified
       if (DOMAIN_VERIFIED && data.contact_method?.toLowerCase() === 'email' && data.contact_info) {
         await sendEmail(
