@@ -12,6 +12,8 @@ import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LeadMagnetModal from "@/components/LeadMagnetModal";
 import MagneticButton from "@/components/MagneticButton";
 import HomeProgramCards from "@/components/HomeProgramCards";
+import LogoBar from "@/components/LogoBar";
+import MetricsBanner from "@/components/MetricsBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
@@ -140,6 +142,9 @@ const Index = () => {
           </motion.a>
         </section>
 
+        {/* ─── TRUST SIGNALS ─── */}
+        <LogoBar />
+
         {/* ─── THE PROBLEM (tight) ─── */}
         <section className="py-20">
           <div className="container mx-auto px-4">
@@ -189,7 +194,8 @@ const Index = () => {
         {/* ─── PROGRAMS (commitment ladder) ─── */}
         <HomeProgramCards />
 
-        {/* Social proof (logos + testimonials) will go here once real content is collected */}
+        {/* ─── SOCIAL PROOF ─── */}
+        <MetricsBanner />
 
         {/* ─── BOTTOM CTA ─── */}
         <motion.section

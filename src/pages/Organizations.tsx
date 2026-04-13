@@ -6,6 +6,7 @@ import PageMeta from "@/components/PageMeta";
 import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import ContextualTestimonials from "@/components/ContextualTestimonials";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -205,21 +206,12 @@ const Organizations = () => {
           </div>
         </section>
 
-        {/* ─── TESTIMONIALS PLACEHOLDER ─── */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-              <p className="label-technical mb-3">From Partners</p>
-              <h2 className="text-3xl font-semibold text-foreground mb-4">
-                What organizational leaders are saying.
-              </h2>
-              <p className="text-muted-foreground">
-                Testimonials from organizational partners coming soon. If you've worked with Words Incarnate,{" "}
-                <a href="/testimonials/share" className="text-primary hover:underline">share your experience</a>.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        {/* ─── TESTIMONIALS ─── */}
+        <ContextualTestimonials
+          audience="organization"
+          label="From Partners"
+          heading="What organizational leaders are saying."
+        />
 
         {/* ─── BOTTOM CTA ─── */}
         <motion.section
