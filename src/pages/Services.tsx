@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import PricingCards from "@/components/PricingCards";
 import FAQ from "@/components/FAQ";
 import PageMeta from "@/components/PageMeta";
 import JsonLd, { webPageSchema } from "@/components/JsonLd";
@@ -147,9 +146,6 @@ const Services = () => {
             </div>
           </motion.div>
         </div>
-
-        {/* Pricing */}
-        <PricingCards />
 
         {/* FAQ */}
         <FAQ />

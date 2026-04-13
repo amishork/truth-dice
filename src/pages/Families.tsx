@@ -17,51 +17,46 @@ const fadeUp = {
 const phases = [
   {
     step: "01",
-    name: "Discovery",
-    desc: "We listen. A deep conversation with leadership to understand your school's charism, culture, and the gap between stated mission and lived reality.",
+    name: "Honor",
+    desc: "We start with an honest conversation about what your family actually values — not what you think you should value. Through guided reflection, you and your spouse articulate the commitments that shape your household.",
   },
   {
     step: "02",
-    name: "Assessment",
-    desc: "Faculty and student values assessments surface what your community actually prioritizes — and where formation is needed most.",
+    name: "Observe",
+    desc: "Together we look at the daily texture of your family life — meals, evenings, weekends, discipline, screen time, traditions — and map where your values are already alive, and where they're getting lost.",
   },
   {
     step: "03",
-    name: "Design",
-    desc: "A custom formation plan built around your school's calendar, culture, and capacity. No off-the-shelf programs.",
+    name: "Live",
+    desc: "We design practical rhythms, rituals, and conversations tailored to your family's ages, stage, and temperament. These aren't abstract principles — they're specific practices that fit your actual life.",
   },
   {
     step: "04",
-    name: "Delivery",
-    desc: "Faculty workshops, student programming, and parent engagement — facilitated on-site by Alex. Experiential, not lecture-based.",
-  },
-  {
-    step: "05",
-    name: "Integration",
-    desc: "Ongoing advisory support to embed the values framework into daily operations, hiring, discipline, and culture-building.",
+    name: "Declare",
+    desc: "Your family walks away with a values charter — a clear, beautiful articulation of who you are and what you're building together. Something your children can grow into, not just grow up around.",
   },
 ];
 
 const outcomes = [
-  "A shared values vocabulary used across faculty, students, and families",
-  "Faculty formation that re-energizes mission-driven teaching",
-  "Student programming that builds character through experience, not compliance",
-  "A values architecture visible in hallways, classrooms, and decision-making",
-  "Parent engagement that extends formation into the home",
-  "Measurable culture metrics to track formation over time",
+  "A shared language your whole family uses for what matters most",
+  "Practical rituals and rhythms that form character through daily life",
+  "A family values charter — your household's operating document",
+  "Age-appropriate ways to include every child in the conversation",
+  "Conflict resolution grounded in shared commitments, not power struggles",
+  "A living framework that grows with your family over time",
 ];
 
-const Schools = () => {
+const Families = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
       <PageMeta
-        title="For Schools | Words Incarnate"
-        description="Values formation consulting for Catholic schools. Faculty workshops, student programming, and institutional culture transformation."
-        path="/schools"
+        title="For Families | Words Incarnate"
+        description="A guided formation experience that turns your household into a place of intentional culture. Values discovery, family rituals, and a charter your children can grow into."
+        path="/families"
       />
-      <JsonLd data={webPageSchema("For Schools | Words Incarnate", "Values formation consulting for Catholic schools. Faculty workshops, student programming, and institutional culture transformation.", "/schools")} />
+      <JsonLd data={webPageSchema("For Families | Words Incarnate", "A guided formation experience that turns your household into a place of intentional culture.", "/families")} />
       <Navigation />
 
       <main id="main" className="pt-16">
@@ -74,18 +69,18 @@ const Schools = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <p className="label-technical mb-3">Words Incarnate for Schools</p>
+              <p className="label-technical mb-3">Words Incarnate for Families</p>
               <h1 className="text-4xl font-semibold text-foreground sm:text-5xl">
-                Formation at the institutional level.
+                Your family has values. Do your children know what they are?
               </h1>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Catholic schools claim their values. Few have a systematic way of forming students
-                into them. Words Incarnate builds the architecture that makes your mission real —
-                in hallways, classrooms, and the daily texture of school life.
+                Most families assume their values are being transmitted. They aren't — at least
+                not intentionally. Words Incarnate helps your family name what matters most and
+                build the daily rhythms that actually form it.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Button size="lg" onClick={() => navigate("/contact")}>
-                  Request a Proposal
+                  Book a Discovery Call
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate("/quiz")}>
@@ -100,37 +95,41 @@ const Schools = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl">
-              <p className="label-technical mb-3">The Problem</p>
+              <p className="label-technical mb-3">The Challenge</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Mission statements don't form students. Experiences do.
+                Good intentions don't raise children. Intentional culture does.
               </h2>
               <div className="mt-8 space-y-4 text-foreground leading-relaxed">
                 <p>
-                  Most Catholic schools have beautiful mission statements. But walk through the hallways
-                  and ask students what the school values — you'll hear silence, or rehearsed answers
-                  that don't connect to lived experience.
+                  You know what kind of family you want to be. You probably talk about it
+                  with your spouse — usually after something goes wrong. But between the
+                  morning rush, the evening chaos, and the weight of keeping everything
+                  running, the values you care about most end up being the things you think
+                  about least.
                 </p>
                 <p>
-                  The gap isn't intention. The gap is architecture. Schools need a systematic way to
-                  translate their charism into formation that students, faculty, and parents actually feel.
+                  The problem isn't that you don't care. The problem is that family culture
+                  happens whether you design it or not. Without intentional architecture,
+                  your household defaults to whatever patterns are easiest — and those
+                  patterns rarely form the character you're hoping for.
                 </p>
                 <p className="text-muted-foreground">
-                  Words Incarnate provides that architecture using the HOLD method — Honor what the
-                  school truly values, Observe where it's already alive in daily life, Live it through
-                  redesigned systems and practices, and Declare it across the community.
+                  Words Incarnate gives your family the structure to move from aspiration
+                  to formation — using the HOLD method to build a household culture your
+                  children will carry with them.
                 </p>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* ─── ENGAGEMENT MODEL ─── */}
+        {/* ─── THE HOLD JOURNEY ─── */}
         <section className="bg-card py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center mb-14">
-              <p className="label-technical mb-3">The Model</p>
+              <p className="label-technical mb-3">The Journey</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Five phases. One transformed culture.
+                Four steps to a family that lives its values.
               </h2>
             </motion.div>
 
@@ -161,9 +160,9 @@ const Schools = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl">
-              <p className="label-technical mb-3">What You Get</p>
+              <p className="label-technical mb-3">What Your Family Gets</p>
               <h2 className="text-3xl font-semibold text-foreground mb-10">
-                Outcomes, not just workshops.
+                More than a conversation — a way of life.
               </h2>
               <div className="space-y-4">
                 {outcomes.map((outcome, i) => (
@@ -184,19 +183,18 @@ const Schools = () => {
           </div>
         </section>
 
-        {/* ─── PRICING ─── */}
+        {/* ─── INVESTMENT ─── */}
         <section className="bg-card py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
               <p className="label-technical mb-3">Investment</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Custom engagements for every school.
+                Tailored to your family.
               </h2>
               <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                Every engagement is scoped to your school's size, needs, and budget.
-                Single workshops start at $2,500. Full-year consulting partnerships
-                start at $4,000 per month. We'll build the right scope together on a
-                discovery call.
+                Family formation workshops start at $450. Every engagement is
+                scoped to your family's size, ages, and goals. We'll design the
+                right experience together on a discovery call.
               </p>
               <div className="mt-8">
                 <Button onClick={() => navigate("/contact")} className="group">
@@ -212,13 +210,13 @@ const Schools = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-              <p className="label-technical mb-3">From School Leaders</p>
+              <p className="label-technical mb-3">From Families</p>
               <h2 className="text-3xl font-semibold text-foreground mb-4">
-                What administrators are saying.
+                What families are saying.
               </h2>
               <p className="text-muted-foreground">
-                Testimonials from school partners coming soon. If you've worked with Words Incarnate,{" "}
-                <a href="/contact" className="text-primary hover:underline">share your experience</a>.
+                Testimonials from families coming soon. If you've worked with Words Incarnate,{" "}
+                <a href="/testimonials/share" className="text-primary hover:underline">share your experience</a>.
               </p>
             </motion.div>
           </div>
@@ -234,19 +232,23 @@ const Schools = () => {
         >
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">
-              Ready to bring formation to your school?
+              Your family deserves an intentional culture.
             </h2>
             <p className="mt-3 text-primary-foreground/80">
-              Tell us about your school and we'll scope a custom engagement.
+              Start with the free assessment or book a conversation.
             </p>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button size="lg" variant="secondary" onClick={() => navigate("/quiz")}>
+                Free Values Assessment
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
               <Button
                 size="lg"
-                variant="secondary"
+                variant="outline"
+                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
                 onClick={() => navigate("/contact")}
               >
-                Request a Proposal
-                <ArrowRight className="ml-2 h-4 w-4" />
+                Book a Discovery Call
               </Button>
             </div>
           </div>
@@ -258,4 +260,4 @@ const Schools = () => {
   );
 };
 
-export default Schools;
+export default Families;

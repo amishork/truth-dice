@@ -15,10 +15,11 @@ import { useTheme } from "next-themes";
 
 const navItems = [
   { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/services", label: "Services" },
+  { to: "/how-we-work", label: "How We Work" },
   { to: "/schools", label: "For Schools" },
-  { to: "/testimonials", label: "Wall of Love" },
+  { to: "/families", label: "For Families" },
+  { to: "/organizations", label: "For Organizations" },
+  { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];
 

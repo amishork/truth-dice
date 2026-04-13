@@ -17,51 +17,46 @@ const fadeUp = {
 const phases = [
   {
     step: "01",
-    name: "Discovery",
-    desc: "We listen. A deep conversation with leadership to understand your school's charism, culture, and the gap between stated mission and lived reality.",
+    name: "Honor",
+    desc: "A structured diagnostic with leadership to surface the organization's actual operating values — not the ones on the website, but the ones visible in hiring decisions, resource allocation, and how conflict is handled.",
   },
   {
     step: "02",
-    name: "Assessment",
-    desc: "Faculty and student values assessments surface what your community actually prioritizes — and where formation is needed most.",
+    name: "Observe",
+    desc: "Team assessments, stakeholder interviews, and culture mapping to identify where your stated mission aligns with daily operations — and where the gaps are creating drag, turnover, or misalignment.",
   },
   {
     step: "03",
-    name: "Design",
-    desc: "A custom formation plan built around your school's calendar, culture, and capacity. No off-the-shelf programs.",
+    name: "Live",
+    desc: "Custom frameworks for embedding values into the systems that matter: decision-making protocols, leadership development, team rituals, onboarding, and performance evaluation.",
   },
   {
     step: "04",
-    name: "Delivery",
-    desc: "Faculty workshops, student programming, and parent engagement — facilitated on-site by Alex. Experiential, not lecture-based.",
-  },
-  {
-    step: "05",
-    name: "Integration",
-    desc: "Ongoing advisory support to embed the values framework into daily operations, hiring, discipline, and culture-building.",
+    name: "Declare",
+    desc: "Operationalized culture documents, leadership alignment artifacts, and accountability structures that make values visible and measurable across the organization.",
   },
 ];
 
 const outcomes = [
-  "A shared values vocabulary used across faculty, students, and families",
-  "Faculty formation that re-energizes mission-driven teaching",
-  "Student programming that builds character through experience, not compliance",
-  "A values architecture visible in hallways, classrooms, and decision-making",
-  "Parent engagement that extends formation into the home",
-  "Measurable culture metrics to track formation over time",
+  "A clear values architecture aligned across leadership and teams",
+  "Decision-making frameworks grounded in articulated principles",
+  "Leadership formation that develops character alongside competence",
+  "Culture systems that reduce misalignment, turnover, and drift",
+  "Onboarding and evaluation processes built on shared commitments",
+  "Measurable culture indicators to track alignment over time",
 ];
 
-const Schools = () => {
+const Organizations = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
       <PageMeta
-        title="For Schools | Words Incarnate"
-        description="Values formation consulting for Catholic schools. Faculty workshops, student programming, and institutional culture transformation."
-        path="/schools"
+        title="For Organizations | Words Incarnate"
+        description="Values-driven consulting for mission-driven organizations. Culture strategy, leadership formation, and decision-making frameworks grounded in articulated principles."
+        path="/organizations"
       />
-      <JsonLd data={webPageSchema("For Schools | Words Incarnate", "Values formation consulting for Catholic schools. Faculty workshops, student programming, and institutional culture transformation.", "/schools")} />
+      <JsonLd data={webPageSchema("For Organizations | Words Incarnate", "Values-driven consulting for mission-driven organizations.", "/organizations")} />
       <Navigation />
 
       <main id="main" className="pt-16">
@@ -74,14 +69,14 @@ const Schools = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <p className="label-technical mb-3">Words Incarnate for Schools</p>
+              <p className="label-technical mb-3">Words Incarnate for Organizations</p>
               <h1 className="text-4xl font-semibold text-foreground sm:text-5xl">
-                Formation at the institutional level.
+                Culture is strategy. Treat it like one.
               </h1>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Catholic schools claim their values. Few have a systematic way of forming students
-                into them. Words Incarnate builds the architecture that makes your mission real —
-                in hallways, classrooms, and the daily texture of school life.
+                Mission-driven organizations know what they stand for. Few have the operational
+                infrastructure to ensure those commitments shape daily decisions, leadership
+                development, and team culture. Words Incarnate builds that infrastructure.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Button size="lg" onClick={() => navigate("/contact")}>
@@ -102,22 +97,25 @@ const Schools = () => {
             <motion.div {...fadeUp} className="mx-auto max-w-3xl">
               <p className="label-technical mb-3">The Problem</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Mission statements don't form students. Experiences do.
+                Mission statements don't build culture. Systems do.
               </h2>
               <div className="mt-8 space-y-4 text-foreground leading-relaxed">
                 <p>
-                  Most Catholic schools have beautiful mission statements. But walk through the hallways
-                  and ask students what the school values — you'll hear silence, or rehearsed answers
-                  that don't connect to lived experience.
+                  Your organization has a mission statement. It probably appears on your
+                  website, in your annual report, and on the wall in the lobby. But ask
+                  five employees what it means for how they make decisions on Tuesday
+                  afternoon, and you'll get five different answers — or silence.
                 </p>
                 <p>
-                  The gap isn't intention. The gap is architecture. Schools need a systematic way to
-                  translate their charism into formation that students, faculty, and parents actually feel.
+                  The gap between stated values and organizational behavior is the single
+                  largest source of culture erosion in mission-driven organizations. It
+                  produces cynicism among staff, inconsistency in leadership, and a slow
+                  drift away from the mission that no retreat or strategic plan can fix.
                 </p>
                 <p className="text-muted-foreground">
-                  Words Incarnate provides that architecture using the HOLD method — Honor what the
-                  school truly values, Observe where it's already alive in daily life, Live it through
-                  redesigned systems and practices, and Declare it across the community.
+                  Words Incarnate addresses the root cause: your values aren't embedded in
+                  the systems that run your organization. The HOLD method creates the
+                  architecture that makes values operational.
                 </p>
               </div>
             </motion.div>
@@ -130,7 +128,7 @@ const Schools = () => {
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center mb-14">
               <p className="label-technical mb-3">The Model</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Five phases. One transformed culture.
+                From diagnosis to integration.
               </h2>
             </motion.div>
 
@@ -163,7 +161,7 @@ const Schools = () => {
             <motion.div {...fadeUp} className="mx-auto max-w-3xl">
               <p className="label-technical mb-3">What You Get</p>
               <h2 className="text-3xl font-semibold text-foreground mb-10">
-                Outcomes, not just workshops.
+                Operational values, not aspirational ones.
               </h2>
               <div className="space-y-4">
                 {outcomes.map((outcome, i) => (
@@ -184,23 +182,22 @@ const Schools = () => {
           </div>
         </section>
 
-        {/* ─── PRICING ─── */}
+        {/* ─── INVESTMENT ─── */}
         <section className="bg-card py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
               <p className="label-technical mb-3">Investment</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Custom engagements for every school.
+                Scoped to your organization.
               </h2>
               <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                Every engagement is scoped to your school's size, needs, and budget.
-                Single workshops start at $2,500. Full-year consulting partnerships
-                start at $4,000 per month. We'll build the right scope together on a
-                discovery call.
+                Single workshops start at $3,500. Full-year consulting partnerships
+                start at $5,000 per month. Every engagement is custom-scoped to your
+                organization's size, complexity, and goals.
               </p>
               <div className="mt-8">
                 <Button onClick={() => navigate("/contact")} className="group">
-                  Book a Discovery Call
+                  Request a Proposal
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -212,13 +209,13 @@ const Schools = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-              <p className="label-technical mb-3">From School Leaders</p>
+              <p className="label-technical mb-3">From Partners</p>
               <h2 className="text-3xl font-semibold text-foreground mb-4">
-                What administrators are saying.
+                What organizational leaders are saying.
               </h2>
               <p className="text-muted-foreground">
-                Testimonials from school partners coming soon. If you've worked with Words Incarnate,{" "}
-                <a href="/contact" className="text-primary hover:underline">share your experience</a>.
+                Testimonials from organizational partners coming soon. If you've worked with Words Incarnate,{" "}
+                <a href="/testimonials/share" className="text-primary hover:underline">share your experience</a>.
               </p>
             </motion.div>
           </div>
@@ -234,10 +231,10 @@ const Schools = () => {
         >
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">
-              Ready to bring formation to your school?
+              Ready to align your culture with your mission?
             </h2>
             <p className="mt-3 text-primary-foreground/80">
-              Tell us about your school and we'll scope a custom engagement.
+              Tell us about your organization and we'll scope a custom engagement.
             </p>
             <div className="mt-8">
               <Button
@@ -258,4 +255,4 @@ const Schools = () => {
   );
 };
 
-export default Schools;
+export default Organizations;

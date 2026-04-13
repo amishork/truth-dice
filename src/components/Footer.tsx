@@ -24,9 +24,8 @@ const Footer = () => {
             <nav className="flex flex-col gap-2.5">
               {[
                 { to: "/", label: "Home" },
+                { to: "/how-we-work", label: "How We Work" },
                 { to: "/about", label: "About" },
-                { to: "/our-story", label: "Our Story" },
-                { to: "/services", label: "Services" },
                 { to: "/testimonials", label: "Wall of Love" },
                 { to: "/contact", label: "Contact" },
               ].map((item) => (
@@ -43,11 +42,12 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <p className="label-technical mb-4">Services</p>
+            <p className="label-technical mb-4">Who We Serve</p>
             <nav className="flex flex-col gap-2.5">
-              <NavLink to="/services" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Family Formation</NavLink>
-              <NavLink to="/schools" className="text-sm text-muted-foreground transition-colors hover:text-foreground">School Culture Advisory</NavLink>
-              <NavLink to="/workshop" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Workshop</NavLink>
+              <NavLink to="/schools" className="text-sm text-muted-foreground transition-colors hover:text-foreground">For Schools</NavLink>
+              <NavLink to="/families" className="text-sm text-muted-foreground transition-colors hover:text-foreground">For Families</NavLink>
+              <NavLink to="/organizations" className="text-sm text-muted-foreground transition-colors hover:text-foreground">For Organizations</NavLink>
+              <NavLink to="/case-studies" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Case Studies</NavLink>
               <NavLink to="/quiz" className="text-sm text-muted-foreground transition-colors hover:text-foreground">Free Values Assessment</NavLink>
             </nav>
           </div>

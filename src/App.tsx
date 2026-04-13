@@ -17,6 +17,10 @@ const Index = lazy(() => import("./pages/Index"));
 const Quiz = lazy(() => import("./pages/Quiz"));
 const About = lazy(() => import("./pages/About"));
 const Services = lazy(() => import("./pages/Services"));
+const HowWeWork = lazy(() => import("./pages/HowWeWork"));
+const Families = lazy(() => import("./pages/Families"));
+const Organizations = lazy(() => import("./pages/Organizations"));
+const CaseStudies = lazy(() => import("./pages/CaseStudies"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Schools = lazy(() => import("./pages/Schools"));
 const WallOfLove = lazy(() => import("./pages/WallOfLove"));
@@ -60,7 +64,11 @@ const AnimatedRoutes = () => {
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/our-story" element={<Navigate to="/about" replace />} />
-          <Route path="/services" element={<PageTransition><Services /></PageTransition>} />
+          <Route path="/how-we-work" element={<PageTransition><HowWeWork /></PageTransition>} />
+          <Route path="/services" element={<Navigate to="/how-we-work" replace />} />
+          <Route path="/families" element={<PageTransition><Families /></PageTransition>} />
+          <Route path="/organizations" element={<PageTransition><Organizations /></PageTransition>} />
+          <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
           <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
           <Route path="/schools" element={<PageTransition><Schools /></PageTransition>} />
           <Route path="/testimonials" element={<PageTransition><WallOfLove /></PageTransition>} />

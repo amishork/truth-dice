@@ -31,7 +31,7 @@ const programs = [
     desc: "Personal workshops, family formation journeys, and institutional consulting — tailored to your context.",
     cta: "View Programs",
     ctaVariant: "outline" as const,
-    href: "/services",
+    href: "/how-we-work",
     free: false,
   },
 ];
