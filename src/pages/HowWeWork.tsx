@@ -6,6 +6,7 @@ import PageMeta from "@/components/PageMeta";
 import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, GraduationCap, Building } from "lucide-react";
+import { openCalendlyPopup } from "@/components/Calendly";
 import FAQ from "@/components/FAQ";
 
 const fadeUp = {
@@ -275,7 +276,7 @@ const HowWeWork = () => {
                 size="lg"
                 variant="outline"
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-                onClick={() => navigate("/contact")}
+                onClick={() => openCalendlyPopup()}
               >
                 Book a Discovery Call
               </Button>

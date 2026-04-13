@@ -6,6 +6,7 @@ import PageMeta from "@/components/PageMeta";
 import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { openCalendlyPopup } from "@/components/Calendly";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -199,7 +200,7 @@ const Schools = () => {
                 discovery call.
               </p>
               <div className="mt-8">
-                <Button onClick={() => navigate("/contact")} className="group">
+                <Button onClick={() => openCalendlyPopup()} className="group">
                   Book a Discovery Call
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>

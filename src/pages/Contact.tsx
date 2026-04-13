@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
 import MultiStepContactForm from "@/components/MultiStepContactForm";
+import { CalendlyInline } from "@/components/Calendly";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -63,6 +64,27 @@ const Contact = () => {
               <MultiStepContactForm initialInterest={interest} />
             </motion.div>
           </div>
+
+          {/* ─── CALENDLY SCHEDULING ─── */}
+          <motion.div
+            className="mt-20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div className="text-center mb-8">
+              <p className="label-technical mb-3">Or book directly</p>
+              <h2 className="text-2xl font-semibold text-foreground">
+                Schedule a discovery call
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Pick a time that works for you. No commitment — just a conversation.
+              </p>
+            </div>
+            <div className="sketch-card overflow-hidden">
+              <CalendlyInline minHeight="700px" />
+            </div>
+          </motion.div>
         </div>
       </main>
 

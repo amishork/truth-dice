@@ -6,6 +6,7 @@ import PageMeta from "@/components/PageMeta";
 import JsonLd, { webPageSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { openCalendlyPopup } from "@/components/Calendly";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -79,7 +80,7 @@ const Families = () => {
                 build the daily rhythms that actually form it.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Button size="lg" onClick={() => navigate("/contact")}>
+                <Button size="lg" onClick={() => openCalendlyPopup()}>
                   Book a Discovery Call
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -197,7 +198,7 @@ const Families = () => {
                 right experience together on a discovery call.
               </p>
               <div className="mt-8">
-                <Button onClick={() => navigate("/contact")} className="group">
+                <Button onClick={() => openCalendlyPopup()} className="group">
                   Book a Discovery Call
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -246,7 +247,7 @@ const Families = () => {
                 size="lg"
                 variant="outline"
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-                onClick={() => navigate("/contact")}
+                onClick={() => openCalendlyPopup()}
               >
                 Book a Discovery Call
               </Button>
