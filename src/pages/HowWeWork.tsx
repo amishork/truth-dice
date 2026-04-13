@@ -176,6 +176,16 @@ const HowWeWork = () => {
                 </motion.div>
               ))}
             </div>
+            <motion.div {...fadeUp} className="mt-10 text-center">
+              <Button
+                variant="outline"
+                className="group"
+                onClick={() => navigate("/hold")}
+              >
+                Explore the HOLD Method in Depth
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </motion.div>
           </div>
         </section>
 

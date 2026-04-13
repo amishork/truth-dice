@@ -16,6 +16,7 @@ const OG_IMAGE_MAP: Record<string, string> = {
   "/about": "/og-about.png",
   "/our-story": "/og-our-story.png",
   "/how-we-work": "/og-services.png",
+  "/hold": "/og-services.png",
   "/services": "/og-services.png",
   "/schools": "/og-schools.png",
   "/families": "/og-home.png",

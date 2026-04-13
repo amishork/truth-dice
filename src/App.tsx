@@ -20,6 +20,7 @@ const Quiz = lazy(() => import("./pages/Quiz"));
 const About = lazy(() => import("./pages/About"));
 const Services = lazy(() => import("./pages/Services"));
 const HowWeWork = lazy(() => import("./pages/HowWeWork"));
+const HoldGuide = lazy(() => import("./pages/HoldGuide"));
 const Families = lazy(() => import("./pages/Families"));
 const Organizations = lazy(() => import("./pages/Organizations"));
 const CaseStudies = lazy(() => import("./pages/CaseStudies"));
@@ -68,6 +69,7 @@ const AnimatedRoutes = () => {
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/our-story" element={<Navigate to="/about" replace />} />
           <Route path="/how-we-work" element={<PageTransition><HowWeWork /></PageTransition>} />
+          <Route path="/hold" element={<PageTransition><HoldGuide /></PageTransition>} />
           <Route path="/services" element={<Navigate to="/how-we-work" replace />} />
           <Route path="/families" element={<PageTransition><Families /></PageTransition>} />
           <Route path="/organizations" element={<PageTransition><Organizations /></PageTransition>} />
