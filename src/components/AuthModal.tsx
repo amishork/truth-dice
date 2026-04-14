@@ -77,7 +77,7 @@ export default function AuthModal({ open, onClose, onContinueAsGuest }: AuthModa
         exit={{ opacity: 0 }}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} role="presentation" />
 
         {/* Modal */}
         <motion.div

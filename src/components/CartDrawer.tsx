@@ -65,7 +65,7 @@ export const CartDrawer = () => {
                     <div key={item.variantId} className="flex gap-4">
                       <div className="w-20 h-20 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0 border border-border">
                         {item.product.node.images?.edges?.[0]?.node ? (
-                          <img src={item.product.node.images.edges[0].node.url} alt={item.product.node.title} className="w-full h-full object-cover" />
+                          <img src={item.product.node.images.edges[0].node.url} alt={item.product.node.title} className="w-full h-full object-cover" loading="lazy" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-secondary/50 text-muted-foreground text-xs">No image</div>
                         )}

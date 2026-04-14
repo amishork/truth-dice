@@ -346,13 +346,13 @@ const Admin = () => {
       <div className="admin-console">
         {/* Mobile header */}
         <div className="ac-mobile-header">
-          <button className="ac-btn-icon" onClick={() => setMobileOpen(true)}>
+          <button className="ac-btn-icon" onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <Icon d={ICONS.menu} />
           </button>
           <span style={{ fontFamily: "var(--ac-font-display)", fontSize: "1rem", fontWeight: 500 }}>
             Advisor Console
           </span>
-          <button className="ac-btn-icon" onClick={handleLogout}>
+          <button className="ac-btn-icon" onClick={handleLogout} aria-label="Sign out">
             <Icon d={ICONS.logout} size={18} />
           </button>
         </div>
@@ -369,6 +369,10 @@ const Admin = () => {
         />
 
         <main className="ac-main">
+          {/* Mobile notice */}
+          <div className="ac-mobile-notice">
+            This dashboard is optimized for desktop. Some features may not display correctly on small screens.
+          </div>
           <div className="ac-content">
             {renderView()}
           </div>

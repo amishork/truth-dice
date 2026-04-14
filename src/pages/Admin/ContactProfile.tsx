@@ -207,7 +207,7 @@ export default function ContactProfile({
     <div>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <button className="ac-btn-icon" onClick={onBack} style={{ fontSize: "1.25rem" }}>←</button>
+        <button className="ac-btn-icon" onClick={onBack} style={{ fontSize: "1.25rem" }} aria-label="Go back">←</button>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: "var(--ac-font-display)", fontSize: "1.25rem", fontWeight: 500, color: "var(--ac-text)" }}>
             {lead.name || lead.email || "Unknown Contact"}

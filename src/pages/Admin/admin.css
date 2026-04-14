@@ -731,3 +731,20 @@
   fill: var(--ac-accent);
   opacity: 0.1;
 }
+
+/* Mobile notice */
+.ac-mobile-notice {
+  display: none;
+  padding: 10px 16px;
+  background: var(--ac-warning);
+  color: #1a1a1a;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .ac-mobile-notice {
+    display: block;
+  }
+}

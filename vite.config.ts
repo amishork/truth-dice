@@ -50,6 +50,8 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('@sentry')) return 'sentry';
           if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) return 'forms';
           if (id.includes('@radix-ui')) return 'radix';
+          if (id.includes('jspdf')) return 'jspdf';
+          if (id.includes('html2canvas')) return 'html2canvas';
         },
       },
     },
