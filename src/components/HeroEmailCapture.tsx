@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
+import { getUtmPayload } from "@/lib/utm";
 
 const HeroEmailCapture = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ const HeroEmailCapture = () => {
     setLoading(true);
     // Use upsert to handle duplicate emails gracefully
     await supabase.from("email_captures").upsert(
-      { email: email.trim(), source: "hero" },
+      { email: email.trim(), source: "hero", ...getUtmPayload() },
       { onConflict: "email" }
     );
     setLoading(false);

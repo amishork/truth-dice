@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
+import { getUtmPayload } from "@/lib/utm";
 
 interface LeadMagnetModalProps {
   open: boolean;
@@ -26,7 +27,7 @@ const LeadMagnetModal = ({ open, onClose }: LeadMagnetModalProps) => {
 
     setLoading(true);
     await supabase.from("email_captures").upsert(
-      { email: email.trim(), name: name.trim() || null, source: "lead_magnet" },
+      { email: email.trim(), name: name.trim() || null, source: "lead_magnet", ...getUtmPayload() },
       { onConflict: "email" }
     );
     setLoading(false);

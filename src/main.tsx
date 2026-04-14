@@ -4,6 +4,10 @@ import * as Sentry from "@sentry/react";
 import posthog from "posthog-js";
 import App from "./App.tsx";
 import "./index.css";
+import { captureUtm } from "./lib/utm";
+
+// Capture UTM parameters and landing page on first load
+captureUtm();
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,

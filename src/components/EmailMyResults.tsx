@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackEmailCaptured, trackResultsShared } from "@/lib/analytics";
+import { getUtmPayload } from "@/lib/utm";
 
 interface EmailMyResultsProps {
   values: string[];
@@ -24,7 +25,7 @@ const EmailMyResults: React.FC<EmailMyResultsProps> = ({ values, areaLabel }) =>
 
     setLoading(true);
     await supabase.from("email_captures").upsert(
-      { email: email.trim(), source: "results_email" },
+      { email: email.trim(), source: "results_email", ...getUtmPayload() },
       { onConflict: "email" }
     );
     setLoading(false);

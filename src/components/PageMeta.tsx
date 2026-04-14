@@ -68,6 +68,20 @@ const PageMeta = ({ title, description, path = "" }: PageMetaProps) => {
       document.head.appendChild(canonical);
     }
     canonical.setAttribute("href", `${BASE_URL}${path}`);
+
+    // Robots meta — noindex admin routes
+    const isAdmin = path.startsWith("/admin");
+    let robotsMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (isAdmin) {
+      if (!robotsMeta) {
+        robotsMeta = document.createElement("meta");
+        robotsMeta.setAttribute("name", "robots");
+        document.head.appendChild(robotsMeta);
+      }
+      robotsMeta.setAttribute("content", "noindex, nofollow");
+    } else if (robotsMeta) {
+      robotsMeta.remove();
+    }
   }, [title, description, path]);
 
   return null;

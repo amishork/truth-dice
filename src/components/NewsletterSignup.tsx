@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { toast } from "sonner";
+import { getUtmPayload } from "@/lib/utm";
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ const NewsletterSignup = () => {
 
     setLoading(true);
     const { error } = await supabase.from("email_captures").upsert(
-      { email: email.trim(), source: "newsletter" },
+      { email: email.trim(), source: "newsletter", ...getUtmPayload() },
       { onConflict: "email" }
     );
     setLoading(false);

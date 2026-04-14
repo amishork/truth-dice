@@ -274,6 +274,13 @@ serve(async (req) => {
             lead_score: 70,
             notes,
             last_activity_at: new Date().toISOString(),
+            // UTM attribution (passed from frontend sessionStorage)
+            utm_source: data.utm_source || null,
+            utm_medium: data.utm_medium || null,
+            utm_campaign: data.utm_campaign || null,
+            utm_content: data.utm_content || null,
+            utm_term: data.utm_term || null,
+            landing_page: data.landing_page || null,
           };
 
           // Upsert by email if available, otherwise just insert

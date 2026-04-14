@@ -3,13 +3,28 @@ import posthog from "posthog-js";
 
 /**
  * Words Incarnate Funnel Analytics
- * Dual-fires to Vercel Analytics (existing) and PostHog (funnel analysis).
+ * Triple-fires to Vercel Analytics, PostHog, and GA4.
  *
  * Key funnel stages:
  *   quiz_started → area_selected → section1_complete → section2_complete →
  *   section3_complete → final_selection_complete → quiz_saved →
  *   results_viewed → dice_rolled → chat_engaged → booking_submitted
  */
+
+// GA4 helper — gtag is loaded globally via index.html
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+function ga4Event(event: string, params?: Record<string, string | number | boolean>) {
+  try {
+    window.gtag?.("event", event, params);
+  } catch {
+    // GA4 should never break the app
+  }
+}
 
 export function trackEvent(
   event: string,
@@ -25,6 +40,7 @@ export function trackEvent(
   } catch {
     // PostHog should never break the app
   }
+  ga4Event(event, properties);
 }
 
 // ─── Quiz Funnel ──────────────────────────────────────────────────────────────
@@ -135,4 +151,14 @@ export function trackBookingInitiated() {
 
 export function trackWorkshopCtaClicked(location: string) {
   trackEvent("workshop_cta_clicked", { location });
+}
+
+// ─── Calendly & Resources ────────────────────────────────────────────────────
+
+export function trackCalendlyOpened(location: string) {
+  trackEvent("calendly_opened", { location });
+}
+
+export function trackResourceDownloaded(resource: string) {
+  trackEvent("resource_downloaded", { resource });
 }

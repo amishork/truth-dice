@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackLeadMagnetDownloaded } from "@/lib/analytics";
+import { getUtmPayload } from "@/lib/utm";
 import { Download, FileText, BookOpen, GraduationCap, Users, Loader2, CheckCircle2, X } from "lucide-react";
 
 const fadeUp = {
@@ -86,7 +87,7 @@ const Resources = () => {
     setLoading(true);
 
     const { error } = await supabase.from("email_captures").upsert(
-      { email: email.trim(), name: name.trim() || null, source: `resource_${resourceId}` },
+      { email: email.trim(), name: name.trim() || null, source: `resource_${resourceId}`, ...getUtmPayload() },
       { onConflict: "email" }
     );
 

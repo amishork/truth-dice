@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
+import JsonLd, { articleSchema } from "@/components/JsonLd";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import type { BlogPostMeta } from "@/content/blog/posts";
@@ -19,6 +20,14 @@ const BlogLayout = ({ meta, children }: BlogLayoutProps) => {
         description={meta.description}
         path={`/blog/${meta.slug}`}
       />
+      <JsonLd data={articleSchema({
+        title: meta.title,
+        description: meta.description,
+        slug: meta.slug,
+        date: meta.date,
+        author: meta.author,
+        tags: meta.tags,
+      })} />
       <Navigation />
 
       <main id="main" className="container mx-auto px-4 pt-24 pb-20">

@@ -767,8 +767,8 @@ Deno.serve(async (req) => {
       }
 
       case "source_analytics": {
-        const { data: emails } = await db.from("email_captures").select("source, created_at");
-        const { data: leads } = await db.from("leads").select("source, pipeline_stage");
+        const { data: emails } = await db.from("email_captures").select("source, utm_source, utm_medium, utm_campaign, created_at");
+        const { data: leads } = await db.from("leads").select("source, pipeline_stage, utm_source, utm_medium, utm_campaign, landing_page, created_at");
 
         const emailsBySource: Record<string, number> = {};
         for (const e of emails || []) {
@@ -785,9 +785,37 @@ Deno.serve(async (req) => {
           if (convertedStages.includes(l.pipeline_stage)) conversionBySource[src].converted++;
         }
 
+        // UTM attribution — leads by utm_source
+        const leadsByUtmSource: Record<string, number> = {};
+        const leadsByUtmMedium: Record<string, number> = {};
+        const leadsByUtmCampaign: Record<string, number> = {};
+        const leadsByLandingPage: Record<string, number> = {};
+        for (const l of leads || []) {
+          if (l.utm_source) leadsByUtmSource[l.utm_source] = (leadsByUtmSource[l.utm_source] || 0) + 1;
+          if (l.utm_medium) leadsByUtmMedium[l.utm_medium] = (leadsByUtmMedium[l.utm_medium] || 0) + 1;
+          if (l.utm_campaign) leadsByUtmCampaign[l.utm_campaign] = (leadsByUtmCampaign[l.utm_campaign] || 0) + 1;
+          if (l.landing_page) leadsByLandingPage[l.landing_page] = (leadsByLandingPage[l.landing_page] || 0) + 1;
+        }
+
+        // UTM attribution — email captures by utm_source
+        const emailsByUtmSource: Record<string, number> = {};
+        const emailsByUtmCampaign: Record<string, number> = {};
+        for (const e of emails || []) {
+          if (e.utm_source) emailsByUtmSource[e.utm_source] = (emailsByUtmSource[e.utm_source] || 0) + 1;
+          if (e.utm_campaign) emailsByUtmCampaign[e.utm_campaign] = (emailsByUtmCampaign[e.utm_campaign] || 0) + 1;
+        }
+
         return json({
           emailsBySource,
           conversionBySource,
+          utm: {
+            leadsByUtmSource,
+            leadsByUtmMedium,
+            leadsByUtmCampaign,
+            leadsByLandingPage,
+            emailsByUtmSource,
+            emailsByUtmCampaign,
+          },
         }, 200, cors);
       }
 

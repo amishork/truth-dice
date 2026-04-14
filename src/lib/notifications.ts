@@ -1,3 +1,5 @@
+import { getUtmPayload } from "@/lib/utm";
+
 const NOTIFICATION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`;
 
 export async function sendNotification(type: "contact" | "newsletter" | "lead_magnet" | "booking" | "testimonial", data: Record<string, unknown>) {
@@ -8,7 +10,7 @@ export async function sendNotification(type: "contact" | "newsletter" | "lead_ma
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ type, data }),
+      body: JSON.stringify({ type, data: { ...data, ...getUtmPayload() } }),
     });
   } catch (e) {
     // Notification failure should not block the user experience

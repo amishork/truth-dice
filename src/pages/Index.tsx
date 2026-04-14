@@ -17,6 +17,7 @@ import MetricsBanner from "@/components/MetricsBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { sendNotification } from "@/lib/notifications";
 import { trackEmailCaptured, trackLeadMagnetDownloaded } from "@/lib/analytics";
+import { getUtmPayload } from "@/lib/utm";
 import QuizPreview from "@/components/QuizPreview";
 import WelcomeBack from "@/components/WelcomeBack";
 import PageMeta from "@/components/PageMeta";
@@ -50,7 +51,7 @@ const Index = () => {
     if (!footerEmail.trim() || footerHoneypot) return;
     setFooterLoading(true);
     await supabase.from("email_captures").upsert(
-      { email: footerEmail.trim(), source: "footer_cta" },
+      { email: footerEmail.trim(), source: "footer_cta", ...getUtmPayload() },
       { onConflict: "email" }
     );
     setFooterLoading(false);

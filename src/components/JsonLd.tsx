@@ -92,3 +92,60 @@ export const webPageSchema = (name: string, description: string, path: string) =
   url: `https://wordsincarnate.com${path}`,
   isPartOf: { "@type": "WebSite", name: "Words Incarnate", url: "https://wordsincarnate.com" },
 });
+
+export const articleSchema = (opts: {
+  title: string;
+  description: string;
+  slug: string;
+  date: string;
+  author: string;
+  tags?: string[];
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: opts.title,
+  description: opts.description,
+  url: `https://wordsincarnate.com/blog/${opts.slug}`,
+  datePublished: opts.date,
+  dateModified: opts.date,
+  author: {
+    "@type": "Person",
+    name: opts.author,
+    url: "https://wordsincarnate.com/about",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Words Incarnate",
+    url: "https://wordsincarnate.com",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://wordsincarnate.com/android-chrome-512x512.png",
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": `https://wordsincarnate.com/blog/${opts.slug}`,
+  },
+  ...(opts.tags?.length ? { keywords: opts.tags.join(", ") } : {}),
+});
+
+export const caseStudySchema = (opts: {
+  title: string;
+  description: string;
+  slug: string;
+  segment?: string;
+  date?: string;
+}) => ({
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: opts.title,
+  description: opts.description,
+  url: `https://wordsincarnate.com/case-studies#${opts.slug}`,
+  creator: {
+    "@type": "Organization",
+    name: "Words Incarnate",
+    url: "https://wordsincarnate.com",
+  },
+  ...(opts.segment ? { about: opts.segment } : {}),
+  ...(opts.date ? { datePublished: opts.date } : {}),
+});

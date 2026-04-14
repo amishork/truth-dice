@@ -324,61 +324,113 @@ function SourceAttribution({ password }: { password: string }) {
 
   const emailsBySource = data.emailsBySource as Record<string, number>;
   const conversionBySource = data.conversionBySource as Record<string, { total: number; converted: number }>;
+  const utm = (data.utm || {}) as Record<string, Record<string, number>>;
 
   const emailEntries = Object.entries(emailsBySource).sort((a, b) => b[1] - a[1]);
   const maxEmails = emailEntries[0]?.[1] || 1;
 
   const convEntries = Object.entries(conversionBySource).sort((a, b) => b[1].total - a[1].total);
 
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+  const renderBarChart = (title: string, counts: Record<string, number>) => {
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const max = entries[0]?.[1] || 1;
+    if (entries.length === 0) return null;
+    return (
       <div className="ac-card">
-        <div className="ac-card-header">Leads by Source</div>
-        {emailEntries.length === 0 ? (
-          <div style={{ color: "var(--ac-text-muted)", fontSize: "0.8125rem" }}>No source data</div>
-        ) : (
-          <div>
-            {emailEntries.map(([source, count]) => (
-              <div key={source} className="ac-bar-row">
-                <span className="ac-bar-label">{source}</span>
-                <div className="ac-bar-track">
-                  <div className="ac-bar-fill" style={{ width: `${(count / maxEmails) * 100}%` }} />
-                </div>
-                <span className="ac-bar-count">{count}</span>
+        <div className="ac-card-header">{title}</div>
+        <div>
+          {entries.map(([name, count]) => (
+            <div key={name} className="ac-bar-row">
+              <span className="ac-bar-label">{name}</span>
+              <div className="ac-bar-track">
+                <div className="ac-bar-fill" style={{ width: `${(count / max) * 100}%` }} />
               </div>
-            ))}
-          </div>
-        )}
+              <span className="ac-bar-count">{count}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const hasUtmData = Object.values(utm).some(
+    (obj) => obj && Object.keys(obj).length > 0
+  );
+
+  return (
+    <div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        <div className="ac-card">
+          <div className="ac-card-header">Leads by Source</div>
+          {emailEntries.length === 0 ? (
+            <div style={{ color: "var(--ac-text-muted)", fontSize: "0.8125rem" }}>No source data</div>
+          ) : (
+            <div>
+              {emailEntries.map(([source, count]) => (
+                <div key={source} className="ac-bar-row">
+                  <span className="ac-bar-label">{source}</span>
+                  <div className="ac-bar-track">
+                    <div className="ac-bar-fill" style={{ width: `${(count / maxEmails) * 100}%` }} />
+                  </div>
+                  <span className="ac-bar-count">{count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="ac-card">
+          <div className="ac-card-header">Conversion by Source</div>
+          {convEntries.length === 0 ? (
+            <div style={{ color: "var(--ac-text-muted)", fontSize: "0.8125rem" }}>No conversion data</div>
+          ) : (
+            <div>
+              {convEntries.map(([source, { total, converted }]) => {
+                const rate = total > 0 ? ((converted / total) * 100).toFixed(0) : "0";
+                return (
+                  <div key={source} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--ac-border)" }}>
+                    <span style={{ fontSize: "0.8125rem", color: "var(--ac-text)" }}>{source}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: "0.75rem", color: "var(--ac-text-muted)" }}>{converted}/{total}</span>
+                      <span style={{
+                        fontSize: "0.75rem",
+                        fontFamily: "var(--ac-font-mono)",
+                        fontWeight: 600,
+                        color: Number(rate) >= 50 ? "var(--ac-success)" : Number(rate) >= 20 ? "var(--ac-warning)" : "var(--ac-text-muted)",
+                      }}>
+                        {rate}%
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="ac-card">
-        <div className="ac-card-header">Conversion by Source</div>
-        {convEntries.length === 0 ? (
-          <div style={{ color: "var(--ac-text-muted)", fontSize: "0.8125rem" }}>No conversion data</div>
-        ) : (
-          <div>
-            {convEntries.map(([source, { total, converted }]) => {
-              const rate = total > 0 ? ((converted / total) * 100).toFixed(0) : "0";
-              return (
-                <div key={source} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--ac-border)" }}>
-                  <span style={{ fontSize: "0.8125rem", color: "var(--ac-text)" }}>{source}</span>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <span style={{ fontSize: "0.75rem", color: "var(--ac-text-muted)" }}>{converted}/{total}</span>
-                    <span style={{
-                      fontSize: "0.75rem",
-                      fontFamily: "var(--ac-font-mono)",
-                      fontWeight: 600,
-                      color: Number(rate) >= 50 ? "var(--ac-success)" : Number(rate) >= 20 ? "var(--ac-warning)" : "var(--ac-text-muted)",
-                    }}>
-                      {rate}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+      {/* UTM Attribution */}
+      {hasUtmData && (
+        <>
+          <div style={{ marginTop: 32, marginBottom: 16, fontSize: "0.9375rem", fontWeight: 600, color: "var(--ac-text)", fontFamily: "var(--ac-font-heading)" }}>
+            UTM Attribution
           </div>
-        )}
-      </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+            {renderBarChart("Leads by UTM Source", utm.leadsByUtmSource || {})}
+            {renderBarChart("Leads by UTM Medium", utm.leadsByUtmMedium || {})}
+            {renderBarChart("Leads by UTM Campaign", utm.leadsByUtmCampaign || {})}
+            {renderBarChart("Leads by Landing Page", utm.leadsByLandingPage || {})}
+            {renderBarChart("Emails by UTM Source", utm.emailsByUtmSource || {})}
+            {renderBarChart("Emails by UTM Campaign", utm.emailsByUtmCampaign || {})}
+          </div>
+        </>
+      )}
+
+      {!hasUtmData && (
+        <div style={{ marginTop: 24, padding: "16px 20px", background: "var(--ac-bg-hover)", borderRadius: 8, fontSize: "0.8125rem", color: "var(--ac-text-muted)" }}>
+          No UTM data yet. UTM attribution will appear here once leads arrive via tagged links (e.g. <code style={{ fontFamily: "var(--ac-font-mono)", fontSize: "0.75rem" }}>?utm_source=newsletter&utm_campaign=spring</code>).
+        </div>
+      )}
     </div>
   );
 }
