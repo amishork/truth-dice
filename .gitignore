@@ -28,3 +28,4 @@ bun.lock
 bun.lockb
 test-results/
 playwright-report/
+supabase/.temp/

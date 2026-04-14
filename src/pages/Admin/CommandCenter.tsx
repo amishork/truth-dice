@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { type OverviewData, type BookingRecord, type ContactRecord, type EmailRecord, type QuizRecord, type TestimonialRecord, timeAgo } from "./api";
+import React, { useMemo, useState, useEffect } from "react";
+import { api, type OverviewData, type BookingRecord, type ContactRecord, type EmailRecord, type QuizRecord, type TestimonialRecord, type DataHealth, timeAgo } from "./api";
 
 // ─── Sparkline ───
 
@@ -363,6 +363,7 @@ export default function CommandCenter({
   emails,
   quizzes,
   testimonials,
+  password,
 }: {
   overview: OverviewData;
   bookings: BookingRecord[];
@@ -370,10 +371,21 @@ export default function CommandCenter({
   emails: EmailRecord[];
   quizzes: QuizRecord[];
   testimonials: TestimonialRecord[];
+  password: string;
 }) {
   const insight = useMemo(() => buildInsight(overview, bookings, contacts, quizzes), [overview, bookings, contacts, quizzes]);
   const actionQueue = useMemo(() => buildActionQueue(bookings, contacts, testimonials), [bookings, contacts, testimonials]);
   const activityFeed = useMemo(() => buildActivityFeed(bookings, contacts, emails, quizzes, testimonials), [bookings, contacts, emails, quizzes, testimonials]);
+
+  // Data health fetch
+  const [health, setHealth] = useState<DataHealth | null>(null);
+  useEffect(() => {
+    api(password, "data_health").then(res => setHealth(res.health)).catch(() => {});
+  }, [password]);
+
+  const healthIssues = health
+    ? health.duplicates.length + health.missing_fields + health.stale_leads + health.engagements_without_sessions + health.sessions_without_notes
+    : 0;
 
   return (
     <div>
@@ -384,6 +396,21 @@ export default function CommandCenter({
       <div style={{ margin: "24px 0 32px" }}>
         <StatStrip overview={overview} quizzes={quizzes} emails={emails} />
       </div>
+
+      {/* Data Health Alerts */}
+      {health && healthIssues > 0 && (
+        <div className="ac-card" style={{ marginBottom: 24, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, borderLeft: "3px solid var(--ac-warning)" }}>
+          <span style={{ fontSize: 16 }}>⚠️</span>
+          <div style={{ flex: 1, fontSize: "0.8125rem", color: "var(--ac-text-secondary)" }}>
+            <span style={{ fontWeight: 600, color: "var(--ac-text)" }}>{healthIssues} data issue{healthIssues !== 1 ? "s" : ""} found. </span>
+            {health.duplicates.length > 0 && <span>{health.duplicates.length} duplicate{health.duplicates.length !== 1 ? "s" : ""}, </span>}
+            {health.missing_fields > 0 && <span>{health.missing_fields} incomplete lead{health.missing_fields !== 1 ? "s" : ""}, </span>}
+            {health.stale_leads > 0 && <span>{health.stale_leads} stale lead{health.stale_leads !== 1 ? "s" : ""}, </span>}
+            {health.engagements_without_sessions > 0 && <span>{health.engagements_without_sessions} engagement{health.engagements_without_sessions !== 1 ? "s" : ""} without sessions</span>}
+            <span style={{ marginLeft: 4 }}>→ Check System &gt; Data Health</span>
+          </div>
+        </div>
+      )}
 
       {/* Two-column: Action Queue + Activity Feed */}
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 24, alignItems: "flex-start" }}>

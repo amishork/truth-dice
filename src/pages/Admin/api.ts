@@ -25,6 +25,7 @@ export type AdminView =
   | "analytics"
   | "engagements"
   | "revenue"
+  | "proposals"
   | "testimonials"
   | "leads-lists"
   | "content-config"
@@ -185,6 +186,48 @@ export interface EngagementSession {
 }
 
 export const HOLD_STAGES = ["honor", "observe", "live", "declare"] as const;
+
+export interface ProposalRecord {
+  id: string;
+  lead_id: string | null;
+  client_name: string;
+  organization: string | null;
+  segment: "family" | "school" | "organization";
+  engagement_type: string;
+  tier: string | null;
+  investment_amount: number | null;
+  investment_description: string | null;
+  timeline: string | null;
+  deliverables: string[];
+  custom_notes: string | null;
+  status: "draft" | "sent" | "viewed" | "accepted" | "declined";
+  sent_at: string | null;
+  viewed_at: string | null;
+  responded_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EmailSendRecord {
+  id: string;
+  lead_id: string | null;
+  template_key: string;
+  recipient_email: string;
+  subject: string | null;
+  status: string;
+  resend_id: string | null;
+  sent_at: string;
+}
+
+export interface DataHealth {
+  duplicates: { email: string; count: number }[];
+  missing_fields: number;
+  missing_fields_leads: { id: string; name: string | null; email: string | null; phone: string | null; customer_type: string | null }[];
+  stale_leads: number;
+  stale_leads_list: { id: string; name: string | null; email: string | null; pipeline_stage: string; last_activity_at: string | null }[];
+  engagements_without_sessions: number;
+  sessions_without_notes: number;
+}
 
 export interface RevenueSummary {
   totalRevenue: number;

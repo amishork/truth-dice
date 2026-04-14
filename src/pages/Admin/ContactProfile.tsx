@@ -20,6 +20,7 @@ function stageLabel(stage: string): string {
 const ACTIVITY_ICONS: Record<string, string> = {
   quiz_completed: "📊",
   email_captured: "✉️",
+  email_sent: "📤",
   chat_completed: "💬",
   booking_requested: "📅",
   contact_submitted: "📝",
@@ -35,6 +36,8 @@ function activityDescription(activity: LeadActivity): string {
   switch (activity.activity_type) {
     case "email_captured":
       return `Email captured via ${meta.source || "unknown source"}`;
+    case "email_sent":
+      return `Email sent: ${meta.subject || meta.template || "—"}`;
     case "contact_submitted":
       return meta.service_interest ? `Contact form: ${meta.service_interest}` : "Submitted contact form";
     case "booking_requested":
@@ -83,6 +86,31 @@ export default function ContactProfile({
   // New note
   const [newNote, setNewNote] = useState("");
   const [addingNote, setAddingNote] = useState(false);
+
+  // Quick email send
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+
+  const handleSendEmail = async () => {
+    if (!lead?.email || !emailSubject.trim() || !emailBody.trim()) return;
+    setSendingEmail(true);
+    try {
+      await api(password, "send_email", {
+        lead_id: lead.id,
+        recipient_email: lead.email,
+        subject: emailSubject,
+        html: emailBody.replace(/\n/g, "<br/>"),
+        template_key: "manual",
+      });
+      setEmailSubject("");
+      setEmailBody("");
+      setShowEmailForm(false);
+      loadLead();
+    } catch { /* */ }
+    setSendingEmail(false);
+  };
 
   const loadLead = useCallback(async () => {
     setLoading(true);
@@ -319,8 +347,49 @@ export default function ContactProfile({
           </div>
         </div>
 
-        {/* Right column — timeline */}
+        {/* Right column — email + timeline */}
         <div>
+          {/* Quick Email Send */}
+          {lead.email && (
+            <div className="ac-card" style={{ marginBottom: 16 }}>
+              <div className="ac-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>Send Email</span>
+                <button
+                  className="ac-btn ac-btn-ghost ac-btn-sm"
+                  onClick={() => setShowEmailForm(!showEmailForm)}
+                  style={{ fontSize: "0.75rem" }}
+                >
+                  {showEmailForm ? "Cancel" : "Compose"}
+                </button>
+              </div>
+              {showEmailForm && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ac-text-muted)" }}>To: {lead.email}</div>
+                  <input
+                    className="ac-input"
+                    placeholder="Subject"
+                    value={emailSubject}
+                    onChange={e => setEmailSubject(e.target.value)}
+                  />
+                  <textarea
+                    className="ac-input"
+                    rows={4}
+                    placeholder="Message body (plain text, line breaks preserved)"
+                    value={emailBody}
+                    onChange={e => setEmailBody(e.target.value)}
+                  />
+                  <button
+                    className="ac-btn ac-btn-primary ac-btn-sm"
+                    disabled={!emailSubject.trim() || !emailBody.trim() || sendingEmail}
+                    onClick={handleSendEmail}
+                  >
+                    {sendingEmail ? "Sending..." : "Send Email"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="ac-card">
             <div className="ac-card-header">Activity Timeline</div>
             {activities.length === 0 ? (

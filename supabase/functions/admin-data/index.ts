@@ -816,6 +816,202 @@ Deno.serve(async (req) => {
         return json({ success: true }, 200, cors);
       }
 
+      // ─── 4.1: Proposals ───
+
+      case "proposals": {
+        const { data } = await db.from("proposals").select("*").order("created_at", { ascending: false });
+        return json({ proposals: data || [] }, 200, cors);
+      }
+
+      case "create_proposal": {
+        const p = params as Record<string, unknown>;
+        if (!p?.client_name || !p?.segment || !p?.engagement_type) {
+          return json({ error: "Missing required fields" }, 400, cors);
+        }
+        const { data, error } = await db.from("proposals").insert({
+          lead_id: p.lead_id || null,
+          client_name: p.client_name,
+          organization: p.organization || null,
+          segment: p.segment,
+          engagement_type: p.engagement_type,
+          tier: p.tier || null,
+          investment_amount: p.investment_amount || null,
+          investment_description: p.investment_description || null,
+          timeline: p.timeline || null,
+          deliverables: p.deliverables || [],
+          custom_notes: p.custom_notes || null,
+          status: "draft",
+        }).select().single();
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ proposal: data }, 200, cors);
+      }
+
+      case "update_proposal": {
+        const p = params as Record<string, unknown>;
+        if (!p?.id) return json({ error: "Missing id" }, 400, cors);
+        const updates: Record<string, unknown> = {};
+        for (const key of ["client_name", "organization", "segment", "engagement_type", "tier", "investment_amount", "investment_description", "timeline", "deliverables", "custom_notes", "status", "sent_at", "viewed_at", "responded_at"]) {
+          if (p[key] !== undefined) updates[key] = p[key];
+        }
+        const { error } = await db.from("proposals").update(updates).eq("id", p.id);
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ success: true }, 200, cors);
+      }
+
+      case "delete_proposal": {
+        const id = (params as Record<string, unknown>)?.id;
+        if (!id) return json({ error: "Missing id" }, 400, cors);
+        const { error } = await db.from("proposals").delete().eq("id", id);
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ success: true }, 200, cors);
+      }
+
+      // ─── 4.2: Email Sends ───
+
+      case "send_email": {
+        const p = params as Record<string, unknown>;
+        if (!p?.recipient_email || !p?.subject || !p?.html || !p?.template_key) {
+          return json({ error: "Missing required fields" }, 400, cors);
+        }
+        const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+        if (!RESEND_API_KEY) return json({ error: "RESEND_API_KEY not configured" }, 500, cors);
+
+        const DOMAIN_VERIFIED = Deno.env.get("DOMAIN_VERIFIED") === "true";
+        const fromEmail = DOMAIN_VERIFIED
+          ? "Words Incarnate <hello@send.wordsincarnate.com>"
+          : "Words Incarnate <onboarding@resend.dev>";
+
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: [p.recipient_email],
+            subject: p.subject,
+            html: p.html,
+          }),
+        });
+
+        let resendId = null;
+        let status = "sent";
+        if (!res.ok) {
+          console.error("Resend error:", res.status, await res.text());
+          status = "failed";
+        } else {
+          const resData = await res.json();
+          resendId = resData.id || null;
+        }
+
+        // Log the send
+        await db.from("email_sends").insert({
+          lead_id: p.lead_id || null,
+          template_key: p.template_key,
+          recipient_email: p.recipient_email,
+          subject: p.subject,
+          status,
+          resend_id: resendId,
+        });
+
+        // Log activity on the lead
+        if (p.lead_id) {
+          await db.from("lead_activities").insert({
+            lead_id: p.lead_id,
+            activity_type: "email_sent",
+            metadata: { template: p.template_key, subject: p.subject, status },
+          });
+          await db.from("leads").update({ last_activity_at: new Date().toISOString() }).eq("id", p.lead_id);
+        }
+
+        if (status === "failed") return json({ error: "Email send failed" }, 500, cors);
+        return json({ success: true, resend_id: resendId }, 200, cors);
+      }
+
+      case "email_history": {
+        const leadId = (params as Record<string, unknown>)?.lead_id;
+        let query = db.from("email_sends").select("*").order("sent_at", { ascending: false });
+        if (leadId) query = query.eq("lead_id", leadId);
+        const { data } = await query.limit(100);
+        return json({ emails: data || [] }, 200, cors);
+      }
+
+      // ─── 4.3: Data Health ───
+
+      case "data_health": {
+        // Duplicate leads by email
+        const { data: dupes } = await db.rpc("get_duplicate_lead_emails") as { data: { email: string; count: number }[] | null };
+
+        // Fallback: query directly if RPC doesn't exist
+        let duplicates: { email: string; count: number }[] = [];
+        if (!dupes) {
+          const { data: allLeads } = await db.from("leads").select("email").not("email", "is", null);
+          const emailCounts: Record<string, number> = {};
+          for (const l of allLeads || []) {
+            if (l.email) emailCounts[l.email] = (emailCounts[l.email] || 0) + 1;
+          }
+          duplicates = Object.entries(emailCounts)
+            .filter(([, c]) => c > 1)
+            .map(([email, count]) => ({ email, count }));
+        } else {
+          duplicates = dupes;
+        }
+
+        // Leads missing critical fields
+        const { data: missingFields } = await db.from("leads")
+          .select("id, email, name, phone, customer_type")
+          .or("name.is.null,phone.is.null,customer_type.is.null");
+        const leadsNeedingAttention = (missingFields || []).filter(l =>
+          !l.name || !l.phone || !l.customer_type
+        );
+
+        // Stale leads (no activity in 30+ days, not in terminal stages)
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: staleLeads } = await db.from("leads")
+          .select("id, name, email, pipeline_stage, last_activity_at")
+          .not("pipeline_stage", "in", "(won,lost,nurture)")
+          .or(`last_activity_at.is.null,last_activity_at.lt.${thirtyDaysAgo}`);
+
+        // Engagement integrity
+        const { data: allEngagements } = await db.from("engagements").select("id, client_name, status");
+        const { data: allSessions } = await db.from("engagement_sessions").select("id, engagement_id, session_notes");
+
+        const engagementIds = new Set((allSessions || []).map(s => s.engagement_id));
+        const engagementsWithoutSessions = (allEngagements || []).filter(e => !engagementIds.has(e.id));
+        const sessionsWithoutNotes = (allSessions || []).filter(s => !s.session_notes);
+
+        return json({
+          health: {
+            duplicates,
+            missing_fields: leadsNeedingAttention.length,
+            missing_fields_leads: leadsNeedingAttention.slice(0, 20),
+            stale_leads: (staleLeads || []).length,
+            stale_leads_list: (staleLeads || []).slice(0, 20),
+            engagements_without_sessions: engagementsWithoutSessions.length,
+            sessions_without_notes: sessionsWithoutNotes.length,
+          },
+        }, 200, cors);
+      }
+
+      case "merge_leads": {
+        const p = params as Record<string, unknown>;
+        if (!p?.keep_id || !p?.delete_id) return json({ error: "Missing keep_id or delete_id" }, 400, cors);
+
+        // Move activities from deleted lead to kept lead
+        await db.from("lead_activities").update({ lead_id: p.keep_id }).eq("lead_id", p.delete_id);
+        // Move email sends
+        await db.from("email_sends").update({ lead_id: p.keep_id }).eq("lead_id", p.delete_id);
+        // Move engagements
+        await db.from("engagements").update({ lead_id: p.keep_id }).eq("lead_id", p.delete_id);
+        // Move proposals
+        await db.from("proposals").update({ lead_id: p.keep_id }).eq("lead_id", p.delete_id);
+        // Delete the duplicate
+        const { error } = await db.from("leads").delete().eq("id", p.delete_id);
+        if (error) return json({ error: error.message }, 500, cors);
+        return json({ success: true }, 200, cors);
+      }
+
       default:
         return json({ error: "Unknown action" }, 400, cors);
     }

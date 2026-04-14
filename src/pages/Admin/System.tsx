@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api } from "./api";
+import { api, type DataHealth } from "./api";
 
 function currency(n: number): string {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
@@ -214,12 +214,137 @@ function IntegrationStatus() {
   );
 }
 
+// ─── Data Health ───
+
+function DataHealthPanel({ password }: { password: string }) {
+  const [health, setHealth] = useState<DataHealth | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [merging, setMerging] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api(password, "data_health");
+        setHealth(res.health);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [password]);
+
+  const handleMerge = async (email: string) => {
+    if (!confirm(`Merge duplicate leads for ${email}? The lead with more data will be kept.`)) return;
+    setMerging(email);
+    try {
+      // Get all leads with this email
+      const res = await api(password, "leads", { limit: 100 });
+      const dupes = (res.data || []).filter((l: { email: string | null }) => l.email === email);
+      if (dupes.length < 2) return;
+      // Keep the one with more activity / data
+      dupes.sort((a: { notes: string | null; lead_score: number }, b: { notes: string | null; lead_score: number }) => (b.notes?.length || 0) + b.lead_score - (a.notes?.length || 0) - a.lead_score);
+      const keepId = dupes[0].id;
+      for (let i = 1; i < dupes.length; i++) {
+        await api(password, "merge_leads", { keep_id: keepId, delete_id: dupes[i].id });
+      }
+      // Reload
+      const newRes = await api(password, "data_health");
+      setHealth(newRes.health);
+    } finally {
+      setMerging(null);
+    }
+  };
+
+  if (loading) return <div className="ac-card"><div className="ac-card-header">Data Health</div><div className="ac-loading"><div className="ac-spinner" /></div></div>;
+  if (!health) return null;
+
+  const totalIssues = health.duplicates.length + health.missing_fields + health.stale_leads +
+    health.engagements_without_sessions + health.sessions_without_notes;
+
+  return (
+    <div className="ac-card">
+      <div className="ac-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>Data Health</span>
+        {totalIssues > 0 ? (
+          <span className="ac-badge" style={{ background: "var(--ac-warning)20", color: "var(--ac-warning)" }}>
+            {totalIssues} issue{totalIssues !== 1 ? "s" : ""}
+          </span>
+        ) : (
+          <span className="ac-badge" style={{ background: "var(--ac-success)20", color: "var(--ac-success)" }}>
+            All clear
+          </span>
+        )}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Duplicates */}
+        <div style={{ padding: "8px 0", borderBottom: "1px solid var(--ac-border)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8125rem" }}>
+            <span style={{ color: "var(--ac-text-secondary)" }}>Duplicate leads</span>
+            <span style={{ fontWeight: 600, color: health.duplicates.length > 0 ? "var(--ac-warning)" : "var(--ac-text-muted)" }}>
+              {health.duplicates.length}
+            </span>
+          </div>
+          {health.duplicates.map(d => (
+            <div key={d.email} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6, paddingLeft: 12 }}>
+              <span style={{ fontSize: "0.75rem", color: "var(--ac-text-muted)" }}>{d.email} ({d.count}x)</span>
+              <button
+                className="ac-btn ac-btn-ghost ac-btn-sm"
+                onClick={() => handleMerge(d.email)}
+                disabled={merging === d.email}
+                style={{ fontSize: "0.6875rem" }}
+              >
+                {merging === d.email ? "Merging..." : "Merge"}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Missing fields */}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8125rem", padding: "8px 0", borderBottom: "1px solid var(--ac-border)" }}>
+          <span style={{ color: "var(--ac-text-secondary)" }}>Leads missing critical fields</span>
+          <span style={{ fontWeight: 600, color: health.missing_fields > 0 ? "var(--ac-warning)" : "var(--ac-text-muted)" }}>
+            {health.missing_fields}
+          </span>
+        </div>
+
+        {/* Stale leads */}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8125rem", padding: "8px 0", borderBottom: "1px solid var(--ac-border)" }}>
+          <span style={{ color: "var(--ac-text-secondary)" }}>Stale leads (30+ days inactive)</span>
+          <span style={{ fontWeight: 600, color: health.stale_leads > 0 ? "var(--ac-warning)" : "var(--ac-text-muted)" }}>
+            {health.stale_leads}
+          </span>
+        </div>
+
+        {/* Engagement integrity */}
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8125rem", padding: "8px 0", borderBottom: "1px solid var(--ac-border)" }}>
+          <span style={{ color: "var(--ac-text-secondary)" }}>Engagements without sessions</span>
+          <span style={{ fontWeight: 600, color: health.engagements_without_sessions > 0 ? "var(--ac-warning)" : "var(--ac-text-muted)" }}>
+            {health.engagements_without_sessions}
+          </span>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8125rem", padding: "8px 0" }}>
+          <span style={{ color: "var(--ac-text-secondary)" }}>Sessions without notes</span>
+          <span style={{ fontWeight: 600, color: health.sessions_without_notes > 0 ? "var(--ac-warning)" : "var(--ac-text-muted)" }}>
+            {health.sessions_without_notes}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── System Container ───
 
 export default function System({ password }: { password: string }) {
   return (
     <div>
       <div className="ac-section-title">System</div>
+
+      {/* Data Health — full width at top */}
+      <div style={{ marginBottom: 24 }}>
+        <DataHealthPanel password={password} />
+      </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "flex-start" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>

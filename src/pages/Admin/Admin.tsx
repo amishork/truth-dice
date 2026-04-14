@@ -7,6 +7,7 @@ import DataView from "./DataView";
 import Pipeline from "./Pipeline";
 import Engagements from "./Engagements";
 import Revenue from "./Revenue";
+import Proposals from "./Proposals";
 import Analytics from "./Analytics";
 import ContentConfig from "./ContentConfig";
 import System from "./System";
@@ -137,6 +138,7 @@ function Sidebar({
     { id: "pipeline", label: "Pipeline", icon: "pipeline" },
     { id: "analytics", label: "Analytics", icon: "chart", dividerAfter: true },
     { id: "engagements", label: "Engagements", icon: "briefcase" },
+    { id: "proposals", label: "Proposals", icon: "mail" },
     { id: "revenue", label: "Revenue", icon: "dollar", dividerAfter: true },
     { id: "testimonials", label: "Testimonials", icon: "star", badge: pendingCount || undefined },
     { id: "leads-lists", label: "Leads & Lists", icon: "mail" },
@@ -306,6 +308,7 @@ const Admin = () => {
             emails={emails}
             quizzes={quizzes}
             testimonials={testimonials}
+            password={password}
           />
         );
       case "testimonials":
@@ -323,6 +326,8 @@ const Admin = () => {
         return <Pipeline password={password} />;
       case "engagements":
         return <Engagements password={password} />;
+      case "proposals":
+        return <Proposals password={password} />;
       case "revenue":
         return <Revenue password={password} />;
       case "content-config":
