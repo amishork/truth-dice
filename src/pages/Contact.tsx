@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
 import MultiStepContactForm from "@/components/MultiStepContactForm";
+import Cal from "@calcom/embed-react";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -12,19 +13,11 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-function buildCalUrl(theme: string | undefined) {
-  const isDark = theme === "dark";
-  const params = new URLSearchParams({
-    theme: isDark ? "dark" : "light",
-    layout: "month_view",
-  });
-  return `https://cal.com/words-incarnate/discovery-call/embed?${params.toString()}`;
-}
-
 const Contact = () => {
   const [searchParams] = useSearchParams();
   const interest = searchParams.get("interest") ?? undefined;
   const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,9 +74,9 @@ const Contact = () => {
 
         {/* ─── INLINE BOOKING ─── */}
         <section className="mt-24 border-t border-border bg-background">
-          <div className="container mx-auto px-4 pt-16">
+          <div className="container mx-auto px-4 pt-16 pb-8">
             <motion.div
-              className="mx-auto max-w-xl text-center mb-12"
+              className="mx-auto max-w-xl text-center mb-10"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -98,16 +91,18 @@ const Contact = () => {
               </p>
             </motion.div>
 
-            <div className="mx-auto max-w-4xl cal-embed-wrapper">
-              <iframe
-                key={resolvedTheme}
-                src={buildCalUrl(resolvedTheme)}
-                title="Schedule a discovery call with Words Incarnate"
-                width="100%"
-                height="700"
-                frameBorder="0"
-                loading="lazy"
-                allow="payment"
+            <div className="mx-auto max-w-4xl">
+              <Cal
+                calLink="words-incarnate/discovery-call"
+                config={{
+                  layout: "month_view",
+                  theme: isDark ? "dark" : "light",
+                }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  overflow: "scroll",
+                }}
               />
             </div>
           </div>
