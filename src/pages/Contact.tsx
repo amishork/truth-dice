@@ -12,16 +12,13 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-function buildCalendlyUrl(theme: string | undefined) {
+function buildCalUrl(theme: string | undefined) {
   const isDark = theme === "dark";
   const params = new URLSearchParams({
-    hide_event_type_details: "1",
-    hide_gdpr_banner: "1",
-    background_color: isDark ? "0f0f0f" : "ffffff",
-    text_color: isDark ? "ededed" : "141414",
-    primary_color: isDark ? "db2442" : "9a132a",
+    theme: isDark ? "dark" : "light",
+    layout: "month_view",
   });
-  return `https://calendly.com/wordsincarnate/30min?${params.toString()}`;
+  return `https://cal.com/words-incarnate/discovery-call/embed?${params.toString()}`;
 }
 
 const Contact = () => {
@@ -101,14 +98,16 @@ const Contact = () => {
               </p>
             </motion.div>
 
-            <div className="mx-auto max-w-4xl calendly-frame-wrapper">
+            <div className="mx-auto max-w-4xl cal-embed-wrapper">
               <iframe
-                src={buildCalendlyUrl(resolvedTheme)}
-                title="Schedule a discovery call"
+                key={resolvedTheme}
+                src={buildCalUrl(resolvedTheme)}
+                title="Schedule a discovery call with Words Incarnate"
                 width="100%"
                 height="700"
                 frameBorder="0"
-                scrolling="no"
+                loading="lazy"
+                allow="payment"
               />
             </div>
           </div>

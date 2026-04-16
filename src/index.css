@@ -1168,28 +1168,16 @@
   }
 }
 
-/* Calendly scheduling — seamless iframe integration */
-.calendly-frame-wrapper {
+/* Cal.com scheduling embed — seamless integration */
+.cal-embed-wrapper {
   position: relative;
   overflow: hidden;
 }
 
-.calendly-frame-wrapper iframe {
+.cal-embed-wrapper iframe {
   display: block;
   width: 100%;
   height: 700px;
   border: none;
-}
-
-/* Cover the Calendly "Powered by" ribbon in top-right corner */
-.calendly-frame-wrapper::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 120px;
-  height: 120px;
-  background-color: hsl(var(--background));
-  z-index: 10;
-  pointer-events: none;
+  color-scheme: auto;
 }

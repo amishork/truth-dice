@@ -1,35 +1,8 @@
 import { useEffect, useRef } from "react";
 
-const CALENDLY_URL = "https://calendly.com/wordsincarnate";
-const CALENDLY_CSS = "https://assets.calendly.com/assets/external/widget.css";
-const CALENDLY_JS = "https://assets.calendly.com/assets/external/widget.js";
+const CAL_URL = "https://cal.com/words-incarnate";
 
-/** Loads the Calendly script + CSS once, returns a promise that resolves when ready */
-let loadPromise: Promise<void> | null = null;
-function ensureCalendlyLoaded(): Promise<void> {
-  if (loadPromise) return loadPromise;
-  loadPromise = new Promise((resolve) => {
-    if (!document.querySelector(`link[href="${CALENDLY_CSS}"]`)) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = CALENDLY_CSS;
-      document.head.appendChild(link);
-    }
-    const existing = document.querySelector(`script[src="${CALENDLY_JS}"]`);
-    if (existing) {
-      resolve();
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = CALENDLY_JS;
-    script.async = true;
-    script.onload = () => resolve();
-    document.head.appendChild(script);
-  });
-  return loadPromise;
-}
-
-// ─── Inline Embed ───
+// ─── Inline Embed (kept for backward compat, use raw iframe on Contact page) ───
 
 interface CalendlyInlineProps {
   eventType?: string;
@@ -42,60 +15,40 @@ interface CalendlyInlineProps {
 }
 
 export const CalendlyInline = ({
-  eventType = "/30min",
+  eventType = "/discovery-call",
   className = "",
   height = "700px",
-  backgroundColor,
-  textColor,
-  primaryColor,
-  hideEventTypeDetails = false,
 }: CalendlyInlineProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (backgroundColor) params.set("background_color", backgroundColor);
-    if (textColor) params.set("text_color", textColor);
-    if (primaryColor) params.set("primary_color", primaryColor);
-    if (hideEventTypeDetails) params.set("hide_event_type_details", "1");
-    params.set("hide_gdpr_banner", "1");
-    const url = `${CALENDLY_URL}${eventType}?${params.toString()}`;
-
-    ensureCalendlyLoaded().then(() => {
-      const el = containerRef.current;
-      if (!el) return;
-      const C = (window as any).Calendly;
-      if (!C) return;
-
-      el.innerHTML = "";
-      C.initInlineWidget({ url, parentElement: el });
-    });
-  }, [eventType, backgroundColor, textColor, primaryColor, hideEventTypeDetails]);
-
   return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{ width: "100%", height, overflow: "hidden" }}
-    />
+    <div ref={containerRef} className={className}>
+      <iframe
+        src={`${CAL_URL}${eventType}/embed?layout=month_view&theme=light`}
+        title="Schedule a call"
+        width="100%"
+        height={height}
+        frameBorder="0"
+        style={{ border: "none" }}
+      />
+    </div>
   );
 };
 
 // ─── Popup ───
+// Opens Cal.com in a new centered window (popup style)
 
 interface OpenCalendlyOptions {
-  /** Optional specific event type path, e.g. "/30min" */
   eventType?: string;
 }
 
-export function openCalendlyPopup({ eventType = "" }: OpenCalendlyOptions = {}) {
-  ensureCalendlyLoaded().then(() => {
-    if ((window as any).Calendly) {
-      (window as any).Calendly.initPopupWidget({
-        url: `${CALENDLY_URL}${eventType}`,
-      });
-    }
-  });
+export function openCalendlyPopup({ eventType = "/discovery-call" }: OpenCalendlyOptions = {}) {
+  const url = `${CAL_URL}${eventType}`;
+  const w = 700;
+  const h = 750;
+  const left = (window.screen.width - w) / 2;
+  const top = (window.screen.height - h) / 2;
+  window.open(url, "cal-booking", `width=${w},height=${h},top=${top},left=${left},scrollbars=yes`);
 }
 
 export default CalendlyInline;
