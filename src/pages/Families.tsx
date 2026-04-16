@@ -20,29 +20,29 @@ const phases = [
   {
     step: "01",
     name: "Honor",
-    desc: "We start with an honest conversation about what your family actually values — not what you think you should value. Through guided reflection, you and your spouse articulate the commitments that shape your household.",
+    desc: "We start with an honest conversation about what your family actually values. Not what you think you should value. Through guided reflection, you and your spouse articulate the commitments that shape your household.",
   },
   {
     step: "02",
     name: "Observe",
-    desc: "Together we look at the daily texture of your family life — meals, evenings, weekends, discipline, screen time, traditions — and map where your values are already alive, and where they're getting lost.",
+    desc: "Together we look at the daily texture of your family life: meals, evenings, weekends, discipline, screen time, traditions. We map where your values are already alive and where they're getting lost.",
   },
   {
     step: "03",
     name: "Live",
-    desc: "We design practical rhythms, rituals, and conversations tailored to your family's ages, stage, and temperament. These aren't abstract principles — they're specific practices that fit your actual life.",
+    desc: "We design practical rhythms, rituals, and conversations tailored to your family's ages, stage, and temperament. Specific practices that fit your actual life, not abstract principles.",
   },
   {
     step: "04",
     name: "Declare",
-    desc: "Your family walks away with a values charter — a clear, beautiful articulation of who you are and what you're building together. Something your children can grow into, not just grow up around.",
+    desc: "Your family walks away with a values charter: a clear, beautiful articulation of who you are and what you're building together. Something your children can grow into, not just grow up around.",
   },
 ];
 
 const outcomes = [
   "A shared language your whole family uses for what matters most",
   "Practical rituals and rhythms that form character through daily life",
-  "A family values charter — your household's operating document",
+  "A family values charter, your household's operating document",
   "Age-appropriate ways to include every child in the conversation",
   "Conflict resolution grounded in shared commitments, not power struggles",
   "A living framework that grows with your family over time",
@@ -110,14 +110,14 @@ const Families = () => {
                   about least.
                 </p>
                 <p>
-                  The problem isn't that you don't care. The problem is that family culture
-                  happens whether you design it or not. Without intentional architecture,
-                  your household defaults to whatever patterns are easiest — and those
-                  patterns rarely form the character you're hoping for.
+                  You care deeply. But family culture happens whether you design it or not.
+                  Without intentional architecture, your household defaults to whatever
+                  patterns are easiest, and those patterns rarely form the character
+                  you're hoping for.
                 </p>
                 <p className="text-muted-foreground">
                   Words Incarnate gives your family the structure to move from aspiration
-                  to formation — using the HOLD method to build a household culture your
+                  to formation, using the HOLD method to build a household culture your
                   children will carry with them.
                 </p>
               </div>
@@ -164,7 +164,7 @@ const Families = () => {
             <motion.div {...fadeUp} className="mx-auto max-w-3xl">
               <p className="label-technical mb-3">What Your Family Gets</p>
               <h2 className="text-3xl font-semibold text-foreground mb-10">
-                More than a conversation — a way of life.
+                What your family walks away with.
               </h2>
               <div className="space-y-4">
                 {outcomes.map((outcome, i) => (
@@ -180,29 +180,6 @@ const Families = () => {
                     <p className="text-foreground">{outcome}</p>
                   </motion.div>
                 ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ─── INVESTMENT ─── */}
-        <section className="bg-card py-20">
-          <div className="container mx-auto px-4">
-            <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-              <p className="label-technical mb-3">Investment</p>
-              <h2 className="text-3xl font-semibold text-foreground">
-                Tailored to your family.
-              </h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                Family formation workshops start at $450. Every engagement is
-                scoped to your family's size, ages, and goals. We'll design the
-                right experience together on a discovery call.
-              </p>
-              <div className="mt-8">
-                <Button onClick={() => openCalendlyPopup()} className="group">
-                  Book a Discovery Call
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
               </div>
             </motion.div>
           </div>

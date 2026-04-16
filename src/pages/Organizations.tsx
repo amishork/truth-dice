@@ -19,12 +19,12 @@ const phases = [
   {
     step: "01",
     name: "Honor",
-    desc: "A structured diagnostic with leadership to surface the organization's actual operating values — not the ones on the website, but the ones visible in hiring decisions, resource allocation, and how conflict is handled.",
+    desc: "A structured diagnostic with leadership to surface the organization's actual operating values. Not the ones on the website, but the ones visible in hiring decisions, resource allocation, and how conflict is handled.",
   },
   {
     step: "02",
     name: "Observe",
-    desc: "Team assessments, stakeholder interviews, and culture mapping to identify where your stated mission aligns with daily operations — and where the gaps are creating drag, turnover, or misalignment.",
+    desc: "Team assessments, stakeholder interviews, and culture mapping to identify where your stated mission aligns with daily operations and where the gaps are creating drag, turnover, or misalignment.",
   },
   {
     step: "03",
@@ -34,7 +34,7 @@ const phases = [
   {
     step: "04",
     name: "Declare",
-    desc: "Operationalized culture documents, leadership alignment artifacts, and accountability structures that make values visible and measurable across the organization.",
+    desc: "Operationalized culture documents, leadership alignment artifacts, and accountability structures that make values visible and measurable across the organization. Operational tools, not wall art.",
   },
 ];
 
@@ -105,7 +105,7 @@ const Organizations = () => {
                   Your organization has a mission statement. It probably appears on your
                   website, in your annual report, and on the wall in the lobby. But ask
                   five employees what it means for how they make decisions on Tuesday
-                  afternoon, and you'll get five different answers — or silence.
+                  afternoon, and you'll get five different answers. Or silence.
                 </p>
                 <p>
                   The gap between stated values and organizational behavior is the single
@@ -183,29 +183,6 @@ const Organizations = () => {
           </div>
         </section>
 
-        {/* ─── INVESTMENT ─── */}
-        <section className="bg-card py-20">
-          <div className="container mx-auto px-4">
-            <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center">
-              <p className="label-technical mb-3">Investment</p>
-              <h2 className="text-3xl font-semibold text-foreground">
-                Scoped to your organization.
-              </h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                Single workshops start at $3,500. Full-year consulting partnerships
-                start at $5,000 per month. Every engagement is custom-scoped to your
-                organization's size, complexity, and goals.
-              </p>
-              <div className="mt-8">
-                <Button onClick={() => navigate("/contact")} className="group">
-                  Request a Proposal
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
         {/* ─── TESTIMONIALS ─── */}
         <ContextualTestimonials
           audience="organization"
@@ -223,7 +200,7 @@ const Organizations = () => {
         >
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-semibold text-primary-foreground sm:text-3xl">
-              Ready to align your culture with your mission?
+              Your mission deserves operational infrastructure.
             </h2>
             <p className="mt-3 text-primary-foreground/80">
               Tell us about your organization and we'll scope a custom engagement.

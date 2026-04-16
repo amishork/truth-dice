@@ -32,23 +32,23 @@ const phases: PhaseData[] = [
     name: "Honor",
     tagline: "Name what you actually value.",
     philosophy:
-      "Honoring begins with honesty. Most people — and most institutions — have never done the slow, uncomfortable work of naming what they truly hold sacred. Not the aspirational list. Not the polished version for the brochure. The real commitments — the ones that shape your decisions when no one is watching, when resources are scarce, when the easy path diverges from the right one. Honor means looking at your life, your family, your organization, and saying: this is what we actually orient around. And being willing to discover that it might not be what you expected.",
+      "Honoring begins with honesty. Most people and most institutions have never done the slow, uncomfortable work of naming what they truly hold sacred. Not the aspirational list. Not the polished version for the brochure. The real commitments, the ones that shape your decisions when no one is watching, when resources are scarce, when the easy path diverges from the right one. Honor means looking at your life, your family, your organization, and saying: this is what we actually orient around. And being willing to discover that it might not be what you expected.",
     question: "What would someone learn about your values by watching your life for a week — without hearing a word you say?",
     examples: [
       {
         icon: Users,
         segment: "For Families",
-        text: "A couple sits down after the kids are in bed. They don't start with a values exercise — they start with a question: 'What did we fight about this month?' The patterns in conflict reveal what each person is actually protecting. That's where values live — not in the aspirational, but in the defended.",
+        text: "A couple sits down after the kids are in bed. They don't start with a values exercise. They start with a question: 'What did we fight about this month?' The patterns in conflict reveal what each person is actually protecting. Values live in what we defend, not in what we aspire to.",
       },
       {
         icon: GraduationCap,
         segment: "For Schools",
-        text: "The principal doesn't begin with the charism document. She begins by asking: 'When a student is struggling, what does every teacher here do instinctively?' The answer reveals what the school actually values — whether it's compliance, compassion, performance, or formation. The charism matters only if it matches.",
+        text: "The principal doesn't begin with the charism document. She begins by asking: 'When a student is struggling, what does every teacher here do instinctively?' The answer reveals what the school actually values: compliance, compassion, performance, or formation. The charism matters only if it matches.",
       },
       {
         icon: Building,
         segment: "For Organizations",
-        text: "The executive team reviews the last ten hires. Not the job descriptions — the actual people they chose and why. The pattern in hiring decisions reveals organizational values more honestly than any strategic plan. If every hire optimizes for output, 'people-first culture' is aspirational, not actual.",
+        text: "The executive team reviews the last ten hires. Not the job descriptions, but the actual people they chose and why. The pattern in hiring decisions reveals organizational values more honestly than any strategic plan. If every hire optimizes for output, 'people-first culture' is aspirational, not actual.",
       },
     ],
     reflection: {
@@ -59,25 +59,25 @@ const phases: PhaseData[] = [
   {
     letter: "O",
     name: "Observe",
-    tagline: "See where values are already alive — and where they aren't.",
+    tagline: "See where values are alive and where they aren't.",
     philosophy:
-      "Observation is the diagnostic discipline. It requires setting aside what you think is happening and looking at what is actually happening — in the rhythms of your household, in the hallways of your school, in the meeting rooms of your organization. Values show up in time allocation, in attention, in what gets celebrated and what gets punished. They show up in the stories people tell about their best days and their worst ones. Observe doesn't judge. It maps. It builds a truthful picture of the gap between stated values and lived reality, so you can close it with precision instead of wishful thinking.",
+      "Observation is the diagnostic discipline. It requires setting aside what you think is happening and looking at what is actually happening: in the rhythms of your household, in the hallways of your school, in the meeting rooms of your organization. Values show up in time allocation, in attention, in what gets celebrated and what gets punished. They show up in the stories people tell about their best days and their worst ones. Observe doesn't judge. It maps. It builds a truthful picture of the gap between stated values and lived reality, so you can close it with precision instead of wishful thinking.",
     question: "Where is the value you named in Honor already alive in your daily life? Where is it conspicuously absent?",
     examples: [
       {
         icon: Users,
         segment: "For Families",
-        text: "The family decides 'presence' is their core value. So they audit a typical week: How many meals are eaten together without screens? How many bedtimes include conversation instead of just routine? Where is presence already thriving — and where has efficiency quietly displaced it?",
+        text: "The family decides 'presence' is their core value. So they audit a typical week: How many meals are eaten together without screens? How many bedtimes include conversation instead of just routine? Where is presence already thriving, and where has efficiency quietly displaced it?",
       },
       {
         icon: GraduationCap,
         segment: "For Schools",
-        text: "Faculty take the values assessment individually, then compare results as a department. The gaps aren't failures — they're diagnostic. Where the English department and the Athletics department diverge on priorities tells you exactly where formation is working and where it's disconnected.",
+        text: "Faculty take the values assessment individually, then compare results as a department. The gaps are diagnostic, not failures. Where the English department and the Athletics department diverge on priorities tells you exactly where formation is working and where it's disconnected.",
       },
       {
         icon: Building,
         segment: "For Organizations",
-        text: "A nonprofit maps its decision-making over 90 days. They track: when a tough call came up, what actually drove the decision? Budget? Optics? Mission? The pattern reveals the real operating values — and it's often not what leadership assumes.",
+        text: "A nonprofit maps its decision-making over 90 days. They track: when a tough call came up, what actually drove the decision? Budget? Optics? Mission? The pattern reveals the real operating values, and it's often not what leadership assumes.",
       },
     ],
     reflection: {
@@ -90,18 +90,18 @@ const phases: PhaseData[] = [
     name: "Live",
     tagline: "Build the architecture that makes values real.",
     philosophy:
-      "Living your values is not a feeling — it's infrastructure. It's the systems, rituals, habits, and environments you build so that the right thing becomes the default thing. A family that values togetherness needs a weekly rhythm that protects it — not just good intentions. A school that values formation needs it embedded in discipline procedures, not just the mission statement. An organization that values integrity needs it in the hiring rubric, not just the employee handbook. Live is the design phase: taking what you've honored and observed and engineering the daily conditions that make it sustainable.",
+      "Living your values is infrastructure, not a feeling. Systems, rituals, habits, and environments you build so that the right thing becomes the default thing. A family that values togetherness needs a weekly rhythm that protects it, not just good intentions. A school that values formation needs it embedded in discipline procedures, not just the mission statement. An organization that values integrity needs it in the hiring rubric, not just the employee handbook. Live is the design phase: taking what you've honored and observed and engineering the daily conditions that make it sustainable.",
     question: "What one practice, ritual, or system could you implement this week that would make your core value the default instead of the exception?",
     examples: [
       {
         icon: Users,
         segment: "For Families",
-        text: "The family installs 'presence' into their weekly rhythm: Sunday dinner is device-free — no exceptions, no negotiations. Wednesday bedtime includes a 'rose and thorn' conversation with each child. These aren't ideas. They're structures. They work because they're scheduled, not spontaneous.",
+        text: "The family installs 'presence' into their weekly rhythm: Sunday dinner is device-free, no exceptions, no negotiations. Wednesday bedtime includes a 'rose and thorn' conversation with each child. These are structures, not ideas. They work because they're scheduled, not spontaneous.",
       },
       {
         icon: GraduationCap,
         segment: "For Schools",
-        text: "The school redesigns its advisory period. Instead of administrative announcements, advisory becomes a weekly 15-minute formation experience — structured around one value, one question, one conversation. The curriculum doesn't change. The culture container changes.",
+        text: "The school redesigns its advisory period. Instead of administrative announcements, advisory becomes a weekly 15-minute formation experience structured around one value, one question, one conversation. The curriculum doesn't change. The culture container changes.",
       },
       {
         icon: Building,
@@ -119,23 +119,23 @@ const phases: PhaseData[] = [
     name: "Declare",
     tagline: "Make your values visible and accountable.",
     philosophy:
-      "Declaration is the act of making private conviction public. It's putting language around what you stand for and sharing it — with your children, your faculty, your team, your community. Declaration creates accountability. It invites others into the commitment. And it produces artifacts — family charters, school values architecture, organizational culture documents — that outlast any single conversation or workshop. Declaring isn't performative. It's operational. It gives people words to use, standards to hold, and a shared story to inhabit. Without declaration, values remain private preferences. With it, they become shared culture.",
+      "Declaration is the act of making private conviction public. Putting language around what you stand for and sharing it with your children, your faculty, your team, your community. Declaration creates accountability. It invites others into the commitment. And it produces artifacts: family charters, school values architecture, organizational culture documents that outlast any single conversation or workshop. Declaring is operational. It gives people words to use, standards to hold, and a shared story to inhabit. Without declaration, values remain private preferences. With it, they become shared culture.",
     question: "If your family, school, or organization had a one-page document that declared who you are and what you stand for — what would be on it?",
     examples: [
       {
         icon: Users,
         segment: "For Families",
-        text: "The family creates a values charter — a single page, framed in the kitchen. Six values, each with one sentence explaining what it means for their family specifically. The kids helped write it. When conflict arises, someone points to the wall. It's not a lecture — it's a shared language.",
+        text: "The family creates a values charter: a single page, framed in the kitchen. Six values, each with one sentence explaining what it means for their family specifically. The kids helped write it. When conflict arises, someone points to the wall. A shared language, not a lecture.",
       },
       {
         icon: GraduationCap,
         segment: "For Schools",
-        text: "The school publishes its 'values architecture' — a visible, shareable framework that connects the founding charism to daily practices. It appears in the hallways, on the website, in faculty onboarding, and in the student handbook. It becomes the grammar of the school's culture.",
+        text: "The school publishes its 'values architecture,' a visible, shareable framework that connects the founding charism to daily practices. It appears in the hallways, on the website, in faculty onboarding, and in the student handbook. It becomes the grammar of the school's culture.",
       },
       {
         icon: Building,
         segment: "For Organizations",
-        text: "The nonprofit's culture document isn't a poster in the break room. It's a living operational tool: referenced in performance reviews, embedded in onboarding, and updated annually. When someone asks 'why did we make that decision?' — the answer points back to a declared commitment.",
+        text: "The nonprofit's culture document is a living operational tool, not a poster in the break room. Referenced in performance reviews, embedded in onboarding, and updated annually. When someone asks 'why did we make that decision?' the answer points back to a declared commitment.",
       },
     ],
     reflection: {
@@ -224,7 +224,7 @@ const HoldGuide = () => {
               </h1>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 A formation framework for families, schools, and organizations who want
-                their values to shape their culture — not just decorate it.
+                their values to shape their culture, not just decorate it.
               </p>
               <motion.div
                 className="mt-12 flex justify-center"
@@ -243,13 +243,13 @@ const HoldGuide = () => {
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-2xl">
               <p className="text-lg text-foreground leading-relaxed font-serif">
-                Everyone has values. Families, schools, organizations — they all claim to
-                stand for something. The question is whether those values are forming the
+                Everyone has values. Families, schools, organizations: they all claim to
+                stand for something. What matters is whether those values are forming the
                 people inside them, or just sitting on a wall somewhere.
               </p>
               <p className="mt-6 text-lg text-foreground leading-relaxed font-serif">
                 The HOLD method exists because values don't transmit themselves. They require
-                architecture — a structured process of naming, diagnosing, building, and
+                architecture: a structured process of naming, diagnosing, building, and
                 declaring. What follows is that process, in depth.
               </p>
             </motion.div>
@@ -348,7 +348,7 @@ const HoldGuide = () => {
           <div className="container mx-auto px-4">
             <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-semibold text-foreground font-serif">
-                The method works. The question is where to start.
+                The method works. Start wherever you are.
               </h2>
               <p className="mt-6 text-muted-foreground leading-relaxed">
                 The HOLD framework is the same whether you're a family of four, a school of

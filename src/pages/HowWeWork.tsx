@@ -22,16 +22,16 @@ const holdPhases = [
     name: "Honor",
     subtitle: "Name what you actually value.",
     description:
-      "Most people — and most institutions — have never done the hard work of articulating what they truly hold sacred. Not aspirational values on a wall. Not the polished version for the website. The real ones — the commitments that shape decisions when no one is watching. Honor begins with honest excavation: what do you actually orient your life around?",
+      "Honoring begins with honesty. Most people and most institutions have never done the slow, uncomfortable work of naming what they truly hold sacred. Not the aspirational list. Not the polished version for the website. The real commitments, the ones that shape your decisions when no one is watching, when resources are scarce, when the easy path diverges from the right one. Honor means looking at your life, your family, your organization, and saying: this is what we actually orient around. And being willing to discover that it might not be what you expected.",
     practice:
-      "Through guided conversation and structured reflection, we surface the values that are already alive in your life, your family, or your institution — and distinguish them from the ones you only claim.",
+      "Through guided conversation and structured reflection, we surface the values that are already alive in your life, your family, or your institution, and distinguish them from the ones you only claim.",
   },
   {
     letter: "O",
     name: "Observe",
-    subtitle: "See where values are already alive — and where they aren't.",
+    subtitle: "See where values are alive and where they aren't.",
     description:
-      "Values aren't abstract. They show up — or fail to show up — in the texture of daily life. How you spend your evenings. How your school handles discipline. How your organization makes hiring decisions. Observe is the diagnostic phase: mapping the gap between stated values and lived reality.",
+      "Values show up in the texture of daily life, or they fail to. How you spend your evenings. How your school handles discipline. How your organization makes hiring decisions. Observe is the diagnostic phase: mapping the gap between stated values and lived reality.",
     practice:
       "We use structured assessments, interviews, and observation to build a clear picture of where formation is working and where it's breaking down. No assumptions. No shortcuts.",
   },
@@ -40,7 +40,7 @@ const holdPhases = [
     name: "Live",
     subtitle: "Build the architecture that makes values real.",
     description:
-      "Knowing your values is not the same as living them. Live is the design phase — creating systems, rhythms, practices, and environments that make your values the default, not the exception. This is where formation happens: not through lectures or posters, but through redesigned experiences.",
+      "Knowing your values is not the same as living them. Live is the design phase: creating systems, rhythms, practices, and environments that make your values the default, not the exception. Formation happens through redesigned experiences, not through lectures or posters.",
     practice:
       "Custom formation plans built around your actual context. For families: rituals, conversations, and household rhythms. For schools: curriculum integration, faculty formation, student programming. For organizations: decision frameworks, culture systems, and leadership practices.",
   },
@@ -49,9 +49,9 @@ const holdPhases = [
     name: "Declare",
     subtitle: "Make your values visible and accountable.",
     description:
-      "Values that aren't declared can't be shared, transmitted, or held accountable. Declare is the integration phase — articulating your values in language that others can understand, remember, and hold you to. This is where private conviction becomes public commitment.",
+      "Values that stay private can't be shared, transmitted, or held accountable. Declare is the integration phase: articulating your values in language that others can understand, remember, and hold you to. Private conviction becomes public commitment.",
     practice:
-      "Tangible artifacts: family charters, school values architecture, organizational culture documents. These aren't decorative — they're operational tools that keep formation on track over time.",
+      "Tangible artifacts: family charters, school values architecture, organizational culture documents. Operational tools that keep formation on track over time.",
   },
 ];
 
@@ -105,8 +105,8 @@ const HowWeWork = () => {
               </h1>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 Everyone has values. Few have a system for living them. The HOLD method is a
-                structured framework for translating what you believe into how you actually live —
-                in your family, your school, or your organization.
+                structured framework for translating what you believe into how you actually live,
+                whether in your family, your school, or your organization.
               </p>
             </motion.div>
           </div>
@@ -127,7 +127,7 @@ const HowWeWork = () => {
                   those values in the people they serve.
                 </p>
                 <p>
-                  The gap isn't intention — it's architecture. Values require infrastructure
+                  The gap is architectural, not intentional. Values require infrastructure
                   the same way a building requires a foundation. Without it, even the best
                   intentions remain aspirational. Words Incarnate builds that infrastructure.
                 </p>
@@ -142,10 +142,10 @@ const HowWeWork = () => {
             <motion.div {...fadeUp} className="mx-auto max-w-3xl text-center mb-16">
               <p className="label-technical mb-3">The HOLD Framework</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Four phases. One transformed culture.
+                Four phases of formation.
               </h2>
               <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                HOLD is not a workshop or a curriculum — it's a formation methodology.
+                HOLD is a formation methodology, not a workshop or a curriculum.
                 Each phase builds on the last, moving from discovery to integration.
               </p>
             </motion.div>
@@ -195,14 +195,14 @@ const HowWeWork = () => {
             <motion.div {...fadeUp} className="mx-auto max-w-3xl">
               <p className="label-technical mb-3">The Difference</p>
               <h2 className="text-3xl font-semibold text-foreground">
-                Formation, not information.
+                Formation goes deeper than information.
               </h2>
               <div className="mt-8 space-y-4 text-foreground leading-relaxed">
                 <p>
-                  Most values work stops at identification — you take an assessment, get a report,
-                  and go home. Words Incarnate starts where others stop. The assessment is the
-                  beginning, not the deliverable. The real work is building the lived environment
-                  where values become habits, habits become character, and character becomes culture.
+                  Most values work stops at identification: you take an assessment, get a report,
+                  and go home. The assessment is the beginning of our work, not the deliverable.
+                  The real work is building the lived environment where values become habits,
+                  habits become character, and character becomes culture.
                 </p>
                 <p>
                   Every engagement is facilitated personally by Alex Mishork — a consultant with
