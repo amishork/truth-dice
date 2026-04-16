@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 
 const CALENDLY_URL = "https://calendly.com/wordsincarnate";
 const CALENDLY_CSS = "https://assets.calendly.com/assets/external/widget.css";
@@ -9,14 +9,12 @@ let loadPromise: Promise<void> | null = null;
 function ensureCalendlyLoaded(): Promise<void> {
   if (loadPromise) return loadPromise;
   loadPromise = new Promise((resolve) => {
-    // CSS
     if (!document.querySelector(`link[href="${CALENDLY_CSS}"]`)) {
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = CALENDLY_CSS;
       document.head.appendChild(link);
     }
-    // JS
     const existing = document.querySelector(`script[src="${CALENDLY_JS}"]`);
     if (existing) {
       resolve();
@@ -34,15 +32,12 @@ function ensureCalendlyLoaded(): Promise<void> {
 // ─── Inline Embed ───
 
 interface CalendlyInlineProps {
-  /** Specific event type path, e.g. "/30min" */
   eventType?: string;
   className?: string;
   height?: string;
-  /** Hex colors without # for Calendly theming */
   backgroundColor?: string;
   textColor?: string;
   primaryColor?: string;
-  /** Hide the left-side event details panel */
   hideEventTypeDetails?: boolean;
 }
 
@@ -56,40 +51,26 @@ export const CalendlyInline = ({
   hideEventTypeDetails = false,
 }: CalendlyInlineProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const initializedRef = useRef(false);
 
-  const buildUrl = useCallback(() => {
+  useEffect(() => {
     const params = new URLSearchParams();
     if (backgroundColor) params.set("background_color", backgroundColor);
     if (textColor) params.set("text_color", textColor);
     if (primaryColor) params.set("primary_color", primaryColor);
     if (hideEventTypeDetails) params.set("hide_event_type_details", "1");
     params.set("hide_gdpr_banner", "1");
-    const paramString = params.toString();
-    return `${CALENDLY_URL}${eventType}${paramString ? "?" + paramString : ""}`;
-  }, [eventType, backgroundColor, textColor, primaryColor, hideEventTypeDetails]);
-
-  useEffect(() => {
-    initializedRef.current = false;
+    const url = `${CALENDLY_URL}${eventType}?${params.toString()}`;
 
     ensureCalendlyLoaded().then(() => {
-      if (!containerRef.current || initializedRef.current) return;
-      if (!(window as any).Calendly) return;
+      const el = containerRef.current;
+      if (!el) return;
+      const C = (window as any).Calendly;
+      if (!C) return;
 
-      // Clear previous content
-      containerRef.current.innerHTML = "";
-      initializedRef.current = true;
-
-      (window as any).Calendly.initInlineWidget({
-        url: buildUrl(),
-        parentElement: containerRef.current,
-      });
+      el.innerHTML = "";
+      C.initInlineWidget({ url, parentElement: el });
     });
-
-    return () => {
-      initializedRef.current = false;
-    };
-  }, [buildUrl]);
+  }, [eventType, backgroundColor, textColor, primaryColor, hideEventTypeDetails]);
 
   return (
     <div
