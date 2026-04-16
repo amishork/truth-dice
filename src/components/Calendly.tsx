@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 const CALENDLY_URL = "https://calendly.com/wordsincarnate";
 const CALENDLY_CSS = "https://assets.calendly.com/assets/external/widget.css";
@@ -34,56 +34,68 @@ function ensureCalendlyLoaded(): Promise<void> {
 // ─── Inline Embed ───
 
 interface CalendlyInlineProps {
-  /** Optional specific event type path, e.g. "/30min" */
+  /** Specific event type path, e.g. "/30min" */
   eventType?: string;
   className?: string;
-  minHeight?: string;
+  height?: string;
   /** Hex colors without # for Calendly theming */
   backgroundColor?: string;
   textColor?: string;
   primaryColor?: string;
+  /** Hide the left-side event details panel */
+  hideEventTypeDetails?: boolean;
 }
 
 export const CalendlyInline = ({
-  eventType = "",
+  eventType = "/30min",
   className = "",
-  minHeight = "700px",
+  height = "700px",
   backgroundColor,
   textColor,
   primaryColor,
+  hideEventTypeDetails = false,
 }: CalendlyInlineProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
 
-  // Build the full Calendly URL with color params
-  const colorParams = new URLSearchParams();
-  if (backgroundColor) colorParams.set("background_color", backgroundColor);
-  if (textColor) colorParams.set("text_color", textColor);
-  if (primaryColor) colorParams.set("primary_color", primaryColor);
-  colorParams.set("hide_gdpr_banner", "1");
-  const paramString = colorParams.toString();
-  const url = `${CALENDLY_URL}${eventType}${paramString ? "?" + paramString : ""}`;
+  const buildUrl = useCallback(() => {
+    const params = new URLSearchParams();
+    if (backgroundColor) params.set("background_color", backgroundColor);
+    if (textColor) params.set("text_color", textColor);
+    if (primaryColor) params.set("primary_color", primaryColor);
+    if (hideEventTypeDetails) params.set("hide_event_type_details", "1");
+    params.set("hide_gdpr_banner", "1");
+    const paramString = params.toString();
+    return `${CALENDLY_URL}${eventType}${paramString ? "?" + paramString : ""}`;
+  }, [eventType, backgroundColor, textColor, primaryColor, hideEventTypeDetails]);
 
   useEffect(() => {
+    initializedRef.current = false;
+
     ensureCalendlyLoaded().then(() => {
-      // Programmatic init needed for SPA navigation (script already loaded)
-      if (containerRef.current && (window as any).Calendly) {
-        // Only init if Calendly hasn't auto-initialized this element already
-        if (!containerRef.current.querySelector("iframe")) {
-          (window as any).Calendly.initInlineWidget({
-            url,
-            parentElement: containerRef.current,
-          });
-        }
-      }
+      if (!containerRef.current || initializedRef.current) return;
+      if (!(window as any).Calendly) return;
+
+      // Clear previous content
+      containerRef.current.innerHTML = "";
+      initializedRef.current = true;
+
+      (window as any).Calendly.initInlineWidget({
+        url: buildUrl(),
+        parentElement: containerRef.current,
+      });
     });
-  }, [url]);
+
+    return () => {
+      initializedRef.current = false;
+    };
+  }, [buildUrl]);
 
   return (
     <div
       ref={containerRef}
-      className={`calendly-inline-widget ${className}`}
-      data-url={url}
-      style={{ minWidth: "320px", width: "100%", height: minHeight }}
+      className={className}
+      style={{ width: "100%", height, overflow: "hidden" }}
     />
   );
 };

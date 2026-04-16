@@ -1167,3 +1167,23 @@
     transform: translateY(100px);
   }
 }
+
+/* Calendly embed container — force iframe to fill */
+.calendly-container {
+  position: relative;
+}
+
+.calendly-container > div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.calendly-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+}
