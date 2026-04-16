@@ -97,18 +97,12 @@ const Contact = () => {
             </motion.div>
 
             <motion.div
-              className="mx-auto max-w-4xl relative"
+              className="mx-auto max-w-4xl"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              {/* Badge cover — sits on top of iframe corner */}
-              <div
-                className="absolute top-0 right-0 bg-background"
-                style={{ width: "100px", height: "100px", zIndex: 2147483647 }}
-                aria-hidden="true"
-              />
               <div className="calendly-embed-wrapper">
                 <CalendlyInline
                   eventType="/30min"

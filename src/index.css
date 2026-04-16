@@ -1188,3 +1188,17 @@
   height: 100% !important;
   border: none !important;
 }
+
+/* Cover the Calendly "Powered by" ribbon badge */
+.calendly-embed-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 110px;
+  height: 110px;
+  background: inherit;
+  background-color: hsl(var(--background));
+  z-index: 2147483647;
+  pointer-events: none;
+}
