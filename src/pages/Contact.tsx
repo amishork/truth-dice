@@ -93,6 +93,7 @@ const Contact = () => {
 
             <div className="mx-auto max-w-4xl">
               <Cal
+                key={resolvedTheme}
                 calLink="words-incarnate/discovery-call"
                 config={{
                   layout: "month_view",
