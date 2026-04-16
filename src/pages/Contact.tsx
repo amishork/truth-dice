@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
-import { useTheme } from "next-themes";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
 import MultiStepContactForm from "@/components/MultiStepContactForm";
-import { CalendlyInline } from "@/components/Calendly";
+import { openCalendlyPopup } from "@/components/Calendly";
+import { Clock, MessageCircle, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -13,16 +14,9 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-const CALENDLY_COLORS = {
-  light: { bg: "ffffff", text: "141414", primary: "9a132a" },
-  dark: { bg: "0f0f0f", text: "ededed", primary: "db2442" },
-} as const;
-
 const Contact = () => {
   const [searchParams] = useSearchParams();
   const interest = searchParams.get("interest") ?? undefined;
-  const { theme } = useTheme();
-  const colors = CALENDLY_COLORS[theme === "dark" ? "dark" : "light"];
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,32 +71,60 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* ─── CALENDLY SCHEDULING ─── */}
+        {/* ─── BOOKING SECTION ─── */}
         <motion.section
-          className="mt-24 border-t border-border bg-card"
+          className="mt-24 border-t border-border"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
-          <div className="container mx-auto px-4 pt-16 pb-4">
-            <div className="mx-auto max-w-2xl text-center mb-10">
-              <p className="label-technical mb-3">Or skip the form</p>
-              <h2 className="text-3xl font-semibold text-foreground font-serif">
-                Book a discovery call
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                30 minutes. No preparation needed. We'll listen to where you are and
-                tell you honestly whether we can help.
-              </p>
+          <div className="bg-card">
+            <div className="container mx-auto px-4 py-24">
+              <div className="mx-auto max-w-2xl text-center">
+                <p className="label-technical mb-4">Or skip the form</p>
+                <h2 className="text-3xl font-semibold text-foreground font-serif sm:text-4xl">
+                  Book a discovery call
+                </h2>
+                <p className="mt-5 text-muted-foreground leading-relaxed max-w-lg mx-auto">
+                  A 30-minute conversation to understand where you are, what you're
+                  building, and whether Words Incarnate is the right fit. No pitch,
+                  no pressure.
+                </p>
+
+                {/* Detail chips */}
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
+                  <div className="flex items-center gap-2.5 text-sm text-foreground">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/8 dark:bg-primary/15">
+                      <Clock className="h-4 w-4 text-primary" />
+                    </div>
+                    <span>30 minutes</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-sm text-foreground">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/8 dark:bg-primary/15">
+                      <MessageCircle className="h-4 w-4 text-primary" />
+                    </div>
+                    <span>Video or phone</span>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="mt-12">
+                  <Button
+                    size="lg"
+                    className="group text-base px-10 py-6"
+                    onClick={() => openCalendlyPopup()}
+                  >
+                    Choose a Time
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </div>
+
+                <p className="mt-6 text-xs text-muted-foreground/60">
+                  Opens scheduling overlay · Pick any available slot
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="mx-auto max-w-4xl px-4 pb-8">
-            <CalendlyInline
-              minHeight="750px"
-              backgroundColor={colors.bg}
-              textColor={colors.text}
-              primaryColor={colors.primary}
-            />
           </div>
         </motion.section>
       </main>
