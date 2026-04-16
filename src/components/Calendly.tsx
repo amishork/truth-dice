@@ -54,35 +54,36 @@ export const CalendlyInline = ({
 }: CalendlyInlineProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Build the full Calendly URL with color params
+  const colorParams = new URLSearchParams();
+  if (backgroundColor) colorParams.set("background_color", backgroundColor);
+  if (textColor) colorParams.set("text_color", textColor);
+  if (primaryColor) colorParams.set("primary_color", primaryColor);
+  colorParams.set("hide_gdpr_banner", "1");
+  const paramString = colorParams.toString();
+  const url = `${CALENDLY_URL}${eventType}${paramString ? "?" + paramString : ""}`;
+
   useEffect(() => {
     ensureCalendlyLoaded().then(() => {
+      // Programmatic init needed for SPA navigation (script already loaded)
       if (containerRef.current && (window as any).Calendly) {
-        // Clear any previous widget
-        containerRef.current.innerHTML = "";
-
-        const colorParams = new URLSearchParams();
-        if (backgroundColor) colorParams.set("background_color", backgroundColor);
-        if (textColor) colorParams.set("text_color", textColor);
-        if (primaryColor) colorParams.set("primary_color", primaryColor);
-        colorParams.set("hide_gdpr_banner", "1");
-
-        const paramString = colorParams.toString();
-        const separator = eventType.includes("?") ? "&" : "?";
-        const url = `${CALENDLY_URL}${eventType}${paramString ? separator + paramString : ""}`;
-
-        (window as any).Calendly.initInlineWidget({
-          url,
-          parentElement: containerRef.current,
-        });
+        // Only init if Calendly hasn't auto-initialized this element already
+        if (!containerRef.current.querySelector("iframe")) {
+          (window as any).Calendly.initInlineWidget({
+            url,
+            parentElement: containerRef.current,
+          });
+        }
       }
     });
-  }, [eventType, backgroundColor, textColor, primaryColor]);
+  }, [url]);
 
   return (
     <div
       ref={containerRef}
-      className={className}
-      style={{ minWidth: "320px", minHeight }}
+      className={`calendly-inline-widget ${className}`}
+      data-url={url}
+      style={{ minWidth: "320px", width: "100%", height: minHeight }}
     />
   );
 };
