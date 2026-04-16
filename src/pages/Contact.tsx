@@ -15,7 +15,7 @@ const fadeUp = {
 
 const CALENDLY_THEME = {
   light: { bg: "ffffff", text: "141414", primary: "9a132a" },
-  dark:  { bg: "171717", text: "ededed", primary: "db2442" },
+  dark:  { bg: "0f0f0f", text: "ededed", primary: "db2442" },
 } as const;
 
 const Contact = () => {
@@ -78,8 +78,8 @@ const Contact = () => {
         </div>
 
         {/* ─── INLINE BOOKING ─── */}
-        <section className="mt-24 border-t border-border bg-card">
-          <div className="container mx-auto px-4 py-16 pb-8">
+        <section className="mt-24 border-t border-border bg-background">
+          <div className="container mx-auto px-4 pt-16 pb-0">
             <motion.div
               className="mx-auto max-w-xl text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
@@ -97,19 +97,19 @@ const Contact = () => {
             </motion.div>
 
             <motion.div
-              className="mx-auto max-w-4xl"
+              className="mx-auto max-w-4xl relative"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <div className="calendly-container relative rounded-lg overflow-hidden">
-                {/* Cover the Calendly badge in top-right corner */}
-                <div
-                  className="absolute top-0 right-0 z-10 bg-card"
-                  style={{ width: "72px", height: "72px" }}
-                  aria-hidden="true"
-                />
+              {/* Badge cover — sits on top of iframe corner */}
+              <div
+                className="absolute top-0 right-0 bg-background"
+                style={{ width: "100px", height: "100px", zIndex: 2147483647 }}
+                aria-hidden="true"
+              />
+              <div className="calendly-embed-wrapper">
                 <CalendlyInline
                   eventType="/30min"
                   height="700px"
