@@ -15,7 +15,7 @@ const fadeUp = {
 
 const CALENDLY_THEME = {
   light: { bg: "ffffff", text: "141414", primary: "9a132a" },
-  dark:  { bg: "0f0f0f", text: "ededed", primary: "db2442" },
+  dark:  { bg: "171717", text: "ededed", primary: "db2442" },
 } as const;
 
 const Contact = () => {
@@ -103,7 +103,13 @@ const Contact = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <div className="calendly-container rounded-xl border border-border bg-background overflow-hidden">
+              <div className="calendly-container relative rounded-lg overflow-hidden">
+                {/* Cover the Calendly badge in top-right corner */}
+                <div
+                  className="absolute top-0 right-0 z-10 bg-card"
+                  style={{ width: "72px", height: "72px" }}
+                  aria-hidden="true"
+                />
                 <CalendlyInline
                   eventType="/30min"
                   height="700px"
