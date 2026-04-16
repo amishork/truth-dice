@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
+import { useTheme } from "next-themes";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
@@ -12,80 +13,98 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
+const CALENDLY_COLORS = {
+  light: { bg: "ffffff", text: "141414", primary: "9a132a" },
+  dark: { bg: "0f0f0f", text: "ededed", primary: "db2442" },
+} as const;
+
 const Contact = () => {
   const [searchParams] = useSearchParams();
   const interest = searchParams.get("interest") ?? undefined;
+  const { theme } = useTheme();
+  const colors = CALENDLY_COLORS[theme === "dark" ? "dark" : "light"];
+
   return (
     <div className="min-h-screen bg-background">
       <PageMeta title="Contact" description="Ready to make your values incarnate? Get in touch with Words Incarnate to explore formation experiences for your family, school, or organization." path="/contact" />
       <Navigation />
 
-      <main id="main" className="container mx-auto px-4 pt-24 pb-20">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid gap-12 lg:grid-cols-5">
-            {/* Left info panel */}
-            <motion.div {...fadeUp} className="lg:col-span-2">
-              <h1 className="text-4xl font-semibold text-foreground sm:text-5xl">
-                Let's talk
-              </h1>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Ready to make your values incarnate? Tell us about your needs and we'll craft a path forward together.
-              </p>
+      <main id="main" className="pt-24 pb-0">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-5xl">
+            <div className="grid gap-12 lg:grid-cols-5">
+              {/* Left info panel */}
+              <motion.div {...fadeUp} className="lg:col-span-2">
+                <h1 className="text-4xl font-semibold text-foreground sm:text-5xl">
+                  Let's talk
+                </h1>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  Ready to make your values incarnate? Tell us about your needs and we'll craft a path forward together.
+                </p>
 
-              <div className="mt-10 space-y-6">
-                <div>
-                  <p className="label-technical mb-2">Email</p>
-                  <a href="mailto:alex@wordsincarnate.com" className="text-foreground hover:text-primary transition-colors">
-                    alex@wordsincarnate.com
-                  </a>
+                <div className="mt-10 space-y-6">
+                  <div>
+                    <p className="label-technical mb-2">Email</p>
+                    <a href="mailto:alex@wordsincarnate.com" className="text-foreground hover:text-primary transition-colors">
+                      alex@wordsincarnate.com
+                    </a>
+                  </div>
+                  <div>
+                    <p className="label-technical mb-2">Response time</p>
+                    <p className="text-foreground">1–2 business days</p>
+                  </div>
+                  <div>
+                    <p className="label-technical mb-2">We serve</p>
+                    <ul className="space-y-1 text-muted-foreground text-sm">
+                      <li>Individuals & Families</li>
+                      <li>Schools & Educators</li>
+                      <li>Organizations & Leaders</li>
+                    </ul>
+                  </div>
                 </div>
-                <div>
-                  <p className="label-technical mb-2">Response time</p>
-                  <p className="text-foreground">1–2 business days</p>
-                </div>
-                <div>
-                  <p className="label-technical mb-2">We serve</p>
-                  <ul className="space-y-1 text-muted-foreground text-sm">
-                    <li>Individuals & Families</li>
-                    <li>Schools & Educators</li>
-                    <li>Organizations & Leaders</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            {/* Multi-step form */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="lg:col-span-3"
-            >
-              <MultiStepContactForm initialInterest={interest} />
-            </motion.div>
+              {/* Multi-step form */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="lg:col-span-3"
+              >
+                <MultiStepContactForm initialInterest={interest} />
+              </motion.div>
+            </div>
           </div>
+        </div>
 
-          {/* ─── CALENDLY SCHEDULING ─── */}
-          <motion.div
-            className="mt-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <div className="text-center mb-8">
-              <p className="label-technical mb-3">Or book directly</p>
-              <h2 className="text-2xl font-semibold text-foreground">
-                Schedule a discovery call
+        {/* ─── CALENDLY SCHEDULING ─── */}
+        <motion.section
+          className="mt-24 border-t border-border bg-card"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <div className="container mx-auto px-4 pt-16 pb-4">
+            <div className="mx-auto max-w-2xl text-center mb-10">
+              <p className="label-technical mb-3">Or skip the form</p>
+              <h2 className="text-3xl font-semibold text-foreground font-serif">
+                Book a discovery call
               </h2>
-              <p className="mt-2 text-muted-foreground">
-                Pick a time that works for you. No commitment — just a conversation.
+              <p className="mt-3 text-muted-foreground">
+                30 minutes. No preparation needed. We'll listen to where you are and
+                tell you honestly whether we can help.
               </p>
             </div>
-            <div className="sketch-card overflow-hidden">
-              <CalendlyInline minHeight="700px" />
-            </div>
-          </motion.div>
-        </div>
+          </div>
+          <div className="mx-auto max-w-4xl px-4 pb-8">
+            <CalendlyInline
+              minHeight="750px"
+              backgroundColor={colors.bg}
+              textColor={colors.text}
+              primaryColor={colors.primary}
+            />
+          </div>
+        </motion.section>
       </main>
 
       <Footer />

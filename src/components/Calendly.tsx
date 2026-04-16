@@ -38,25 +38,45 @@ interface CalendlyInlineProps {
   eventType?: string;
   className?: string;
   minHeight?: string;
+  /** Hex colors without # for Calendly theming */
+  backgroundColor?: string;
+  textColor?: string;
+  primaryColor?: string;
 }
 
 export const CalendlyInline = ({
   eventType = "",
   className = "",
   minHeight = "700px",
+  backgroundColor,
+  textColor,
+  primaryColor,
 }: CalendlyInlineProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     ensureCalendlyLoaded().then(() => {
       if (containerRef.current && (window as any).Calendly) {
+        // Clear any previous widget
+        containerRef.current.innerHTML = "";
+
+        const colorParams = new URLSearchParams();
+        if (backgroundColor) colorParams.set("background_color", backgroundColor);
+        if (textColor) colorParams.set("text_color", textColor);
+        if (primaryColor) colorParams.set("primary_color", primaryColor);
+        colorParams.set("hide_gdpr_banner", "1");
+
+        const paramString = colorParams.toString();
+        const separator = eventType.includes("?") ? "&" : "?";
+        const url = `${CALENDLY_URL}${eventType}${paramString ? separator + paramString : ""}`;
+
         (window as any).Calendly.initInlineWidget({
-          url: `${CALENDLY_URL}${eventType}`,
+          url,
           parentElement: containerRef.current,
         });
       }
     });
-  }, [eventType]);
+  }, [eventType, backgroundColor, textColor, primaryColor]);
 
   return (
     <div
