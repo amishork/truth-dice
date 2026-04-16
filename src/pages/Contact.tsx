@@ -5,7 +5,6 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import PageMeta from "@/components/PageMeta";
 import MultiStepContactForm from "@/components/MultiStepContactForm";
-import { CalendlyInline } from "@/components/Calendly";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -13,16 +12,22 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-const CALENDLY_THEME = {
-  light: { bg: "ffffff", text: "141414", primary: "9a132a" },
-  dark:  { bg: "0f0f0f", text: "ededed", primary: "db2442" },
-} as const;
+function buildCalendlyUrl(theme: string | undefined) {
+  const isDark = theme === "dark";
+  const params = new URLSearchParams({
+    hide_event_type_details: "1",
+    hide_gdpr_banner: "1",
+    background_color: isDark ? "0f0f0f" : "ffffff",
+    text_color: isDark ? "ededed" : "141414",
+    primary_color: isDark ? "db2442" : "9a132a",
+  });
+  return `https://calendly.com/wordsincarnate/30min?${params.toString()}`;
+}
 
 const Contact = () => {
   const [searchParams] = useSearchParams();
   const interest = searchParams.get("interest") ?? undefined;
   const { resolvedTheme } = useTheme();
-  const colors = CALENDLY_THEME[resolvedTheme === "dark" ? "dark" : "light"];
 
   return (
     <div className="min-h-screen bg-background">
@@ -79,7 +84,7 @@ const Contact = () => {
 
         {/* ─── INLINE BOOKING ─── */}
         <section className="mt-24 border-t border-border bg-background">
-          <div className="container mx-auto px-4 pt-16 pb-0">
+          <div className="container mx-auto px-4 pt-16">
             <motion.div
               className="mx-auto max-w-xl text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
@@ -96,24 +101,16 @@ const Contact = () => {
               </p>
             </motion.div>
 
-            <motion.div
-              className="mx-auto max-w-4xl"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <div className="calendly-embed-wrapper">
-                <CalendlyInline
-                  eventType="/30min"
-                  height="700px"
-                  hideEventTypeDetails
-                  backgroundColor={colors.bg}
-                  textColor={colors.text}
-                  primaryColor={colors.primary}
-                />
-              </div>
-            </motion.div>
+            <div className="mx-auto max-w-4xl calendly-frame-wrapper">
+              <iframe
+                src={buildCalendlyUrl(resolvedTheme)}
+                title="Schedule a discovery call"
+                width="100%"
+                height="700"
+                frameBorder="0"
+                scrolling="no"
+              />
+            </div>
           </div>
         </section>
       </main>
